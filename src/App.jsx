@@ -1294,7 +1294,7 @@ function Login({ onLogin }) {
             ]}
           />
           {loginMode === "account" ? (
-            <Form layout="vertical" onFinish={handleAccountLogin} initialValues={{ account: "1", password: "123456" }}>
+            <Form layout="vertical" onFinish={handleAccountLogin}>
               <Form.Item label="账号" name="account">
                 <Input size="large" autoComplete="username" placeholder="输入 1 / 2 / 3" />
               </Form.Item>
