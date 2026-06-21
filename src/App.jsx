@@ -1276,14 +1276,14 @@ function Login({ onLogin }) {
               <Text type="secondary">AI销售托管平台</Text>
             </div>
           </div>
-          <Form layout="vertical" onFinish={handleAccountLogin}>
+          <Form layout="vertical" initialValues={{ account: "1", password: "demo123456" }} onFinish={handleAccountLogin}>
             <Form.Item label="账号" name="account">
               <Input size="large" autoComplete="username" placeholder="输入 1 / 2 / 3" />
             </Form.Item>
             <Form.Item label="密码" name="password">
               <Input.Password size="large" autoComplete="current-password" />
             </Form.Item>
-            <Paragraph type="secondary">演示账号：1 平台管理员，2 企业员工，3 企业管理员。系统会按账号权限展示菜单和数据。</Paragraph>
+            <Paragraph type="secondary">默认演示账号：1 / demo123456。也可输入 2 企业员工或 3 企业管理员，系统会按账号权限展示菜单和数据。</Paragraph>
             <Button type="primary" size="large" block htmlType="submit">
               登录
             </Button>
