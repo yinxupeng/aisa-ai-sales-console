@@ -307,6 +307,10 @@ body {
   display: none;
 }
 
+.mobile-nav-drawer .ant-drawer-body {
+  padding: 12px;
+}
+
 .app-content {
   padding: 24px 32px 40px;
   background: #f3f6fb;
@@ -2137,6 +2141,16 @@ body {
     display: none;
   }
 
+  .mobile-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    color: #1f2a44;
+    border: 1px solid #d9e2ef;
+    background: #fff;
+  }
+
   .app-header {
     height: auto;
     min-height: 96px;
@@ -2150,7 +2164,7 @@ body {
   }
 
   .page-heading h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .app-content {

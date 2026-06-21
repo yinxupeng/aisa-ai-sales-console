@@ -11,6 +11,7 @@ import {
   DatePicker,
   Descriptions,
   Divider,
+  Drawer,
   Form,
   Input,
   Layout,
@@ -2954,6 +2955,7 @@ function AppShell({ user, onLogout }) {
   const allowedPageTitle = Object.fromEntries(allowedMenuItems.map((item) => [item.key, item.label]));
   const [route, setRoute] = useState(allowedPageTitle[initialRoute] ? initialRoute : "dashboard");
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const userWecomAccounts = managedWecomAccounts.filter((item) => user.wecomKeys.includes(item.key));
   const [activeOrg, setActiveOrg] = useState("all");
   const [activeWecom, setActiveWecom] = useState(userWecomAccounts[0]?.key || managedWecomAccounts[0].key);
@@ -2977,6 +2979,11 @@ function AppShell({ user, onLogout }) {
   useEffect(() => {
     if (!allowedPageTitle[route]) setRoute("dashboard");
   }, [route, allowedPageTitle]);
+
+  const handleMenuSelect = (key) => {
+    setRoute(key);
+    setMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     if (!visibleWecomKeys.includes(activeWecom)) {
@@ -3021,7 +3028,7 @@ function AppShell({ user, onLogout }) {
             />
           </Tooltip>
         </div>
-        <Menu theme="dark" mode="inline" selectedKeys={[route]} items={allowedMenuItems} onClick={({ key }) => setRoute(key)} />
+        <Menu theme="dark" mode="inline" selectedKeys={[route]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
         {!collapsed ? <Card className="sider-status" size="small">
           <Space><Badge status="success" /><div><Text strong>企微通道正常</Text><br /><Text type="secondary">最近同步 14:20</Text></div></Space>
         </Card> : null}
@@ -3030,6 +3037,7 @@ function AppShell({ user, onLogout }) {
         <Header className="app-header">
           <Space className="header-title-wrap" align="center">
             <div className="page-heading">
+              <Button className="mobile-menu" type="text" icon={<MenuUnfoldOutlined />} onClick={() => setMobileMenuOpen(true)} />
               <Title level={2}>{allowedPageTitle[route] || pageTitle[route]}</Title>
               {route === "conversations" ? (
                 <>
@@ -3066,6 +3074,16 @@ function AppShell({ user, onLogout }) {
         </Header>
         <Content className="app-content">{content}</Content>
       </Layout>
+      <Drawer
+        title="AISA 导航"
+        placement="left"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        width={260}
+        className="mobile-nav-drawer"
+      >
+        <Menu mode="inline" selectedKeys={[route]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
+      </Drawer>
     </Layout>
   );
 }
