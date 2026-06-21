@@ -152,105 +152,6 @@ body {
   text-align: left;
 }
 
-.login-mode {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
-}
-
-.login-mode .ant-radio-button-wrapper {
-  display: inline-flex;
-  height: 42px;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding-inline: 12px;
-}
-
-.login-mode .ant-radio-button-wrapper span:last-child {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.wecom-login {
-  display: grid;
-  gap: 18px;
-  justify-items: center;
-  width: 100%;
-}
-
-.wecom-qr-card {
-  position: relative;
-  display: grid;
-  width: 210px;
-  aspect-ratio: 1;
-  place-items: center;
-  padding: 24px;
-  border: 1px solid #d9e2ef;
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(12, 149, 136, 0.1), transparent 42%),
-    #fff;
-  box-shadow: 0 14px 34px rgba(18, 32, 59, 0.1);
-}
-
-.qr-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  width: 138px;
-}
-
-.qr-grid i {
-  aspect-ratio: 1;
-  border-radius: 3px;
-  background: #eef4fb;
-}
-
-.qr-grid i.active {
-  background: #111827;
-}
-
-.qr-corner {
-  position: absolute;
-  width: 46px;
-  height: 46px;
-  border: 8px solid #111827;
-  border-radius: 7px;
-  background: #fff;
-  box-shadow: inset 0 0 0 8px #fff, inset 0 0 0 16px #111827;
-}
-
-.qr-corner.top-left {
-  top: 22px;
-  left: 22px;
-}
-
-.qr-corner.top-right {
-  top: 22px;
-  right: 22px;
-}
-
-.qr-corner.bottom-left {
-  bottom: 22px;
-  left: 22px;
-}
-
-.qr-center-icon {
-  position: absolute;
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 8px;
-  background: #f3faf7;
-  color: #0c9588;
-  font-size: 22px;
-  box-shadow: 0 0 0 6px #fff;
-}
-
 .brand-mark {
   display: grid;
   width: 48px;
@@ -510,6 +411,45 @@ body {
   border: 1px solid #edf1f7;
   border-radius: 8px;
   background: #fbfdff;
+}
+
+.channel-entry-card {
+  border-color: #dbe8ff;
+  background:
+    linear-gradient(135deg, rgba(36, 111, 229, 0.08), transparent 42%),
+    #fff;
+}
+
+.channel-entry-card .ant-card-body {
+  padding: 22px 28px;
+}
+
+.channel-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.channel-entry h4.ant-typography {
+  margin: 0;
+}
+
+.channel-entry .ant-typography-secondary {
+  margin: 10px 0 0;
+  max-width: 760px;
+}
+
+.channel-entry-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #e8f1ff;
+  color: #246fe5;
+  font-size: 18px;
 }
 
 .toolbar .ant-input-search {
@@ -1327,6 +1267,49 @@ body {
   padding-top: 2px;
 }
 
+.schedule-end-config {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #edf1f7;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.schedule-end-tip {
+  margin-top: -6px;
+  font-size: 12px;
+}
+
+.schedule-end-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.schedule-end-mode-item {
+  grid-column: 1;
+}
+
+.schedule-end-amount-item {
+  grid-column: 1;
+}
+
+.schedule-end-unit-item {
+  grid-column: 2;
+}
+
+.schedule-end-fixed-time-item {
+  grid-column: 1 / -1;
+}
+
+.schedule-end-row .ant-select,
+.schedule-end-row .ant-input,
+.schedule-end-row .ant-picker {
+  width: 100%;
+}
+
 .schedule-remove-button {
   height: 36px;
   padding-inline: 4px;
@@ -2121,37 +2104,6 @@ body {
   line-height: 1.75;
 }
 
-.humanization-preview-card {
-  height: 100%;
-}
-
-.humanization-chat-preview {
-  display: grid;
-  gap: 12px;
-}
-
-.preview-bubble {
-  max-width: 92%;
-  padding: 12px 14px;
-  border-radius: 8px;
-  color: #1f2a44;
-  line-height: 1.7;
-}
-
-.preview-bubble.customer {
-  justify-self: flex-start;
-  background: #e8f2ff;
-}
-
-.preview-bubble.ai {
-  justify-self: flex-end;
-  background: #f3faf7;
-}
-
-.preview-bubble.ai.secondary {
-  background: #fff7e8;
-}
-
 @media (max-width: 900px) {
   .skill-builder-grid {
     grid-template-columns: 1fr;
@@ -2179,14 +2131,6 @@ body {
 
   .flow-line {
     width: 60vw;
-  }
-
-  .login-mode .ant-radio-button-wrapper {
-    padding-inline: 8px;
-  }
-
-  .wecom-qr-card {
-    width: min(210px, 78vw);
   }
 
   .app-sider {

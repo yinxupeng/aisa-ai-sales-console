@@ -35,7 +35,6 @@ import {
   AudioOutlined,
   ArrowLeftOutlined,
   BarChartOutlined,
-  BookOutlined,
   CheckCircleOutlined,
   CloudSyncOutlined,
   CommentOutlined,
@@ -49,7 +48,6 @@ import {
   PaperClipOutlined,
   PictureOutlined,
   PlusOutlined,
-  QrcodeOutlined,
   SendOutlined,
   SmileOutlined,
   UploadOutlined,
@@ -178,9 +176,9 @@ const knowledge = [
 ];
 
 const salesAccounts = [
-  { key: "sale1", name: "李老师", role: "课程顾问", wecom: "li_sales", wecomId: "wm_8a92", channel: "句子通道已连接", hosted: true, sendMode: "人工确认", skills: ["获取学员信息", "生成课程顾问话术"], customerTotal: 32, hostedCustomers: 18, manualCustomers: 6, sentToday: 18, abnormal: 1, syncedAt: "14:20" },
-  { key: "sale2", name: "陈老师", role: "班主任", wecom: "chen_sales", wecomId: "wm_6c31", channel: "句子通道已连接", hosted: true, sendMode: "自动发送", skills: ["创建试听跟进", "更新学员标签"], customerTotal: 24, hostedCustomers: 26, manualCustomers: 2, sentToday: 26, abnormal: 0, syncedAt: "14:18" },
-  { key: "sale3", name: "周老师", role: "市场", wecom: "zhou_sales", wecomId: "wm_2f17", channel: "待绑定句子", hosted: false, sendMode: "人工确认", skills: ["生成课程顾问话术"], customerTotal: 16, hostedCustomers: 0, manualCustomers: 0, sentToday: 0, abnormal: 0, syncedAt: "未同步" }
+  { key: "sale1", name: "李老师", role: "课程顾问", phone: "13800008881", wecom: "li_sales", wecomId: "wm_8a92", channel: "句子通道已连接", hosted: true, sendMode: "人工确认", skills: ["获取学员信息", "生成课程顾问话术"], customerTotal: 32, hostedCustomers: 18, manualCustomers: 6, sentToday: 18, abnormal: 1, syncedAt: "14:20" },
+  { key: "sale2", name: "陈老师", role: "班主任", phone: "13800008882", wecom: "chen_sales", wecomId: "wm_6c31", channel: "句子通道已连接", hosted: true, sendMode: "自动发送", skills: ["创建试听跟进", "更新学员标签"], customerTotal: 24, hostedCustomers: 26, manualCustomers: 2, sentToday: 26, abnormal: 0, syncedAt: "14:18" },
+  { key: "sale3", name: "周老师", role: "市场", phone: "13800008883", wecom: "zhou_sales", wecomId: "wm_2f17", channel: "待绑定句子", hosted: false, sendMode: "人工确认", skills: ["生成课程顾问话术"], customerTotal: 16, hostedCustomers: 0, manualCustomers: 0, sentToday: 0, abnormal: 0, syncedAt: "未同步" }
 ];
 
 const managedWecomAccounts = [
@@ -1204,11 +1202,9 @@ const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
   { key: "strategy", icon: <BarChartOutlined />, label: "Skill 管理" },
-  { key: "customers", icon: <UserOutlined />, label: "客户中心" },
   { key: "sales", icon: <TeamOutlined />, label: "企微托管" },
   { key: "agent", icon: <RobotOutlined />, label: "角色配置" },
   { key: "humanization", icon: <SmileOutlined />, label: "拟人化设置" },
-  { key: "knowledge", icon: <BookOutlined />, label: "资源管理" },
   { key: "settings", icon: <SettingOutlined />, label: "系统配置" }
 ];
 
@@ -1255,8 +1251,6 @@ function WecomAvatar({ item, size = 44, unread = 0 }) {
 }
 
 function Login({ onLogin }) {
-  const [loginMode, setLoginMode] = useState("account");
-  const qrCells = [0, 1, 2, 4, 5, 7, 10, 11, 13, 16, 18, 19, 20, 22, 25, 27, 28, 31, 32, 34, 36, 37, 40, 43, 45, 46, 48];
   const handleAccountLogin = (values) => {
     onLogin(values.account || "1");
   };
@@ -1282,52 +1276,18 @@ function Login({ onLogin }) {
               <Text type="secondary">AI销售托管平台</Text>
             </div>
           </div>
-          <Radio.Group
-            className="login-mode"
-            value={loginMode}
-            onChange={(event) => setLoginMode(event.target.value)}
-            optionType="button"
-            buttonStyle="solid"
-            options={[
-              { value: "account", label: <><UserOutlined />账号密码</> },
-              { value: "wecom", label: <><WechatOutlined />企业微信扫码</> }
-            ]}
-          />
-          {loginMode === "account" ? (
-            <Form layout="vertical" onFinish={handleAccountLogin}>
-              <Form.Item label="账号" name="account">
-                <Input size="large" autoComplete="username" placeholder="输入 1 / 2 / 3" />
-              </Form.Item>
-              <Form.Item label="密码" name="password">
-                <Input.Password size="large" autoComplete="current-password" />
-              </Form.Item>
-              <Paragraph type="secondary">演示账号：1 平台管理员，2 企业员工，3 企业管理员。系统会按账号权限展示菜单和数据。</Paragraph>
-              <Button type="primary" size="large" block htmlType="submit">
-                登录
-              </Button>
-            </Form>
-          ) : (
-            <div className="wecom-login">
-              <div className="wecom-qr-card" aria-label="企业微信登录二维码">
-                <div className="qr-corner top-left" />
-                <div className="qr-corner top-right" />
-                <div className="qr-corner bottom-left" />
-                <div className="qr-grid" aria-hidden="true">
-                  {Array.from({ length: 49 }).map((_, index) => (
-                    <i key={index} className={qrCells.includes(index) ? "active" : ""} />
-                  ))}
-                </div>
-                <QrcodeOutlined className="qr-center-icon" />
-              </div>
-              <Space direction="vertical" size={8} align="center" className="full-width">
-                <Text strong>使用企业微信扫一扫登录</Text>
-                <Text type="secondary">扫码登录后按账号权限进入对应工作台。</Text>
-              </Space>
-              <Button type="primary" size="large" block icon={<WechatOutlined />} onClick={() => onLogin("2")}>
-                模拟扫码成功
-              </Button>
-            </div>
-          )}
+          <Form layout="vertical" onFinish={handleAccountLogin}>
+            <Form.Item label="账号" name="account">
+              <Input size="large" autoComplete="username" placeholder="输入 1 / 2 / 3" />
+            </Form.Item>
+            <Form.Item label="密码" name="password">
+              <Input.Password size="large" autoComplete="current-password" />
+            </Form.Item>
+            <Paragraph type="secondary">演示账号：1 平台管理员，2 企业员工，3 企业管理员。系统会按账号权限展示菜单和数据。</Paragraph>
+            <Button type="primary" size="large" block htmlType="submit">
+              登录
+            </Button>
+          </Form>
         </Space>
       </Card>
     </div>
@@ -1920,6 +1880,10 @@ function StrategyEditor({ skill, onBack }) {
               name: skill.name,
               triggerBase: "基于添加好友时间",
               scheduleRules: [{ operationTaskType: "加好友后发送欢迎语", audienceTags: ["新加好友"], triggerMode: "延后触发", timeMode: "相对时间", amount: 1, unit: "分钟" }],
+              endCondition: "按时间结束",
+              endTimeMode: "相对时间",
+              endAmount: 7,
+              endUnit: "天",
               model: "豆包 1.8 深度思考"
             }}
           >
@@ -1989,6 +1953,39 @@ function StrategyEditor({ skill, onBack }) {
                     </div>
                   )}
                 </Form.List>
+                <div className="schedule-end-config">
+                  <Text className="required-section-title">结束时间配置</Text>
+                  <Text type="secondary" className="schedule-end-tip">达到结束时间后不再触发该 Skill 的后续任务</Text>
+                  <Form.Item name="endCondition" className="schedule-base-item">
+                    <Radio.Group>
+                      <Radio value="按时间结束">按时间结束</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <div className="schedule-end-row">
+                    <Form.Item className="schedule-end-mode-item" name="endTimeMode">
+                      <Select options={["相对时间", "固定时间"].map((value) => ({ value }))} />
+                    </Form.Item>
+                    <Form.Item noStyle shouldUpdate={(prev, next) => prev.endTimeMode !== next.endTimeMode}>
+                      {({ getFieldValue }) => {
+                        const endTimeMode = getFieldValue("endTimeMode");
+                        return endTimeMode === "固定时间" ? (
+                          <Form.Item name="endFixedAt" className="schedule-end-fixed-time-item">
+                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择结束年月日时分秒" />
+                          </Form.Item>
+                        ) : (
+                          <>
+                            <Form.Item className="schedule-end-amount-item" name="endAmount">
+                              <Input />
+                            </Form.Item>
+                            <Form.Item className="schedule-end-unit-item" name="endUnit">
+                              <Select options={["分钟", "小时", "天"].map((value) => ({ value }))} />
+                            </Form.Item>
+                          </>
+                        );
+                      }}
+                    </Form.Item>
+                  </div>
+                </div>
               </div>
               <Form.Item label="模型" name="model"><Select options={["豆包 1.8 深度思考", "通义千问 Max", "DeepSeek V3"].map((value) => ({ value }))} /></Form.Item>
             </div>
@@ -2291,9 +2288,12 @@ function CustomersPage({ onViewConversation, visibleWecomKeys = managedWecomAcco
 function SalesPage() {
   const { message } = AntApp.useApp();
   const [configAccount, setConfigAccount] = useState(null);
+  const [channelConfigOpen, setChannelConfigOpen] = useState(false);
   const [salesRows, setSalesRows] = useState(salesAccounts);
   const [syncing, setSyncing] = useState(false);
+  const [salesForm] = Form.useForm();
   const latestSyncAt = salesRows.find((item) => item.syncedAt && item.syncedAt !== "未同步")?.syncedAt || "未同步";
+  const getDefaultAiPassword = (phone = "") => phone.replace(/\D/g, "").slice(-6);
   const columns = [
     { title: "员工", dataIndex: "name", width: 92 },
     { title: "角色", dataIndex: "role", width: 90, render: (v) => <Tag color={v === "课程顾问" ? "blue" : v === "班主任" ? "green" : "gold"}>{v}</Tag> },
@@ -2315,10 +2315,30 @@ function SalesPage() {
       )
     }
   ];
-  const hostedCount = salesRows.filter((item) => item.hosted).length;
-  const hostedCustomerCount = salesRows.reduce((total, item) => total + item.hostedCustomers, 0);
-  const sentCount = salesRows.reduce((total, item) => total + item.sentToday, 0);
-  const manualCustomerCount = salesRows.reduce((total, item) => total + item.manualCustomers, 0);
+  useEffect(() => {
+    if (!configAccount) return;
+    salesForm.setFieldsValue({
+      name: configAccount.name,
+      role: configAccount.role || "课程顾问",
+      phone: configAccount.phone,
+      wecom: configAccount.wecom,
+      wecomId: configAccount.wecomId,
+      hosted: configAccount.hosted,
+      aiAccount: configAccount.aiAccount || configAccount.phone,
+      aiPassword: configAccount.aiPassword || getDefaultAiPassword(configAccount.phone)
+    });
+  }, [configAccount, salesForm]);
+
+  const handleSaveAccount = () => {
+    salesForm.validateFields().then((values) => {
+      setSalesRows((items) =>
+        items.map((item) => (item.key === configAccount?.key ? { ...item, ...values } : item))
+      );
+      setConfigAccount(null);
+      message.success("已保存AI平台账号配置");
+    });
+  };
+
   const handleSync = () => {
     setSyncing(true);
     const now = new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -2338,21 +2358,25 @@ function SalesPage() {
   };
   return (
     <Space direction="vertical" size={16} className="page-stack">
-      <Row gutter={[16, 16]}>
-        {[
-          ["已托管企微", hostedCount, "员工企微交给AI生成建议"],
-          ["托管客户数", hostedCustomerCount, "已由AI持续托管跟进"],
-          ["今日已发送", sentCount, "自动发送与确认发送合计"],
-          ["需人工介入", manualCustomerCount, "待确认、接管或异常处理"]
-        ].map(([label, value, desc]) => (
-          <Col xs={24} md={12} xl={6} key={label}>
-            <Card>
-              <Statistic title={label} value={value} suffix={<Text type="secondary">{desc}</Text>} />
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      <Card title={<PanelTitle title="企微托管列表" desc="通过句子平台打通企微消息收发，为课程顾问、班主任、市场等角色配置AI托管。" extra={<Space size={12} wrap><Button className="sync-action" icon={<CloudSyncOutlined />} loading={syncing} onClick={handleSync}>刷新同步</Button><Button type="primary" icon={<PlusOutlined />} onClick={() => setConfigAccount({})}>配置企微账号</Button></Space>} />}>
+      <Card className="channel-entry-card" hoverable onClick={() => setChannelConfigOpen(true)}>
+        <div className="channel-entry">
+          <div>
+            <Space size={10} align="center">
+              <CloudSyncOutlined className="channel-entry-icon" />
+              <Title level={4}>关联句子通道</Title>
+              <Tag color="success">已打通</Tag>
+            </Space>
+            <Paragraph type="secondary">
+              配置 AI 平台与句子互动平台的企业级打通关系，用于同步句子互动平台上的企微账号、客户、托管状态和人工介入数据。
+            </Paragraph>
+          </div>
+          <Space size={8} wrap>
+            <Text type="secondary">最近同步 {latestSyncAt}</Text>
+            <Button type="primary">配置打通</Button>
+          </Space>
+        </div>
+      </Card>
+      <Card title={<PanelTitle title="企微托管列表" desc="通过句子平台打通企微消息收发，为课程顾问、班主任、市场等角色配置AI托管。" extra={<Button className="sync-action" icon={<CloudSyncOutlined />} loading={syncing} onClick={handleSync}>刷新同步</Button>} />}>
         <div className="sync-status">
           <Badge status={syncing ? "processing" : "success"} />
           <Text type="secondary">{syncing ? "正在从句子通道同步企微客户、托管和人工介入数据" : `最近同步 ${latestSyncAt}`}</Text>
@@ -2364,31 +2388,44 @@ function SalesPage() {
         </Space>
         <Table className="admin-table" rowKey="key" columns={columns} dataSource={salesRows} pagination={false} scroll={{ x: 980 }} />
       </Card>
-      <Modal title="企微托管配置" open={Boolean(configAccount)} onCancel={() => setConfigAccount(null)} onOk={() => setConfigAccount(null)} okText="保存配置" cancelText="取消" width={720}>
+      <Modal title="句子通道打通配置" open={channelConfigOpen} onCancel={() => setChannelConfigOpen(false)} onOk={() => { setChannelConfigOpen(false); message.success("已保存句子通道打通配置"); }} okText="保存配置" cancelText="取消" width={760}>
         <Form
           layout="vertical"
-          key={configAccount?.key || "sales-config"}
           initialValues={{
-            name: configAccount?.name,
-            role: configAccount?.role || "课程顾问",
-            wecom: configAccount?.wecom,
-            wecomId: configAccount?.wecomId,
-            hosted: configAccount?.hosted,
-            juzibotAccountId: configAccount?.wecom ? `jz_${configAccount.wecom}` : "",
-            juzibotApiKey: "jz_live_xxxxxx"
+            aiEndpoint: "https://ai.aisa.com/open/wecom/sync",
+            juziTenantId: "xinghe-edu",
+            syncScope: ["企微账号", "客户数据", "托管状态", "人工介入"],
+            callbackToken: "aisa_juzi_sync_token"
           }}
+        >
+          <Row gutter={16}>
+            <Col span={12}><Form.Item label="AI平台同步地址" name="aiEndpoint"><Input /></Form.Item></Col>
+            <Col span={12}><Form.Item label="句子互动企业ID" name="juziTenantId"><Input placeholder="请输入句子互动平台企业ID" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="句子互动 App Key" name="juziAppKey"><Input placeholder="请输入 App Key" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="句子互动 App Secret" name="juziAppSecret"><Input.Password placeholder="请输入 App Secret" /></Form.Item></Col>
+            <Col span={24}><Form.Item label="同步数据范围" name="syncScope"><Checkbox.Group options={["企微账号", "客户数据", "托管状态", "人工介入"]} /></Form.Item></Col>
+            <Col span={24}><Form.Item label="回调校验 Token" name="callbackToken"><Input.Password /></Form.Item></Col>
+          </Row>
+        </Form>
+      </Modal>
+      <Modal title="企微托管配置" open={Boolean(configAccount)} onCancel={() => setConfigAccount(null)} onOk={handleSaveAccount} okText="保存配置" cancelText="取消" width={720}>
+        <Form
+          form={salesForm}
+          layout="vertical"
+          key={configAccount?.key || "sales-config"}
         >
           <Row gutter={16}>
             <Col span={12}><Form.Item label="员工姓名" name="name"><Input placeholder="例如：李老师" /></Form.Item></Col>
             <Col span={12}><Form.Item label="角色" name="role"><Select options={["课程顾问", "班主任", "市场"].map((value) => ({ value }))} /></Form.Item></Col>
+            <Col span={12}><Form.Item label="手机号" name="phone"><Input placeholder="例如：13800008888" /></Form.Item></Col>
             <Col span={12}><Form.Item label="企微账号" name="wecom"><Input placeholder="例如：li_sales" /></Form.Item></Col>
             <Col span={12}><Form.Item label="企微ID" name="wecomId"><Input placeholder="例如：wm_8a92" /></Form.Item></Col>
             <Col span={12}><Form.Item label="AI托管状态" name="hosted" valuePropName="checked"><Switch checkedChildren="开启" unCheckedChildren="关闭" /></Form.Item></Col>
           </Row>
-          <Divider orientation="left">句子通道配置</Divider>
+          <Divider orientation="left">AI平台账号密码设置</Divider>
           <Row gutter={16}>
-            <Col span={24}><Form.Item label="句子账号ID" name="juzibotAccountId"><Input placeholder="例如：jz_li_sales" /></Form.Item></Col>
-            <Col span={24}><Form.Item label="API Key" name="juzibotApiKey"><Input.Password placeholder="请输入句子平台 API Key" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="AI平台账号" name="aiAccount"><Input placeholder="默认使用企微手机号" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="AI平台密码" name="aiPassword"><Input.Password placeholder="默认手机号后6位" /></Form.Item></Col>
           </Row>
         </Form>
       </Modal>
@@ -2802,11 +2839,6 @@ function SuggestionsPage() {
 }
 
 function HumanizationPage() {
-  const [testing, setTesting] = useState(false);
-  const [previewMessages, setPreviewMessages] = useState([
-    "了解，三年级阅读丢分一般要先看词汇、长句理解和做题习惯。可以先约一节诊断试听，老师会边上课边看孩子具体卡在哪里。",
-    "我先帮您看下这周可约时间，费用和课程包让顾问老师结合孩子情况再确认，避免给您说不准。"
-  ]);
   const humanizationPrompt = [
     "请把所有角色的回复改写成真实销售/老师本人在企微里自然沟通的语气，目标是降低AI味、减少模板感。",
     "",
@@ -2825,20 +2857,10 @@ function HumanizationPage() {
     { value: "全部", label: "全部角色" },
     ...agents.map((item) => ({ value: item.name, label: item.name }))
   ];
-  const handleTest = () => {
-    setTesting(true);
-    window.setTimeout(() => {
-      setPreviewMessages([
-        "明白，孩子三年级阅读总丢分，先别急着定课程，得先看是词汇、长句理解，还是做题习惯卡住了。",
-        "可以先安排一节诊断试听，老师会边上课边看孩子具体问题。时间和费用我先帮您对一下，再让顾问老师按孩子情况确认，避免说不准。"
-      ]);
-      setTesting(false);
-    }, 500);
-  };
   return (
     <Space direction="vertical" size={16} className="page-stack">
       <Row gutter={[16, 16]} align="stretch">
-        <Col xs={24} xl={15}>
+        <Col span={24}>
           <Card title={<PanelTitle title="全局拟人化策略" desc="用提示词统一描述所有适用角色的语气、回复节奏和去AI味要求。" extra={<Button type="primary">保存设置</Button>} />}>
             <Form
               layout="vertical"
@@ -2858,23 +2880,6 @@ function HumanizationPage() {
                 <Input.TextArea className="humanization-prompt-input" rows={16} placeholder="请输入拟人化要求，例如语气、节奏、禁用表达、敏感内容处理方式等" />
               </Form.Item>
             </Form>
-          </Card>
-        </Col>
-        <Col xs={24} xl={9}>
-          <Card className="humanization-preview-card" title={<PanelTitle title="测试效果预览" desc="测试当前提示词下输出内容是否自然、合理。" extra={<Button type="primary" loading={testing} onClick={handleTest}>测试效果</Button>} />}>
-            <Form layout="vertical" initialValues={{ testInput: "孩子三年级，英语基础一般，阅读总丢分。想先了解试听课怎么安排，费用大概多少？" }}>
-              <Form.Item label="测试用户输入" name="testInput">
-                <Input.TextArea rows={4} />
-              </Form.Item>
-            </Form>
-            <div className="humanization-chat-preview">
-              <div className="preview-bubble customer">孩子三年级，英语基础一般，阅读总丢分。想先了解试听课怎么安排？</div>
-              {previewMessages.map((item, index) => (
-                <div className={index === 0 ? "preview-bubble ai" : "preview-bubble ai secondary"} key={item}>
-                  {item}
-                </div>
-              ))}
-            </div>
           </Card>
         </Col>
       </Row>
