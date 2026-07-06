@@ -6,7 +6,8 @@
   "scripts": {
     "build": "esbuild src/main.jsx --bundle --format=iife --target=es2017 --minify --define:process.env.NODE_ENV='\"production\"' --outdir=assets --entry-names=main --loader:.js=jsx",
     "dev": "python3 -m http.server 8010",
-    "preview": "python3 -m http.server 8010"
+    "preview": "python3 -m http.server 8010",
+    "test": "node scripts/verify-skill-orchestration.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.5",

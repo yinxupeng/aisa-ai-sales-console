@@ -295,10 +295,6 @@ body {
   white-space: nowrap;
 }
 
-.company-select {
-  width: 260px;
-}
-
 .wecom-account-switch {
   width: 230px;
 }
@@ -1124,11 +1120,58 @@ body {
 
 .orchestration-form {
   display: grid;
-  gap: 18px;
+  gap: 12px;
 }
 
 .orchestration-form .ant-form-item {
   margin-bottom: 0;
+}
+
+.orchestration-section {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e3eaf4;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.orchestration-section-title {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.relative-time-row,
+.tag-condition-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.relative-time-value-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 8px;
+}
+
+.tag-condition-group {
+  display: grid;
+  gap: 8px;
+}
+
+.effective-time-notice {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #b8d4ff;
+  border-radius: 8px;
+  background: #eef5ff;
 }
 
 .schedule-config-block {
@@ -1177,9 +1220,16 @@ body {
   gap: 12px;
 }
 
+.schedule-empty-state {
+  padding: 14px 16px;
+  border: 1px dashed #c8d7ec;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
 .schedule-rule-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   align-items: end;
   width: 100%;
@@ -1264,7 +1314,6 @@ body {
 .schedule-rule-actions {
   display: flex;
   grid-column: 1 / -1;
-  grid-row: 5;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
@@ -1274,10 +1323,6 @@ body {
 .schedule-end-config {
   display: grid;
   gap: 10px;
-  padding: 10px;
-  border: 1px solid #edf1f7;
-  border-radius: 8px;
-  background: #fbfdff;
 }
 
 .schedule-end-tip {
@@ -1310,7 +1355,13 @@ body {
 
 .schedule-end-row .ant-select,
 .schedule-end-row .ant-input,
-.schedule-end-row .ant-picker {
+.schedule-end-row .ant-input-number,
+.schedule-end-row .ant-picker,
+.relative-time-row .ant-select,
+.relative-time-row .ant-input,
+.relative-time-row .ant-input-number,
+.tag-condition-row .ant-select,
+.schedule-fixed-time-item .ant-picker {
   width: 100%;
 }
 
@@ -1858,6 +1909,11 @@ body {
   line-height: 1.45;
 }
 
+.plan-skill-source {
+  border: 1px dashed #c8d7ec;
+  background: #f8fbff;
+}
+
 .customer-side-panel {
   overflow-y: auto;
   border-left: 1px solid #edf1f7;
@@ -2196,10 +2252,6 @@ body {
   .ant-card .ant-card-head,
   .ant-card .ant-card-head-wrapper {
     min-height: auto;
-  }
-
-  .company-select {
-    width: 180px;
   }
 
   .panel-title {

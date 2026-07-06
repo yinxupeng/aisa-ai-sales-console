@@ -14,6 +14,7 @@ import {
   Drawer,
   Form,
   Input,
+  InputNumber,
   Layout,
   List,
   Menu,
@@ -1728,17 +1729,33 @@ function SkillLogicRichEditor({ defaultValue }) {
 
 function StrategyEditor({ skill, onBack }) {
   const lifecycleOptions = lifecycleStages.map((item) => ({ value: item.title, label: item.title }));
-  const audienceTagOptions = [
-    "新加好友",
+  const userTagOptions = [
+    "已付费",
+    "高意向",
+    "720期次",
     "已预约体验课",
     "第一节体验课完成",
     "第二节体验课完成",
-    "高意向",
     "中意向",
     "低意向",
     "需人工介入",
     ...lifecycleOptions.map((item) => item.value)
   ].map((value) => ({ value }));
+  const tagAttributeOptions = ["时间标签", "状态标签"].map((value) => ({ value }));
+  const relativeTimeUnitOptions = ["分钟", "小时", "天"].map((value) => ({ value }));
+  const [form] = Form.useForm();
+  const createScheduleRule = () => ({
+    operationTaskType: "输入该 Skill 的定时任务描述",
+    taskEffectiveTriggerMode: "延后触发",
+    taskEffectiveAmount: 1,
+    taskEffectiveUnit: "分钟"
+  });
+  const updateScheduleRuleValue = (ruleIndex, values) => {
+    const rules = form.getFieldValue("scheduleRules") || [];
+    form.setFieldsValue({
+      scheduleRules: rules.map((rule, index) => (index === ruleIndex ? { ...rule, ...values } : rule))
+    });
+  };
   const [debugInput, setDebugInput] = useState("");
   const [debugTrace, setDebugTrace] = useState(null);
   const logicSections = [
@@ -1875,120 +1892,171 @@ function StrategyEditor({ skill, onBack }) {
             <Title level={4}>编排</Title>
           </div>
           <Form
+            form={form}
             layout="vertical"
             key={skill.key}
             initialValues={{
               name: skill.name,
-              triggerBase: "基于添加好友时间",
-              scheduleRules: [{ operationTaskType: "加好友后发送欢迎语", audienceTags: ["新加好友"], triggerMode: "延后触发", timeMode: "相对时间", amount: 1, unit: "分钟" }],
-              endCondition: "按时间结束",
-              endTimeMode: "相对时间",
+              effectiveEvent: "企微加好友",
+              effectiveTag: "已预约体验课",
+              effectiveTagAttribute: "状态标签",
+              effectiveTriggerMode: "延后触发",
+              effectiveAmount: 1,
+              effectiveUnit: "分钟",
+              scheduleRules: [],
+              endTriggerMode: "延后触发",
               endAmount: 7,
-              endUnit: "天",
-              model: "豆包 1.8 深度思考"
+              endUnit: "天"
             }}
           >
             <div className="orchestration-form">
-              <Form.Item label="Skill 名称" name="name"><Input /></Form.Item>
-              <div className="schedule-config-block">
-                <Text className="required-section-title">触发时间配置</Text>
-                <Form.Item name="triggerBase" className="schedule-base-item">
-                  <Radio.Group>
-                    <Radio value="基于添加好友时间">基于添加好友时间</Radio>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.List name="scheduleRules">
-                  {(fields, { add, remove }) => (
-                    <div className="schedule-rule-list">
-                      {fields.map((field, index) => (
-                        <div className="schedule-rule-row" key={field.key}>
-                          <Form.Item className="schedule-operation-item" label="运营任务类型" name={[field.name, "operationTaskType"]}>
-                            <Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} placeholder="描述要做的事情，例如：第一节体验课前提醒" />
-                          </Form.Item>
-                          <Form.Item className="schedule-audience-item" label="发送用户人群" name={[field.name, "audienceTags"]}>
-                            <Select
-                              mode="multiple"
-                              maxTagCount="responsive"
-                              placeholder="选择用户标签确定人群"
-                              options={audienceTagOptions}
-                            />
-                          </Form.Item>
-                          <Form.Item className="schedule-trigger-item" name={[field.name, "triggerMode"]}>
-                            <Select options={["延后触发", "提前触发", "立即触发"].map((value) => ({ value }))} />
-                          </Form.Item>
-                          <Form.Item className="schedule-mode-item" name={[field.name, "timeMode"]}>
-                            <Select options={["相对时间", "固定时间"].map((value) => ({ value }))} />
-                          </Form.Item>
-                          <Form.Item noStyle shouldUpdate={(prev, next) => prev.scheduleRules?.[field.name]?.timeMode !== next.scheduleRules?.[field.name]?.timeMode}>
-                            {({ getFieldValue }) => {
-                              const timeMode = getFieldValue(["scheduleRules", field.name, "timeMode"]);
-                              return timeMode === "固定时间" ? (
-                                <Form.Item name={[field.name, "fixedAt"]} className="schedule-fixed-time-item">
-                                  <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择年月日时分秒" />
-                                </Form.Item>
-                              ) : (
-                                <>
-                                  <Form.Item className="schedule-amount-item" name={[field.name, "amount"]}>
-                                    <Input />
-                                  </Form.Item>
-                                  <Form.Item className="schedule-unit-item" name={[field.name, "unit"]}>
-                                    <Select options={["分钟", "小时", "天"].map((value) => ({ value }))} />
-                                  </Form.Item>
-                                </>
-                              );
-                            }}
-                          </Form.Item>
-                          <div className="schedule-rule-actions">
-                            {fields.length > 1 ? <Button type="link" danger className="schedule-remove-button" onClick={() => remove(field.name)}>删除</Button> : null}
-                            <Button
-                              type="dashed"
-                              className="schedule-add-button"
-                              icon={<PlusOutlined />}
-                              onClick={() => add({ operationTaskType: "加好友后发送欢迎语", audienceTags: ["新加好友"], triggerMode: "延后触发", timeMode: "相对时间", amount: 1, unit: "分钟" })}
-                            >
-                              新增任务
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Form.List>
-                <div className="schedule-end-config">
-                  <Text className="required-section-title">结束时间配置</Text>
-                  <Text type="secondary" className="schedule-end-tip">达到结束时间后不再触发该 Skill 的后续任务</Text>
-                  <Form.Item name="endCondition" className="schedule-base-item">
-                    <Radio.Group>
-                      <Radio value="按时间结束">按时间结束</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                  <div className="schedule-end-row">
-                    <Form.Item className="schedule-end-mode-item" name="endTimeMode">
-                      <Select options={["相对时间", "固定时间"].map((value) => ({ value }))} />
-                    </Form.Item>
-                    <Form.Item noStyle shouldUpdate={(prev, next) => prev.endTimeMode !== next.endTimeMode}>
-                      {({ getFieldValue }) => {
-                        const endTimeMode = getFieldValue("endTimeMode");
-                        return endTimeMode === "固定时间" ? (
-                          <Form.Item name="endFixedAt" className="schedule-end-fixed-time-item">
-                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择结束年月日时分秒" />
-                          </Form.Item>
-                        ) : (
-                          <>
-                            <Form.Item className="schedule-end-amount-item" name="endAmount">
-                              <Input />
-                            </Form.Item>
-                            <Form.Item className="schedule-end-unit-item" name="endUnit">
-                              <Select options={["分钟", "小时", "天"].map((value) => ({ value }))} />
-                            </Form.Item>
-                          </>
-                        );
-                      }}
-                    </Form.Item>
-                  </div>
-                </div>
+              <div className="orchestration-section">
+                <Text className="orchestration-section-title">1. Skill 名称</Text>
+                <Form.Item name="name"><Input /></Form.Item>
               </div>
-              <Form.Item label="模型" name="model"><Select options={["豆包 1.8 深度思考", "通义千问 Max", "DeepSeek V3"].map((value) => ({ value }))} /></Form.Item>
+              <div className="orchestration-section">
+                <Text className="orchestration-section-title">2. Skill 生效条件配置</Text>
+                <Form.Item label="选择生效触发条件" name="effectiveEvent" className="schedule-base-item">
+		                  <Radio.Group>
+		                    <Radio value="企微加好友">企微加好友</Radio>
+		                    <Radio value="用户标签">用户标签</Radio>
+		                    <Radio value="固定时间">固定时间</Radio>
+	                  </Radio.Group>
+                </Form.Item>
+                <Form.Item noStyle shouldUpdate={(prev, next) => prev.effectiveEvent !== next.effectiveEvent}>
+                  {({ getFieldValue }) => {
+	                    const effectiveEvent = getFieldValue("effectiveEvent");
+	                    return effectiveEvent === "用户标签" ? (
+	                      <div className="tag-condition-group">
+	                        <Text strong>选择用户标签及标准属性</Text>
+	                        <div className="tag-condition-row">
+	                          <Form.Item name="effectiveTag">
+	                            <Select
+	                              placeholder="选择用户标签，例如：已付费、高意向、720期次"
+	                              options={userTagOptions}
+	                            />
+	                          </Form.Item>
+	                          <Form.Item name="effectiveTagAttribute">
+	                            <Select
+	                              placeholder="选择标签属性"
+	                              options={tagAttributeOptions}
+	                            />
+	                          </Form.Item>
+	                        </div>
+	                      </div>
+	                    ) : null;
+                  }}
+                </Form.Item>
+                <Form.Item
+                  noStyle
+	                  shouldUpdate={(prev, next) => (
+	                    prev.effectiveEvent !== next.effectiveEvent ||
+	                    prev.effectiveTagAttribute !== next.effectiveTagAttribute
+	                  )}
+                >
+	                  {({ getFieldValue }) => {
+	                    const effectiveEvent = getFieldValue("effectiveEvent");
+	                    const effectiveTagAttribute = getFieldValue("effectiveTagAttribute");
+	                    if (effectiveEvent === "固定时间") {
+	                      return (
+		                        <Form.Item label="设置固定生效时间" name="effectiveFixedAt" className="schedule-fixed-time-item">
+	                          <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择具体日期时分秒" />
+	                        </Form.Item>
+	                      );
+	                    }
+	                    if (effectiveEvent === "用户标签" && effectiveTagAttribute === "状态标签") {
+	                      return (
+	                        <div className="effective-time-notice">
+                          <Text strong>生效时间：立即生效</Text>
+                          <Text type="secondary">当前选择的是状态标签，状态命中后会立即触发该 Skill，不需要配置相对时间或固定时间。</Text>
+                        </div>
+                      );
+                    }
+		                    return (
+		                      <>
+			                        <div className="relative-time-row">
+			                          <Form.Item label="触发时间设置" name="effectiveTriggerMode">
+			                            <Select options={["延后触发"].map((value) => ({ value }))} />
+			                          </Form.Item>
+		                          <div className="relative-time-value-group">
+		                            <Form.Item name="effectiveAmount">
+		                              <InputNumber min={1} precision={0} placeholder="请输入时间" />
+		                            </Form.Item>
+		                            <Form.Item name="effectiveUnit">
+		                              <Select options={relativeTimeUnitOptions} />
+		                            </Form.Item>
+		                          </div>
+	                        </div>
+	                      </>
+	                    );
+                  }}
+                </Form.Item>
+              </div>
+	              <div className="orchestration-section">
+	                <Text className="orchestration-section-title">3. Skill 定时任务配置</Text>
+	                <Text type="secondary">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
+		                <Form.List name="scheduleRules">
+	                  {(fields, { add, remove }) => (
+	                    <div className="schedule-rule-list">
+                        {fields.length === 0 ? (
+                          <div className="schedule-empty-state">
+                            <Text type="secondary">暂无定时任务，可点击新增任务进行配置。</Text>
+                          </div>
+                        ) : null}
+			                      {fields.map((field, index) => (
+			                        <div className="schedule-rule-row" key={field.key}>
+		                          <Form.Item className="schedule-operation-item" label={`定时任务${index + 1}`} name={[field.name, "operationTaskType"]}>
+		                            <Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} placeholder="输入该 Skill 的定时任务描述" />
+		                          </Form.Item>
+		                          <div className="relative-time-row schedule-rule-relative-time">
+		                            <Form.Item label="触发时间设置" name={[field.name, "taskEffectiveTriggerMode"]}>
+		                              <Select options={["延后触发"].map((value) => ({ value }))} />
+		                            </Form.Item>
+	                            <div className="relative-time-value-group">
+	                              <Form.Item name={[field.name, "taskEffectiveAmount"]}>
+	                                <InputNumber min={1} precision={0} placeholder="请输入时间" />
+	                              </Form.Item>
+	                              <Form.Item name={[field.name, "taskEffectiveUnit"]}>
+	                                <Select options={relativeTimeUnitOptions} />
+	                              </Form.Item>
+	                            </div>
+                          </div>
+		                          <div className="schedule-rule-actions">
+		                            <Button type="link" danger className="schedule-remove-button" onClick={() => remove(field.name)}>删除</Button>
+		                          </div>
+	                        </div>
+	                      ))}
+                        <Button
+                          type="dashed"
+                          className="schedule-add-button"
+                          icon={<PlusOutlined />}
+                          onClick={() => add(createScheduleRule())}
+                        >
+                          新增任务
+                        </Button>
+	                    </div>
+	                  )}
+	                </Form.List>
+              </div>
+	              <div className="orchestration-section">
+	                <Text className="orchestration-section-title">4. Skill 结束条件配置</Text>
+	                <div className="schedule-end-config">
+	                  <Text type="secondary" className="schedule-end-tip">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
+	                  <div className="relative-time-row schedule-end-row">
+	                    <Form.Item label="触发时间设置" name="endTriggerMode">
+	                      <Select options={["延后触发"].map((value) => ({ value }))} />
+	                    </Form.Item>
+	                    <div className="relative-time-value-group">
+	                      <Form.Item name="endAmount">
+	                        <InputNumber min={1} precision={0} placeholder="请输入时间" />
+	                      </Form.Item>
+	                      <Form.Item name="endUnit">
+	                        <Select options={relativeTimeUnitOptions} />
+	                      </Form.Item>
+	                    </div>
+	                  </div>
+	                </div>
+              </div>
             </div>
           </Form>
         </section>
@@ -2494,32 +2562,34 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
     );
   }
   const currentStageIndex = selected.lifecycleStage || 0;
-  const customerMessages = (selected.messages || []).filter((message) => message.from === "customer");
-  const latestCustomerMessage = customerMessages[customerMessages.length - 1] || { text: selected.last, time: "10:20" };
   const chatPlans = [
     {
       key: "plan-1",
-      planTime: "明天下午 15:00",
+      source: "会话生成",
+      sourceColor: "success",
+      planTime: "今天下午 15:00",
       topic: "按约定介绍课程内容",
       content: `围绕${selected.tags?.[0] || "孩子年级"}英语基础，说明试听课流程、课程模块和适合的班型，不直接强推报名。`,
-      quote: latestCustomerMessage.text,
-      quoteTime: latestCustomerMessage.time
+      quote: "我现在有点忙，今天下午3点给我发一下相关的课程资料，我们再聊。",
+      quoteTime: "10:20"
     },
     {
       key: "plan-2",
+      source: "Skill 定时任务",
+      sourceColor: "processing",
+      triggerRule: "试听课前 30 分钟",
       planTime: "试听课前 30 分钟",
       topic: "试听提醒与课前准备",
       content: "提醒家长准备孩子近期英语试卷或错题，确认设备、上课链接和可参与时间。",
-      quote: selected.messages?.[0]?.text || selected.last,
-      quoteTime: selected.messages?.[0]?.time || "09:58"
     },
     {
       key: "plan-3",
+      source: "Skill 定时任务",
+      sourceColor: "processing",
+      triggerRule: "试听结束后 20 分钟",
       planTime: "试听结束后 20 分钟",
       topic: "反馈学习问题并推动下一步",
-      content: "总结孩子课堂表现、薄弱点和建议课程路径，询问家长是否需要确认班型和课时安排。",
-      quote: latestCustomerMessage.text,
-      quoteTime: latestCustomerMessage.time
+      content: "总结孩子课堂表现、薄弱点和建议课程路径，询问家长是否需要确认班型和课时安排。"
     }
   ];
   return (
@@ -2707,14 +2777,26 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                     <Card size="small" key={plan.key} className="chat-plan-card">
                       <Space direction="vertical" size={8} className="full-width">
                         <Space className="full-width" align="start" style={{ justifyContent: "space-between" }}>
-                          <Text strong>{plan.topic}</Text>
+                          <Space direction="vertical" size={4}>
+                            <Text strong>{plan.topic}</Text>
+                            <Space size={6} wrap>
+                              <Tag color={plan.sourceColor}>{plan.source}</Tag>
+                            </Space>
+                          </Space>
                           <Tag color="processing">{plan.planTime}</Tag>
                         </Space>
                         <Text>{plan.content}</Text>
-                        <div className="plan-quote">
-                          <Text type="secondary">{plan.quoteTime}</Text>
-                          <Paragraph>{plan.quote}</Paragraph>
-                        </div>
+                        {plan.source === "会话生成" ? (
+                          <div className="plan-quote">
+                            <Text type="secondary">关联聊天记录 · {plan.quoteTime}</Text>
+                            <Paragraph>{plan.quote}</Paragraph>
+                          </div>
+                        ) : (
+                          <div className="plan-quote plan-skill-source">
+                            <Text type="secondary">来自 Skill 定时任务</Text>
+                            <Paragraph>{plan.triggerRule}触发执行</Paragraph>
+                          </div>
+                        )}
                       </Space>
                     </Card>
                   ))}
@@ -3066,8 +3148,7 @@ function AppShell({ user, onLogout }) {
             </div>
           </Space>
           <Space className="header-actions" wrap>
-            {platform ? <Select className="company-select" defaultValue="星河教育科技" options={companies.map((item) => ({ value: item.name, label: item.name }))} prefix="企业" /> : <Tag color="blue">{user.company}</Tag>}
-            <Button icon={<AlertOutlined />} />
+            {!platform ? <Tag color="blue">{user.company}</Tag> : null}
             <Button shape="round" icon={<Avatar size={24}>{user.badge}</Avatar>}>{user.name}</Button>
             <Button onClick={onLogout}>退出</Button>
           </Space>
