@@ -52,6 +52,8 @@ import {
   PlusOutlined,
   SendOutlined,
   SmileOutlined,
+  ForkOutlined,
+  ToolOutlined,
   UploadOutlined,
   RobotOutlined,
   SettingOutlined,
@@ -171,6 +173,317 @@ const strategies = [
   }
 ];
 
+const agentTools = [
+  {
+    key: "tool-1",
+    id: 1,
+    name: "集成AI定时任务",
+    description: "定时触发AI任务，自动执行客户跟进、消息推送、数据同步等操作",
+    prompt: "你是一个定时任务执行助手。根据以下任务配置，在指定时间自动执行AI操作。\n\n任务目标：{{task.goal}}\n执行时间：{{task.scheduleTime}}\n目标客户：{{task.customerName}}\n\n请按照上述配置执行任务，并返回执行结果。",
+    enabled: true,
+    updatedAt: "2026-07-26T17:16:00"
+  },
+  {
+    key: "tool-2",
+    id: 2,
+    name: "企微机器人通知",
+    description: "通过企业微信机器人向指定群聊或个人推送AI处理结果和告警信息",
+    prompt: "你是企微通知助手。请根据任务上下文整理通知内容，并发送到指定企微群聊或个人。\n\n通知对象：{{notice.target}}\n通知主题：{{notice.title}}\n通知内容：{{notice.content}}\n告警等级：{{notice.level}}\n\n请保证通知内容清晰、简洁，并返回发送状态。",
+    enabled: true,
+    updatedAt: "2026-07-26T17:16:00"
+  },
+  {
+    key: "tool-3",
+    id: 3,
+    name: "结束托管工具",
+    description: "手动结束AI托管会话，释放资源并生成会话总结报告",
+    prompt: "你是AI托管结束助手。请根据当前会话状态结束托管，并生成可交给真人销售继续跟进的总结。\n\n客户名称：{{conversation.customerName}}\n当前阶段：{{conversation.stage}}\n最近沟通：{{conversation.lastMessages}}\n\n请输出托管结束结果、客户关键诉求、风险点和建议下一步动作。",
+    enabled: true,
+    updatedAt: "2026-07-26T17:16:00"
+  },
+  {
+    key: "tool-4",
+    id: 4,
+    name: "跳转skill",
+    description: "快速跳转到指定skill阶段，查看和调整AI销售阶段的执行配置",
+    prompt: "你是Skill跳转助手。请根据当前客户状态和运营指令，判断需要进入的Skill阶段。\n\n当前客户：{{customer.name}}\n当前阶段：{{customer.stage}}\n目标Skill：{{skill.name}}\n调整原因：{{skill.reason}}\n\n请返回跳转结果、命中的阶段配置和需要运营确认的事项。",
+    enabled: true,
+    updatedAt: "2026-07-26T17:16:00"
+  },
+  {
+    key: "tool-5",
+    id: 5,
+    name: "调用三方接口获取信息",
+    description: "调用第三方API接口获取客户画像、行业数据等外部信息辅助AI决策",
+    prompt: "你是第三方接口查询助手。请根据业务需要调用外部接口获取信息，并将结果整理为AI可使用的结构化摘要。\n\n接口名称：{{api.name}}\n查询参数：{{api.params}}\n客户标识：{{customer.id}}\n\n请返回接口调用状态、关键字段、异常信息和建议处理方式。",
+    enabled: true,
+    updatedAt: "2026-07-26T17:16:00"
+  }
+];
+
+const sopTasks = [
+  {
+    key: "sop-1",
+    name: "转化sop（正式测试807-813）",
+    code: "NEW_TEST",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "好友通过后欢迎", trigger: "加好友后 1 分钟", action: "发送欢迎语并收集孩子年级", tool: "生成课程顾问话术" },
+      { day: "D1", title: "需求澄清", trigger: "次日 10:00", action: "追问英语基础、学习目标和可试听时间", tool: "获取学员信息" },
+      { day: "D3", title: "试听邀约", trigger: "客户未预约试听", action: "推荐测评试听课并创建跟进提醒", tool: "创建试听跟进" },
+      { day: "D7", title: "异议处理", trigger: "客户表达价格或时间顾虑", action: "生成个性化异议处理话术", tool: "生成课程顾问话术" },
+      { day: "D10", title: "成交推动", trigger: "高意向标签命中", action: "提醒真人销售确认名额和报名链接", tool: "企微机器人通知" },
+      { day: "D14", title: "沉默唤醒", trigger: "连续 3 天未回复", action: "发送低打扰唤醒内容", tool: "跳转skill" },
+      { day: "D21", title: "结束归档", trigger: "转化周期结束", action: "生成客户跟进总结并释放托管资源", tool: "结束托管工具" }
+    ],
+    status: "已停用",
+    updatedAt: "2026-07-28 15:12:42",
+    owner: "李老师企微",
+    boundSales: ["李老师企微"],
+    target: "新加企微好友后，按阶段完成破冰、需求澄清、试听邀约、异议处理和成交提醒。"
+  },
+  {
+    key: "sop-2",
+    name: "转化sop-（第一轮测试731-806）",
+    code: "NEW_TEST_COPY_2",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "自动欢迎", trigger: "加好友后立即", action: "介绍身份并询问咨询目标", tool: "生成课程顾问话术" },
+      { day: "D1", title: "资料补全", trigger: "客户回复后", action: "补全手机号、年级和薄弱点", tool: "获取学员信息" },
+      { day: "D3", title: "试听推进", trigger: "未预约试听", action: "推送试听时间选项", tool: "创建试听跟进" },
+      { day: "D7", title: "转人工提醒", trigger: "客户高意向", action: "通知销售人工确认报名方案", tool: "企微机器人通知" },
+      { day: "D10", title: "复盘总结", trigger: "SOP执行结束", action: "整理执行记录", tool: "结束托管工具" },
+      { day: "D14", title: "二次触达", trigger: "客户未成交", action: "发送阶段性优惠和课程价值点", tool: "生成课程顾问话术" },
+      { day: "D21", title: "归档", trigger: "无响应", action: "标记低意向并沉淀标签", tool: "更新学员标签" }
+    ],
+    status: "草稿",
+    updatedAt: "2026-07-28 15:12:13",
+    owner: "陈老师企微",
+    boundSales: ["陈老师企微"],
+    target: "验证新好友转化链路的触达节奏和自动化话术质量。"
+  },
+  {
+    key: "sop-3",
+    name: "转化sop-（内部测试729-731）",
+    code: "NEW_TEST_COPY_NEW",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "欢迎语", trigger: "新好友通过", action: "建立课程顾问身份", tool: "生成课程顾问话术" },
+      { day: "D1", title: "客户画像", trigger: "客户首轮回复", action: "查询客户画像和历史试听", tool: "调用三方接口获取信息" },
+      { day: "D2", title: "课程推荐", trigger: "识别年级和薄弱点", action: "匹配课程包", tool: "生成课程顾问话术" },
+      { day: "D4", title: "提醒试听", trigger: "已预约试听", action: "课前提醒", tool: "企微机器人通知" },
+      { day: "D7", title: "试听反馈", trigger: "试听结束", action: "输出反馈和下一步建议", tool: "创建试听跟进" },
+      { day: "D10", title: "成交跟进", trigger: "高意向未报名", action: "推送报名提醒", tool: "生成课程顾问话术" },
+      { day: "D14", title: "结束托管", trigger: "周期结束", action: "生成总结", tool: "结束托管工具" }
+    ],
+    status: "已停用",
+    updatedAt: "2026-07-28 15:10:03",
+    owner: "周老师企微",
+    boundSales: ["周老师企微"],
+    target: "内部测试 AI 销售从线索接待到试听反馈的完整路径。"
+  },
+  {
+    key: "sop-4",
+    name: "添加好友-28号",
+    code: "NEW_TEST_COPY_3",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "好友欢迎", trigger: "加好友后 30 秒", action: "自动发送欢迎语", tool: "生成课程顾问话术" },
+      { day: "D1", title: "兴趣判断", trigger: "客户回复", action: "识别咨询方向并打标签", tool: "更新学员标签" },
+      { day: "D2", title: "资料同步", trigger: "手机号已获得", action: "同步三方客户档案", tool: "调用三方接口获取信息" },
+      { day: "D5", title: "课程介绍", trigger: "客户中高意向", action: "发送匹配课程介绍", tool: "生成课程顾问话术" },
+      { day: "D7", title: "人工提醒", trigger: "需报价", action: "通知销售介入", tool: "企微机器人通知" },
+      { day: "D10", title: "唤醒", trigger: "未回复", action: "低频唤醒", tool: "跳转skill" },
+      { day: "D14", title: "复盘", trigger: "结束", action: "输出 SOP 执行摘要", tool: "结束托管工具" }
+    ],
+    status: "启用中",
+    updatedAt: "2026-07-28 14:31:05",
+    owner: "吴老师企微",
+    boundSales: ["吴老师企微"],
+    target: "对 7 月 28 日新增好友批量执行销售跟进 SOP。"
+  },
+  {
+    key: "sop-5",
+    name: "添加好友2",
+    code: "NEW_TEST_COPY",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "破冰", trigger: "加好友后", action: "询问孩子年级", tool: "生成课程顾问话术" },
+      { day: "D1", title: "补充需求", trigger: "客户回复", action: "收集学习目标", tool: "获取学员信息" },
+      { day: "D3", title: "邀约试听", trigger: "未预约", action: "创建试听跟进", tool: "创建试听跟进" },
+      { day: "D5", title: "阶段提醒", trigger: "待确认", action: "通知销售", tool: "企微机器人通知" },
+      { day: "D7", title: "二次沟通", trigger: "中意向", action: "补充课程价值", tool: "生成课程顾问话术" },
+      { day: "D10", title: "沉默处理", trigger: "沉默 3 天", action: "切换唤醒策略", tool: "跳转skill" },
+      { day: "D14", title: "归档", trigger: "SOP结束", action: "总结客户状态", tool: "结束托管工具" }
+    ],
+    status: "已停用",
+    updatedAt: "2026-07-28 12:57:25",
+    owner: "林老师企微",
+    boundSales: ["林老师企微"],
+    target: "标准新好友跟进流程，用于低风险线索试运行。"
+  },
+  {
+    key: "sop-6",
+    name: "添加好友DAY10_SOP",
+    code: "NEW_SOP",
+    startEvent: "FRIEND_ADD",
+    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
+    version: "v1",
+    accountScope: "1个账号",
+    stages: [
+      { day: "D0", title: "欢迎", trigger: "加好友后", action: "欢迎并说明服务", tool: "生成课程顾问话术" },
+      { day: "D3", title: "需求确认", trigger: "首轮沟通后", action: "确认学习诉求", tool: "获取学员信息" },
+      { day: "D10", title: "重点触达", trigger: "加好友第 10 天", action: "发起复访和课程推荐", tool: "生成课程顾问话术" }
+    ],
+    status: "已停用",
+    updatedAt: "2026-07-25 18:07:42",
+    owner: "李老师企微",
+    boundSales: ["李老师企微"],
+    target: "面向较长决策周期客户，在第 10 天集中做复访触达。"
+  }
+];
+
+const sopEventTypes = [
+  { code: "FRIEND_ADD", name: "新加好友", desc: "客户通过企微好友后启动 SOP", timeline: "FRIEND_ADD_DAILY_BOUNDARY" },
+  { code: "FEICE", name: "飞策事件", desc: "上课、下单或直播事件回调触发", timeline: "事件时间" },
+  { code: "TIMER", name: "定时判定", desc: "按运营配置定时启动", timeline: "固定时间" },
+  { code: "WECOM_MSG", name: "客户行为", desc: "客户消息、回复、互动行为触发", timeline: "行为时间" }
+];
+
+const sopConditionFields = [
+  { category: "BASIC_INFO", label: "基础信息", fields: ["gender", "region"] },
+  { category: "FRIEND_ADDED_TIME", label: "加好友时间", fields: ["friend_added_at BETWEEN"] },
+  { category: "COURSE_INFO", label: "课程信息", fields: ["attended_days 包含/不包含 D1-D6"] },
+  { category: "LESSON_STATUS", label: "上课状态", fields: ["attendance_status = ATTENDED/ABSENT"] },
+  { category: "HOMEWORK_INFO", label: "作业信息", fields: ["submitted", "submitted_homework_days D0-D6"] },
+  { category: "ORDER_STATUS", label: "订单状态", fields: ["order_status = PENDING/SUCCESS/FAILED"] },
+  { category: "BEHAVIOR", label: "客户行为", fields: ["has_replied", "recent_reply_days"] }
+];
+
+const sopMessageVariables = [
+  "${nickName}",
+  "${now}",
+  "${date}",
+  "${time}",
+  "${attr.d1ClassTime}",
+  "${attr.d2ClassTime}",
+  "${attr.d3LiveUrl}",
+  "${attr.d6LiveUrl}"
+];
+
+const sopStatusMeta = {
+  DRAFT: { label: "草稿", color: "warning" },
+  ENABLED: { label: "启用中", color: "success" },
+  DISABLED: { label: "已停用", color: "default" }
+};
+
+const normalizeSopStatus = (value) => {
+  if (value === "启用中" || value === "ENABLED") return "ENABLED";
+  if (value === "草稿" || value === "DRAFT") return "DRAFT";
+  return "DISABLED";
+};
+
+const buildSopPhases = (record) => {
+  if (record.phases) return record.phases;
+  return (record.stages || []).map((stage, index) => {
+    const phaseId = `${record.key}-phase-${index + 1}`;
+    const eventId = `${phaseId}-event-1`;
+    const dayOffset = Number(String(stage.day || "D0").replace(/\D/g, "")) || 0;
+    return {
+      id: phaseId,
+      name: stage.title,
+      sort: index + 1,
+      chatAgentCode: index === 0 ? "day0_agent" : `day${Math.min(dayOffset, 6)}_agent_release`,
+      defaultTimeDayOffset: dayOffset,
+      defaultTimeOfDay: dayOffset === 0 ? "18:00:00" : "10:00:00",
+      description: stage.action,
+      events: [
+        {
+          id: eventId,
+          name: stage.trigger,
+          sort: 1,
+          triggerType: dayOffset === 0 ? "INSTANCE_CREATED" : "SCHEDULED",
+          scheduleDayOffset: dayOffset,
+          scheduleTimeOfDay: dayOffset === 0 ? "18:00:00" : "10:00:00",
+          pollEnabled: index % 3 === 1,
+          pollIntervalMinutes: 30,
+          pollCount: 3,
+          enabled: true,
+          description: stage.action,
+          strategies: [
+            {
+              id: `${eventId}-strategy-1`,
+              name: index % 2 === 0 ? "默认 Agent 生成策略" : "固定消息兜底策略",
+              sort: 1,
+              strategyType: index % 2 === 0 ? "AGENT" : "FIXED_MESSAGE",
+              sendChannel: index % 2 === 0 ? "JUZI" : "WECOM_APP",
+              agentCode: stage.tool,
+              prompt: `结合客户当前阶段，执行：${stage.action}。回复需自然，避免承诺效果。`,
+              targetMode: index % 2 === 0 ? "ALL" : "CUSTOM",
+              conditionRule: index % 2 === 0 ? null : {
+                version: 1,
+                op: "AND",
+                rules: [{ category: "BEHAVIOR", source: "profile", field: "has_replied", op: "=", value: true }]
+              },
+              messageType: "TEXT",
+              messageContent: `${"${nickName}"}，这是今天的学习跟进提醒，方便的话我帮您确认下一步安排。`,
+              messageVars: ["${nickName}", "${date}"]
+            }
+          ]
+        }
+      ]
+    };
+  });
+};
+
+const normalizeSopRecord = (record) => {
+  const status = normalizeSopStatus(record.status);
+  const phases = buildSopPhases(record);
+  return {
+    ...record,
+    status,
+    stateVersion: record.stateVersion || Math.max(1, phases.length * 17),
+    sopInfo: record.sopInfo || {
+      sopCode: record.code,
+      name: record.name,
+      description: record.target,
+      eventTypeCode: record.startEvent,
+      timelinePolicyCode: record.timelineStrategy,
+      timelinePolicyVersion: Number(String(record.version || "v1").replace(/\D/g, "")) || 1,
+      timelineResolverType: "DAILY_BOUNDARY",
+      timelineTimezone: "Asia/Shanghai",
+      defaultTimeOfDay: "18:00:00",
+      notifyMode: "FAILED_ONLY",
+      notifyGroupCode: "SOP_FAILED_NOTICE"
+    },
+    salesScope: record.salesScope || (record.boundSales || []).map((label) => managedWecomAccounts.find((item) => item.label === label)?.key || label),
+    phases,
+    runtime: record.runtime || {
+      runningInstances: 126 + phases.length * 3,
+      pausedInstances: phases.length % 3,
+      finishedInstances: 860 + phases.length * 19,
+      finishedLast7Days: 148,
+      failedTasks: phases.length % 2 ? 3 : 1,
+      notifiedFailedTasks: phases.length % 2 ? 2 : 1
+    }
+  };
+};
+
 const knowledge = [
   { key: "k1", title: "AI销售助手产品介绍", type: "产品知识", source: "文本内容", status: "启用", updated: "2026-05-30" },
   { key: "k2", title: "企微自动接待FAQ", type: "FAQ", source: "文本内容", status: "启用", updated: "2026-05-30" },
@@ -199,7 +512,7 @@ const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "knowledge", "settings"],
+    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "sop", "knowledge", "settings", "tools"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -219,7 +532,7 @@ const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "knowledge"],
+    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "sop", "knowledge", "tools"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };
@@ -1207,7 +1520,9 @@ const menuItems = [
   { key: "sales", icon: <TeamOutlined />, label: "企微托管" },
   { key: "agent", icon: <RobotOutlined />, label: "角色配置" },
   { key: "humanization", icon: <SmileOutlined />, label: "拟人化设置" },
-  { key: "settings", icon: <SettingOutlined />, label: "系统配置" }
+  { key: "sop", icon: <ForkOutlined />, label: "SOP管理" },
+  { key: "settings", icon: <SettingOutlined />, label: "系统配置" },
+  { key: "tools", icon: <ToolOutlined />, label: "工具管理" }
 ];
 
 const pageTitle = Object.fromEntries(menuItems.map((item) => [item.key, item.label]));
@@ -1724,6 +2039,704 @@ function SkillLogicRichEditor({ defaultValue }) {
         }}
       />
     </div>
+  );
+}
+
+function ToolsPage() {
+  const [form] = Form.useForm();
+  const [toolRows, setToolRows] = useState(agentTools);
+  const [editingTool, setEditingTool] = useState(null);
+  const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState("全部状态");
+
+  useEffect(() => {
+    if (editingTool) {
+      form.resetFields();
+      form.setFieldsValue(editingTool);
+    }
+  }, [editingTool, form]);
+
+  const filteredRows = toolRows.filter((item) => {
+    const keywordText = keyword.trim().toLowerCase();
+    const matchesKeyword = !keywordText || [item.name, item.description, item.prompt].some((value) => String(value).toLowerCase().includes(keywordText));
+    const matchesStatus = status === "全部状态" || (status === "启用" ? item.enabled : !item.enabled);
+    return matchesKeyword && matchesStatus;
+  });
+
+  const openCreateModal = () => {
+    setEditingTool({
+      key: "",
+      id: toolRows.length ? Math.max(...toolRows.map((item) => item.id)) + 1 : 1,
+      name: "",
+      description: "",
+      prompt: "",
+      enabled: true,
+      updatedAt: new Date().toISOString().slice(0, 19)
+    });
+  };
+
+  const handleSave = (values) => {
+    const nextTool = {
+      ...editingTool,
+      ...values,
+      updatedAt: new Date().toISOString().slice(0, 19)
+    };
+    if (editingTool.key) {
+      setToolRows((items) => items.map((item) => (item.key === editingTool.key ? nextTool : item)));
+    } else {
+      setToolRows((items) => [...items, { ...nextTool, key: `tool-${Date.now()}` }]);
+    }
+    setEditingTool(null);
+  };
+
+  const handleEnabledChange = (record, checked) => {
+    setToolRows((items) => items.map((item) => (item.key === record.key ? { ...item, enabled: checked, updatedAt: new Date().toISOString().slice(0, 19) } : item)));
+  };
+
+  const columns = [
+    { title: "ID", dataIndex: "id", width: 90 },
+    { title: "工具名称", dataIndex: "name", width: 220 },
+    { title: "描述", dataIndex: "description", ellipsis: true },
+    {
+      title: "启用",
+      dataIndex: "enabled",
+      width: 120,
+      render: (value, record) => <Switch checked={value} onChange={(checked) => handleEnabledChange(record, checked)} />
+    },
+    { title: "更新时间", dataIndex: "updatedAt", width: 190, ellipsis: true },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 140,
+      render: (_, record) => (
+        <Space wrap={false}>
+          <Button type="link" onClick={() => setEditingTool(record)}>编辑</Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => Modal.confirm({
+              title: "删除工具提示词",
+              content: `确认删除 ${record.name}？删除后该工具将不可被 Agent 调用。`,
+              okText: "删除",
+              okButtonProps: { danger: true },
+              cancelText: "取消",
+              onOk: () => setToolRows((items) => items.filter((item) => item.key !== record.key))
+            })}
+          >
+            删除
+          </Button>
+        </Space>
+      )
+    }
+  ];
+
+  return (
+    <>
+      <Space direction="vertical" size={16} className="page-stack">
+        <Card>
+          <Row gutter={[24, 16]} align="middle" className="tool-filter-row">
+            <Col xs={24} md={10} xl={6}>
+              <Form.Item label="关键词" className="filter-form-item">
+                <Input placeholder="请输入" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={10} xl={6}>
+              <Form.Item label="状态" className="filter-form-item">
+                <Select value={status} onChange={setStatus} options={["全部状态", "启用", "停用"].map((value) => ({ value, label: value === "全部状态" ? "请选择" : value }))} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} xl={12} className="tool-filter-actions">
+              <Divider type="vertical" className="tool-filter-divider" />
+              <Space>
+                <Button type="primary">查询</Button>
+                <Button onClick={() => { setKeyword(""); setStatus("全部状态"); }}>重置</Button>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+        <Card title={<PanelTitle title="AI工具提示词" desc="维护可供 Agent 调用的工具名称、描述、提示词内容和启用状态。" extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>新增工具</Button>} />}>
+          <Table
+            className="admin-table tool-table"
+            rowKey="key"
+            columns={columns}
+            dataSource={filteredRows}
+            pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
+            scroll={{ x: 1160 }}
+          />
+        </Card>
+      </Space>
+      <Modal
+        title={editingTool?.key ? "编辑工具提示词" : "新增工具提示词"}
+        open={Boolean(editingTool)}
+        onCancel={() => setEditingTool(null)}
+        onOk={() => form.submit()}
+        okText="保存"
+        cancelText="取消"
+        width={1080}
+      >
+        <Form form={form} layout="horizontal" labelCol={{ xs: 24, sm: 4 }} wrapperCol={{ xs: 24, sm: 20 }} onFinish={handleSave}>
+          <Form.Item label="工具名称" name="name" rules={[{ required: true, message: "请输入工具名称" }]}>
+            <Input placeholder="请输入工具名称" />
+          </Form.Item>
+          <Form.Item label="工具描述" name="description" rules={[{ required: true, message: "请输入工具描述" }]}>
+            <Input.TextArea rows={3} placeholder="请输入工具描述" />
+          </Form.Item>
+          <Form.Item label="提示词内容" name="prompt" rules={[{ required: true, message: "请输入提示词内容" }]}>
+            <Input.TextArea rows={11} placeholder="请输入 Agent 调用该工具时使用的提示词，可使用 {{变量名}} 作为上下文占位符。" />
+          </Form.Item>
+          <Form.Item label="启用" name="enabled" valuePropName="checked">
+            <Switch />
+          </Form.Item>
+          <Text type="secondary">工具提示词保存后可用于 AI Agent 调用。</Text>
+        </Form>
+      </Modal>
+    </>
+  );
+}
+
+function SopPage() {
+  const [form] = Form.useForm();
+  const [phaseForm] = Form.useForm();
+  const [eventForm] = Form.useForm();
+  const [strategyForm] = Form.useForm();
+  const [sopRows, setSopRows] = useState(() => sopTasks.map(normalizeSopRecord));
+  const [keyword, setKeyword] = useState("");
+  const [status, setStatus] = useState("ALL");
+  const [startEvent, setStartEvent] = useState("");
+  const [editingSop, setEditingSop] = useState(null);
+  const [viewingSop, setViewingSop] = useState(null);
+  const [editingPhase, setEditingPhase] = useState(null);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [editingStrategy, setEditingStrategy] = useState(null);
+
+  useEffect(() => {
+    if (editingSop) {
+      const sop = normalizeSopRecord(editingSop);
+      form.resetFields();
+      form.setFieldsValue({
+        name: sop.sopInfo.name,
+        code: sop.sopInfo.sopCode,
+        startEvent: sop.sopInfo.eventTypeCode,
+        timelineStrategy: sop.sopInfo.timelinePolicyCode,
+        version: `v${sop.sopInfo.timelinePolicyVersion}`,
+        status: sop.status,
+        target: sop.sopInfo.description,
+        notifyMode: sop.sopInfo.notifyMode,
+        notifyGroupCode: sop.sopInfo.notifyGroupCode,
+        defaultTimeOfDay: sop.sopInfo.defaultTimeOfDay,
+        boundSales: sop.salesScope
+      });
+    }
+  }, [editingSop, form]);
+
+  useEffect(() => {
+    if (editingPhase) {
+      phaseForm.resetFields();
+      phaseForm.setFieldsValue(editingPhase.phase);
+    }
+  }, [editingPhase, phaseForm]);
+
+  useEffect(() => {
+    if (editingEvent) {
+      eventForm.resetFields();
+      eventForm.setFieldsValue(editingEvent.event);
+    }
+  }, [editingEvent, eventForm]);
+
+  useEffect(() => {
+    if (editingStrategy) {
+      strategyForm.resetFields();
+      strategyForm.setFieldsValue(editingStrategy.strategy);
+    }
+  }, [editingStrategy, strategyForm]);
+
+  const filteredRows = sopRows.filter((item) => {
+    const keywordText = keyword.trim().toLowerCase();
+    const matchesKeyword = !keywordText || [item.sopInfo.name, item.sopInfo.sopCode].some((value) => String(value).toLowerCase().includes(keywordText));
+    const matchesStatus = status === "ALL" || item.status === status;
+    const matchesEvent = !startEvent || item.sopInfo.eventTypeCode === startEvent;
+    return matchesKeyword && matchesStatus && matchesEvent;
+  });
+
+  const createSopDraft = () => ({
+    key: "",
+    status: "DRAFT",
+    stateVersion: 1,
+    sopInfo: {
+      sopCode: "",
+      name: "",
+      description: "",
+      eventTypeCode: "FRIEND_ADD",
+      timelinePolicyCode: "FRIEND_ADD_DAILY_BOUNDARY",
+      timelinePolicyVersion: 1,
+      timelineResolverType: "DAILY_BOUNDARY",
+      timelineTimezone: "Asia/Shanghai",
+      defaultTimeOfDay: "18:00:00",
+      notifyMode: "FAILED_ONLY",
+      notifyGroupCode: "SOP_FAILED_NOTICE"
+    },
+    salesScope: [managedWecomAccounts[0]?.key].filter(Boolean),
+    phases: [
+      {
+        id: `phase-${Date.now()}`,
+        name: "好友欢迎",
+        sort: 1,
+        chatAgentCode: "day0_agent",
+        defaultTimeDayOffset: 0,
+        defaultTimeOfDay: "18:00:00",
+        description: "发送欢迎语并收集基础信息",
+        events: []
+      }
+    ],
+    runtime: { runningInstances: 0, pausedInstances: 0, finishedInstances: 0, finishedLast7Days: 0, failedTasks: 0, notifiedFailedTasks: 0 }
+  });
+
+  const statusColor = (value) => {
+    return sopStatusMeta[value]?.color || "default";
+  };
+
+  const statusLabel = (value) => sopStatusMeta[value]?.label || value;
+
+  const updateSopByKey = (key, updater) => {
+    setSopRows((items) => items.map((item) => (item.key === key ? normalizeSopRecord(updater(item)) : item)));
+    setViewingSop((item) => (item?.key === key ? normalizeSopRecord(updater(item)) : item));
+  };
+
+  const handleSave = (values) => {
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const salesScope = values.boundSales || [];
+    const nextSop = {
+      ...editingSop,
+      name: values.name,
+      code: values.code,
+      startEvent: values.startEvent,
+      timelineStrategy: values.timelineStrategy,
+      version: values.version,
+      target: values.target,
+      status: values.status,
+      salesScope,
+      boundSales: salesScope.map((key) => managedWecomAccounts.find((item) => item.key === key)?.label || key),
+      accountScope: `${salesScope.length}个账号`,
+      updatedAt: now,
+      stateVersion: (editingSop.stateVersion || 0) + 1,
+      sopInfo: {
+        ...editingSop.sopInfo,
+        name: values.name,
+        sopCode: values.code,
+        description: values.target,
+        eventTypeCode: values.startEvent,
+        timelinePolicyCode: values.timelineStrategy,
+        timelinePolicyVersion: Number(String(values.version || "v1").replace(/\D/g, "")) || 1,
+        timelineResolverType: values.timelineStrategy === "FRIEND_ADD_DAILY_BOUNDARY" ? "DAILY_BOUNDARY" : "FIXED_TIME",
+        timelineTimezone: "Asia/Shanghai",
+        defaultTimeOfDay: values.defaultTimeOfDay,
+        notifyMode: values.notifyMode,
+        notifyGroupCode: values.notifyGroupCode
+      }
+    };
+    if (editingSop.key) {
+      setSopRows((items) => items.map((item) => (item.key === editingSop.key ? normalizeSopRecord(nextSop) : item)));
+      setViewingSop((item) => (item?.key === editingSop.key ? normalizeSopRecord(nextSop) : item));
+    } else {
+      setSopRows((items) => [normalizeSopRecord({ ...nextSop, key: `sop-${Date.now()}` }), ...items]);
+    }
+    setEditingSop(null);
+  };
+
+  const handleDuplicate = (record) => {
+    const copy = {
+      ...record,
+      key: `sop-${Date.now()}`,
+      name: `${record.sopInfo.name}-复制`,
+      code: `${record.sopInfo.sopCode}_COPY`,
+      status: "DRAFT",
+      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+      stateVersion: 1,
+      sopInfo: { ...record.sopInfo, name: `${record.sopInfo.name}-复制`, sopCode: `${record.sopInfo.sopCode}_COPY` }
+    };
+    setSopRows((items) => [normalizeSopRecord(copy), ...items]);
+  };
+
+  const handleToggle = (record) => {
+    const nextStatus = record.status === "ENABLED" ? "DISABLED" : "ENABLED";
+    updateSopByKey(record.key, (item) => ({ ...item, status: nextStatus, updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "), stateVersion: item.stateVersion + 1 }));
+  };
+
+  const handleSavePhase = (values) => {
+    const phase = { ...editingPhase.phase, ...values, id: editingPhase.phase.id || `phase-${Date.now()}`, events: editingPhase.phase.events || [], sort: editingPhase.phase.sort || editingPhase.sop.phases.length + 1 };
+    updateSopByKey(editingPhase.sop.key, (sop) => ({
+      ...sop,
+      phases: editingPhase.phase.id ? sop.phases.map((item) => (item.id === phase.id ? phase : item)) : [...sop.phases, phase],
+      stateVersion: sop.stateVersion + 1
+    }));
+    setEditingPhase(null);
+  };
+
+  const handleSaveEvent = (values) => {
+    const event = { ...editingEvent.event, ...values, id: editingEvent.event.id || `event-${Date.now()}`, strategies: editingEvent.event.strategies || [], sort: editingEvent.event.sort || editingEvent.phase.events.length + 1 };
+    updateSopByKey(editingEvent.sop.key, (sop) => ({
+      ...sop,
+      phases: sop.phases.map((phase) => phase.id === editingEvent.phase.id ? { ...phase, events: editingEvent.event.id ? phase.events.map((item) => (item.id === event.id ? event : item)) : [...phase.events, event] } : phase),
+      stateVersion: sop.stateVersion + 1
+    }));
+    setEditingEvent(null);
+  };
+
+  const handleSaveStrategy = (values) => {
+    const strategy = { ...editingStrategy.strategy, ...values, id: editingStrategy.strategy.id || `strategy-${Date.now()}`, sort: editingStrategy.strategy.sort || editingStrategy.event.strategies.length + 1 };
+    updateSopByKey(editingStrategy.sop.key, (sop) => ({
+      ...sop,
+      phases: sop.phases.map((phase) => phase.id === editingStrategy.phase.id ? {
+        ...phase,
+        events: phase.events.map((event) => event.id === editingStrategy.event.id ? { ...event, strategies: editingStrategy.strategy.id ? event.strategies.map((item) => (item.id === strategy.id ? strategy : item)) : [...event.strategies, strategy] } : event)
+      } : phase),
+      stateVersion: sop.stateVersion + 1
+    }));
+    setEditingStrategy(null);
+  };
+
+  const createEventDraft = (phase) => ({
+    id: "",
+    name: `${phase.name}触达`,
+    triggerType: phase.defaultTimeDayOffset === 0 ? "INSTANCE_CREATED" : "SCHEDULED",
+    scheduleDayOffset: phase.defaultTimeDayOffset,
+    scheduleTimeOfDay: phase.defaultTimeOfDay,
+    delayMinutes: 30,
+    pollEnabled: false,
+    pollIntervalMinutes: 30,
+    pollCount: 3,
+    enabled: true,
+    description: ""
+  });
+
+  const createStrategyDraft = () => ({
+    id: "",
+    name: "新策略",
+    targetMode: "ALL",
+    strategyType: "AGENT",
+    sendChannel: "JUZI",
+    agentCode: "生成课程顾问话术",
+    prompt: "基于客户画像、最近聊天记录和当前阶段目标生成一条自然的销售跟进话术。",
+    messageType: "TEXT",
+    messageContent: "您好 ${nickName}，我帮您确认一下今天的课程安排。",
+    messageVars: ["${nickName}", "${date}"]
+  });
+
+  const renderConditionRule = (rule) => {
+    if (!rule) return "全部用户";
+    return `${rule.op}：${rule.rules.map((item) => `${item.category}.${item.field} ${item.op} ${item.value}`).join("；")}`;
+  };
+
+  const columns = [
+    {
+      title: "SOP",
+      dataIndex: ["sopInfo", "name"],
+      width: 280,
+      render: (_, record) => (
+        <div>
+          <Text strong>{record.sopInfo.name}</Text>
+          <br />
+          <Text type="secondary">{record.sopInfo.sopCode}</Text>
+        </div>
+      )
+    },
+    {
+      title: "启动事件",
+      dataIndex: ["sopInfo", "eventTypeCode"],
+      width: 160,
+      render: (value) => <Tag color="blue">{value}</Tag>
+    },
+    {
+      title: "时间轴策略",
+      dataIndex: ["sopInfo", "timelinePolicyCode"],
+      width: 250,
+      render: (_, record) => (
+        <div>
+          <Text>{record.sopInfo.timelinePolicyCode}</Text>
+          <br />
+          <Text type="secondary">v{record.sopInfo.timelinePolicyVersion} · {record.sopInfo.timelineResolverType}</Text>
+        </div>
+      )
+    },
+    {
+      title: "范围与阶段",
+      dataIndex: "accountScope",
+      width: 140,
+      render: (_, record) => (
+        <div>
+          <Text>{record.salesScope.length}个账号</Text>
+          <br />
+          <Text type="secondary">{record.phases.length}个阶段</Text>
+        </div>
+      )
+    },
+    { title: "状态", dataIndex: "status", width: 110, render: (value) => <Tag color={statusColor(value)}>{statusLabel(value)}</Tag> },
+    { title: "版本", dataIndex: "stateVersion", width: 90, render: (value) => <Text type="secondary">#{value}</Text> },
+    { title: "更新时间", dataIndex: "updatedAt", width: 180 },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 270,
+      render: (_, record) => (
+        <Space wrap={false}>
+          <Button type="link" onClick={() => setViewingSop(record)}>配置</Button>
+          <Button type="link" onClick={() => setEditingSop(record)}>编辑</Button>
+          <Button type="link" onClick={() => handleDuplicate(record)}>复制</Button>
+          <Button type="link" onClick={() => setViewingSop(record)}>运行明细</Button>
+          <Button type="link" danger={record.status === "ENABLED"} onClick={() => handleToggle(record)}>{record.status === "ENABLED" ? "停用" : "启用"}</Button>
+        </Space>
+      )
+    }
+  ];
+
+  return (
+    <>
+      <Space direction="vertical" size={16} className="page-stack sop-page">
+        <Card className="sop-hero-card">
+          <div className="sop-hero">
+            <div className="sop-hero-icon"><ForkOutlined /></div>
+            <div>
+              <Text className="sop-eyebrow">AI PLATFORM</Text>
+              <Title level={2}>SOP管理</Title>
+              <Text type="secondary">管理 AI 销售 SOP 模板、启动事件、阶段事件、策略 fallback 和运行实例。</Text>
+            </div>
+            <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setEditingSop(createSopDraft())}>创建SOP</Button>
+          </div>
+        </Card>
+        <Row gutter={16}>
+          <Col xs={24} md={6}><Card><Statistic title="启用中 SOP" value={sopRows.filter((item) => item.status === "ENABLED").length} prefix={<CheckCircleOutlined />} /></Card></Col>
+          <Col xs={24} md={6}><Card><Statistic title="运行实例" value={sopRows.reduce((sum, item) => sum + item.runtime.runningInstances, 0)} prefix={<CloudSyncOutlined />} /></Card></Col>
+          <Col xs={24} md={6}><Card><Statistic title="失败任务" value={sopRows.reduce((sum, item) => sum + item.runtime.failedTasks, 0)} prefix={<AlertOutlined />} /></Card></Col>
+          <Col xs={24} md={6}><Card><Statistic title="策略数量" value={sopRows.reduce((sum, item) => sum + item.phases.reduce((phaseSum, phase) => phaseSum + phase.events.reduce((eventSum, event) => eventSum + event.strategies.length, 0), 0), 0)} prefix={<ForkOutlined />} /></Card></Col>
+        </Row>
+        <Card>
+          <Space className="toolbar sop-toolbar" wrap>
+            <Input.Search className="sop-search" placeholder="搜索 SOP 名称或编码" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+            <Select value={status} onChange={setStatus} options={[{ value: "ALL", label: "全部状态" }, ...Object.entries(sopStatusMeta).map(([value, meta]) => ({ value, label: meta.label }))]} />
+            <Select placeholder="启动事件" value={startEvent || undefined} onChange={setStartEvent} allowClear options={sopEventTypes.map((item) => ({ value: item.code, label: `${item.name}（${item.code}）` }))} />
+            <Button type="primary">查询</Button>
+            <Button onClick={() => { setKeyword(""); setStatus("ALL"); setStartEvent(""); }}>刷新</Button>
+          </Space>
+          <Table
+            className="admin-table sop-table"
+            rowKey="key"
+            columns={columns}
+            dataSource={filteredRows}
+            pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
+            scroll={{ x: 1320 }}
+            title={() => <PanelTitle title="SOP任务列表" desc="为 AI 销售配置从触发事件到阶段动作的标准运营流程。" />}
+          />
+        </Card>
+      </Space>
+      <Drawer title={viewingSop ? `${viewingSop.sopInfo.name} · SOP配置` : "SOP配置"} open={Boolean(viewingSop)} onClose={() => setViewingSop(null)} width={1080}>
+        {viewingSop ? (
+          <Tabs
+            items={[
+              {
+                key: "basic",
+                label: "基础配置",
+                children: (
+                  <Space direction="vertical" size={18} className="page-stack">
+                    <Descriptions bordered column={2} size="small">
+                      <Descriptions.Item label="SOP编码">{viewingSop.sopInfo.sopCode}</Descriptions.Item>
+                      <Descriptions.Item label="当前状态"><Tag color={statusColor(viewingSop.status)}>{statusLabel(viewingSop.status)}</Tag></Descriptions.Item>
+                      <Descriptions.Item label="启动事件">{viewingSop.sopInfo.eventTypeCode}</Descriptions.Item>
+                      <Descriptions.Item label="时间轴策略">{viewingSop.sopInfo.timelinePolicyCode} v{viewingSop.sopInfo.timelinePolicyVersion}</Descriptions.Item>
+                      <Descriptions.Item label="解析器类型">{viewingSop.sopInfo.timelineResolverType}</Descriptions.Item>
+                      <Descriptions.Item label="默认时区">{viewingSop.sopInfo.timelineTimezone}</Descriptions.Item>
+                      <Descriptions.Item label="失败通知">{viewingSop.sopInfo.notifyMode}</Descriptions.Item>
+                      <Descriptions.Item label="通知群">{viewingSop.sopInfo.notifyGroupCode}</Descriptions.Item>
+                      <Descriptions.Item label="销售范围" span={2}>{viewingSop.salesScope.map((key) => managedWecomAccounts.find((item) => item.key === key)?.label || key).join("、")}</Descriptions.Item>
+                      <Descriptions.Item label="策略摘要" span={2}>截止时间 12:00，阶段边界 18:00；解析器 DAILY_BOUNDARY，时区 Asia/Shanghai。</Descriptions.Item>
+                      <Descriptions.Item label="说明" span={2}>{viewingSop.sopInfo.description}</Descriptions.Item>
+                    </Descriptions>
+                    <Card size="small" title="可用启动事件">
+                      <Row gutter={[12, 12]}>
+                        {sopEventTypes.map((item) => (
+                          <Col xs={24} md={12} key={item.code}>
+                            <div className="sop-info-tile">
+                              <Text strong>{item.name}</Text>
+                              <Tag>{item.code}</Tag>
+                              <Text type="secondary">{item.desc}</Text>
+                            </div>
+                          </Col>
+                        ))}
+                      </Row>
+                    </Card>
+                  </Space>
+                )
+              },
+              {
+                key: "builder",
+                label: "阶段事件策略",
+                children: (
+                  <Space direction="vertical" size={14} className="page-stack">
+                    <div className="sop-drawer-actions">
+                      <Text type="secondary">每日18点边界 v1 · DAILY_BOUNDARY；阶段窗口以启动事件发生时间为锚点自动计算，相邻阶段首尾连续。</Text>
+                      <Button icon={<PlusOutlined />} onClick={() => setEditingPhase({ sop: viewingSop, phase: { id: "", name: "新阶段", chatAgentCode: "day1_agent_release", defaultTimeDayOffset: viewingSop.phases.length, defaultTimeOfDay: "10:00:00", description: "", events: [] } })}>添加阶段</Button>
+                    </div>
+                    {viewingSop.phases.map((phase) => (
+                      <Card
+                        key={phase.id}
+                        size="small"
+                        className="sop-phase-card"
+                        title={<Space><Tag color="purple">阶段 {phase.sort}</Tag><Text strong>{phase.name}</Text><Text type="secondary">{phase.defaultTimeDayOffset === 0 ? "窗口开始当天" : `第 ${phase.defaultTimeDayOffset} 天`} {phase.defaultTimeOfDay}</Text></Space>}
+                        extra={<Space><Button type="link" onClick={() => setEditingPhase({ sop: viewingSop, phase })}>编辑阶段</Button><Button type="link" onClick={() => setEditingEvent({ sop: viewingSop, phase, event: createEventDraft(phase) })}>添加事件</Button></Space>}
+                      >
+                        <Text type="secondary">阶段闲聊 Agent：{phase.chatAgentCode}；{phase.description}</Text>
+                        <List
+                          className="sop-event-list"
+                          dataSource={phase.events}
+                          renderItem={(event) => (
+                            <List.Item>
+                              <div className="sop-event-block">
+                                <div className="sop-event-head">
+                                  <Space wrap>
+                                    <Tag color={event.enabled ? "green" : "default"}>{event.enabled ? "启用" : "停用"}</Tag>
+                                    <Text strong>{event.name}</Text>
+                                    <Tag>{event.triggerType}</Tag>
+                                    <Text type="secondary">{event.triggerType === "SCHEDULED" ? `D+${event.scheduleDayOffset} ${event.scheduleTimeOfDay}` : event.triggerType === "CHAIN_DELAYED" ? `前置事件完成 ${event.delayMinutes} 分钟后` : "立即触发"}</Text>
+                                    {event.pollEnabled ? <Tag color="orange">开启轮询 {event.pollIntervalMinutes}分钟 x {event.pollCount}</Tag> : null}
+                                  </Space>
+                                  <Space><Button type="link" onClick={() => setEditingEvent({ sop: viewingSop, phase, event })}>编辑事件</Button><Button type="link" onClick={() => setEditingStrategy({ sop: viewingSop, phase, event, strategy: createStrategyDraft() })}>添加策略</Button></Space>
+                                </div>
+                                <Text type="secondary">{event.description}</Text>
+                                <div className="sop-strategy-chain">
+                                  {event.strategies.map((strategy) => (
+                                    <div className="sop-strategy-node" key={strategy.id}>
+                                      <Space wrap>
+                                        <Tag color={strategy.strategyType === "AGENT" ? "blue" : "cyan"}>{strategy.strategyType === "AGENT" ? "Agent 生成" : "固定消息"}</Tag>
+                                        <Text strong>{strategy.name}</Text>
+                                        <Tag>{strategy.sendChannel === "JUZI" ? "句子私聊" : "企微应用"}</Tag>
+                                        <Tag>{strategy.targetMode === "ALL" ? "全部用户" : "自定义用户"}</Tag>
+                                      </Space>
+                                      <Paragraph type="secondary">{strategy.strategyType === "AGENT" ? strategy.prompt : strategy.messageContent}</Paragraph>
+                                      <Text type="secondary">{renderConditionRule(strategy.conditionRule)}</Text>
+                                      <Button type="link" onClick={() => setEditingStrategy({ sop: viewingSop, phase, event, strategy })}>编辑策略</Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </List.Item>
+                          )}
+                        />
+                      </Card>
+                    ))}
+                  </Space>
+                )
+              },
+              {
+                key: "runtime",
+                label: "运行明细",
+                children: (
+                  <Space direction="vertical" size={16} className="page-stack">
+                    <Row gutter={12}>
+                      <Col xs={12} md={4}><Card><Statistic title="运行中" value={viewingSop.runtime.runningInstances} /></Card></Col>
+                      <Col xs={12} md={4}><Card><Statistic title="已暂停" value={viewingSop.runtime.pausedInstances} /></Card></Col>
+                      <Col xs={12} md={4}><Card><Statistic title="已完成" value={viewingSop.runtime.finishedInstances} /></Card></Col>
+                      <Col xs={12} md={4}><Card><Statistic title="近7天完成" value={viewingSop.runtime.finishedLast7Days} /></Card></Col>
+                      <Col xs={12} md={4}><Card><Statistic title="失败任务" value={viewingSop.runtime.failedTasks} /></Card></Col>
+                      <Col xs={12} md={4}><Card><Statistic title="已通知失败" value={viewingSop.runtime.notifiedFailedTasks} /></Card></Col>
+                    </Row>
+                    <Table
+                      size="small"
+                      rowKey="id"
+                      columns={[
+                        { title: "客户", dataIndex: "customer" },
+                        { title: "当前阶段", dataIndex: "phase" },
+                        { title: "事件结果", dataIndex: "result", render: (value) => <Tag color={value === "SUCCESS" ? "green" : value === "FAILED" ? "red" : "blue"}>{value}</Tag> },
+                        { title: "最近执行", dataIndex: "updatedAt" },
+                        { title: "操作", render: () => <Space><Button size="small">暂停</Button><Button size="small">手动触发</Button><Button size="small" danger>终止</Button></Space> }
+                      ]}
+                      dataSource={[
+                        { id: "ins-1", customer: "张妈妈", phase: viewingSop.phases[0]?.name, result: "RUNNING", updatedAt: "2026-07-29 10:22" },
+                        { id: "ins-2", customer: "王妈妈", phase: viewingSop.phases[1]?.name || viewingSop.phases[0]?.name, result: "SUCCESS", updatedAt: "2026-07-29 09:18" },
+                        { id: "ins-3", customer: "刘爸爸", phase: viewingSop.phases[2]?.name || viewingSop.phases[0]?.name, result: "FAILED", updatedAt: "2026-07-28 21:40" }
+                      ]}
+                      pagination={false}
+                    />
+                  </Space>
+                )
+              }
+            ]}
+          />
+        ) : null}
+      </Drawer>
+      <Modal
+        title={editingSop?.key ? "编辑SOP" : "创建SOP"}
+        open={Boolean(editingSop)}
+        onCancel={() => setEditingSop(null)}
+        onOk={() => form.submit()}
+        okText="保存"
+        cancelText="取消"
+        width={980}
+      >
+        <Form form={form} layout="vertical" onFinish={handleSave}>
+          <Row gutter={16}>
+            <Col xs={24} md={12}><Form.Item label="SOP名称" name="name" rules={[{ required: true, message: "请输入SOP名称" }]}><Input placeholder="例如：新好友转化SOP" /></Form.Item></Col>
+            <Col xs={24} md={12}><Form.Item label="SOP编码" name="code" rules={[{ required: true, message: "请输入SOP编码" }]}><Input placeholder="例如：FRIEND_ADD_CONVERT" /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="启动事件" name="startEvent"><Select options={sopEventTypes.map((item) => ({ value: item.code, label: `${item.name}（${item.code}）` }))} /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="时间轴策略" name="timelineStrategy"><Select options={["FRIEND_ADD_DAILY_BOUNDARY", "EVENT_TIME", "FIXED_TIME"].map((value) => ({ value }))} /></Form.Item></Col>
+            <Col xs={24} md={4}><Form.Item label="版本" name="version"><Input /></Form.Item></Col>
+            <Col xs={24} md={4}><Form.Item label="状态" name="status"><Select options={Object.entries(sopStatusMeta).map(([value, meta]) => ({ value, label: meta.label }))} /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="默认触发时刻" name="defaultTimeOfDay"><Input placeholder="18:00:00" /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="失败通知" name="notifyMode"><Select options={[{ value: "FAILED_ONLY", label: "仅失败通知" }, { value: "NONE", label: "不通知" }, { value: "ALL", label: "全部通知" }]} /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="通知群" name="notifyGroupCode"><Input placeholder="SOP_FAILED_NOTICE" /></Form.Item></Col>
+            <Col span={24}><Form.Item label="销售范围" name="boundSales" rules={[{ required: true, message: "请选择销售范围" }]}><Select mode="multiple" options={managedWecomAccounts.map((item) => ({ value: item.key, label: `${item.label}（${item.account}）` }))} /></Form.Item></Col>
+            <Col span={24}><Form.Item label="SOP目标" name="target"><Input.TextArea rows={3} placeholder="说明该 SOP 对 AI 销售的业务目标、适用客户和执行边界。" /></Form.Item></Col>
+          </Row>
+          <Divider orientation="left">配置原则</Divider>
+          <Paragraph type="secondary">基础信息和销售范围独立保存；阶段、事件、策略在配置详情中分层维护。条件策略排在前面，多条 ALL 策略连续排列在链尾，按保存顺序执行 fallback，第一条成功产出内容后停止。</Paragraph>
+        </Form>
+      </Modal>
+      <Modal title={editingPhase?.phase?.id ? "编辑阶段" : "添加阶段"} open={Boolean(editingPhase)} onCancel={() => setEditingPhase(null)} onOk={() => phaseForm.submit()} okText="保存" cancelText="取消">
+        <Form form={phaseForm} layout="vertical" onFinish={handleSavePhase}>
+          <Form.Item label="阶段名称" name="name" rules={[{ required: true, message: "请输入阶段名称" }]}><Input /></Form.Item>
+          <Form.Item label="阶段闲聊 Agent" name="chatAgentCode"><Select options={["day0_agent", "day1_agent_release", "day2_agent_release", "day3_agent_release", "day6_agent_release", "multimodel_homework_agent"].map((value) => ({ value }))} /></Form.Item>
+          <Row gutter={12}>
+            <Col span={12}><Form.Item label="事件默认日期" name="defaultTimeDayOffset"><InputNumber min={0} addonBefore="D+" className="full-input" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="默认触发时刻" name="defaultTimeOfDay"><Input /></Form.Item></Col>
+          </Row>
+          <Form.Item label="阶段说明" name="description"><Input.TextArea rows={3} /></Form.Item>
+        </Form>
+      </Modal>
+      <Modal title={editingEvent?.event?.id ? "编辑事件" : "添加事件"} open={Boolean(editingEvent)} onCancel={() => setEditingEvent(null)} onOk={() => eventForm.submit()} okText="保存" cancelText="取消">
+        <Form form={eventForm} layout="vertical" onFinish={handleSaveEvent}>
+          <Form.Item label="事件名称" name="name" rules={[{ required: true, message: "请输入事件名称" }]}><Input /></Form.Item>
+          <Form.Item label="触发类型" name="triggerType"><Select options={[{ value: "INSTANCE_CREATED", label: "立即触发" }, { value: "SCHEDULED", label: "固定时刻" }, { value: "CHAIN_IMMEDIATE", label: "前置事件完成立即" }, { value: "CHAIN_DELAYED", label: "前置事件完成 N 分钟后" }]} /></Form.Item>
+          <Row gutter={12}>
+            <Col span={8}><Form.Item label="相对日期" name="scheduleDayOffset"><InputNumber min={0} addonBefore="D+" className="full-input" /></Form.Item></Col>
+            <Col span={8}><Form.Item label="固定时刻" name="scheduleTimeOfDay"><Input /></Form.Item></Col>
+            <Col span={8}><Form.Item label="延迟分钟" name="delayMinutes"><InputNumber min={0} className="full-input" /></Form.Item></Col>
+          </Row>
+          <Row gutter={12}>
+            <Col span={8}><Form.Item label="开启轮询" name="pollEnabled" valuePropName="checked"><Switch /></Form.Item></Col>
+            <Col span={8}><Form.Item label="轮询间隔" name="pollIntervalMinutes"><InputNumber min={1} addonAfter="分钟" className="full-input" /></Form.Item></Col>
+            <Col span={8}><Form.Item label="执行次数" name="pollCount"><InputNumber min={1} className="full-input" /></Form.Item></Col>
+          </Row>
+          <Form.Item label="事件说明" name="description"><Input.TextArea rows={3} /></Form.Item>
+        </Form>
+      </Modal>
+      <Modal title={editingStrategy?.strategy?.id ? "编辑策略" : "添加策略"} open={Boolean(editingStrategy)} onCancel={() => setEditingStrategy(null)} onOk={() => strategyForm.submit()} okText="保存" cancelText="取消" width={880}>
+        <Form form={strategyForm} layout="vertical" onFinish={handleSaveStrategy}>
+          <Row gutter={12}>
+            <Col xs={24} md={12}><Form.Item label="策略名称" name="name" rules={[{ required: true, message: "请输入策略名称" }]}><Input /></Form.Item></Col>
+            <Col xs={24} md={6}><Form.Item label="策略类型" name="strategyType"><Select options={[{ value: "AGENT", label: "Agent 生成" }, { value: "FIXED_MESSAGE", label: "固定消息" }]} /></Form.Item></Col>
+            <Col xs={24} md={6}><Form.Item label="发送渠道" name="sendChannel"><Select options={[{ value: "JUZI", label: "句子私聊" }, { value: "WECOM_APP", label: "企微应用" }]} /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="目标用户范围" name="targetMode"><Radio.Group optionType="button" options={[{ value: "ALL", label: "全部用户" }, { value: "CUSTOM", label: "自定义用户" }]} /></Form.Item></Col>
+            <Col xs={24} md={16}><Form.Item label="Agent" name="agentCode"><Select options={[...strategies.map((item) => item.name), ...agentTools.map((item) => item.name)].map((value) => ({ value }))} /></Form.Item></Col>
+            <Col span={24}><Form.Item label="生成指令 / 固定消息内容" name="prompt"><Input.TextArea rows={3} placeholder="Agent 生成时作为 prompt；固定消息可在下方填写消息正文。" /></Form.Item></Col>
+            <Col xs={24} md={8}><Form.Item label="消息类型" name="messageType"><Select options={["TEXT", "IMAGE", "WEB", "VIDEO", "FILE", "MINI_PROGRAM", "VOICE"].map((value) => ({ value }))} /></Form.Item></Col>
+            <Col xs={24} md={16}><Form.Item label="模板变量" name="messageVars"><Select mode="multiple" options={sopMessageVariables.map((value) => ({ value }))} /></Form.Item></Col>
+            <Col span={24}><Form.Item label="固定消息正文" name="messageContent"><Input.TextArea rows={3} placeholder="支持 ${nickName}、${date} 等服务端变量。" /></Form.Item></Col>
+          </Row>
+          <Card size="small" title="条件构建器">
+            <Paragraph type="secondary">自定义用户可用 AND/OR 组合条件，例如基础信息、加好友时间、上课状态、订单状态、客户行为。当前原型展示字段池，真实接口使用 conditionRule JSON 保存。</Paragraph>
+            <Space wrap>{sopConditionFields.map((item) => <Tag key={item.category}>{item.label}：{item.fields.join("、")}</Tag>)}</Space>
+          </Card>
+        </Form>
+      </Modal>
+    </>
   );
 }
 
@@ -2502,15 +3515,18 @@ function SalesPage() {
   );
 }
 
-function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKeys = managedWecomAccounts.map((item) => item.key) }) {
+function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKeys = managedWecomAccounts.map((item) => item.key), onActiveWecomChange }) {
   const visibleConversations = conversations.filter((item) => visibleWecomKeys.includes(item.accountKey));
   const filteredConversations = visibleConversations.filter((item) => item.accountKey === activeWecom);
-  const [selected, setSelected] = useState(visibleConversations.find((item) => item.key === activeConversationKey) || filteredConversations[0] || visibleConversations[0] || null);
+  const activeConversation = activeConversationKey ? visibleConversations.find((item) => item.key === activeConversationKey) : null;
+  const [selected, setSelected] = useState(activeConversation || filteredConversations[0] || visibleConversations[0] || null);
   const [hostingMode, setHostingMode] = useState(selected?.hosted ? "ai" : "manual");
   const [manualReply, setManualReply] = useState("");
   const [composerItems, setComposerItems] = useState([]);
+  const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false);
+  const [customerDrawerTab, setCustomerDrawerTab] = useState("profile");
   useEffect(() => {
-    setSelected(visibleConversations.find((item) => item.key === activeConversationKey) || filteredConversations[0] || visibleConversations[0] || null);
+    setSelected(activeConversation || filteredConversations[0] || visibleConversations[0] || null);
   }, [activeWecom, activeConversationKey, visibleWecomKeys.join("|")]);
   useEffect(() => {
     if (selected) setHostingMode(selected.hosted ? "ai" : "manual");
@@ -2527,6 +3543,42 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
     });
   };
   const needsHumanIntervention = (item) => item.status === "待确认发送" || item.status === "人工接管" || item.sendMode === "人工确认";
+  const visibleWecomAccounts = managedWecomAccounts.filter((item) => visibleWecomKeys.includes(item.key));
+  const activeWecomAccount = visibleWecomAccounts.find((item) => item.key === activeWecom) || visibleWecomAccounts[0];
+  const wecomAccountRows = visibleWecomAccounts.map((account) => {
+    const accountConversations = visibleConversations.filter((item) => item.accountKey === account.key);
+    return {
+      ...account,
+      hostedTotal: accountConversations.filter((item) => item.hosted).length
+    };
+  });
+  const selectWecomAccount = (account) => {
+    const firstConversation = visibleConversations.find((item) => item.accountKey === account.key) || null;
+    onActiveWecomChange?.(account.key);
+    setSelected(firstConversation);
+  };
+  const renderWecomAccountList = () => (
+    <aside className="wecom-account-list">
+      <div className="wecom-account-list-head">
+        <Text strong>企微账号</Text>
+        <Text type="secondary">{wecomAccountRows.length} 个账号</Text>
+      </div>
+      <List
+        className="wecom-account-items"
+        dataSource={wecomAccountRows}
+        locale={{ emptyText: "当前范围暂无企微账号" }}
+        renderItem={(account) => (
+          <List.Item className={activeWecomAccount?.key === account.key ? "wecom-account-item active" : "wecom-account-item"} onClick={() => selectWecomAccount(account)}>
+            <Avatar className="wecom-account-avatar" icon={<WechatOutlined />} />
+            <div className="wecom-account-main">
+              <Text className="wecom-account-name" ellipsis>{account.label}</Text>
+              <Tag>{account.department}</Tag>
+            </div>
+          </List.Item>
+        )}
+      />
+    </aside>
+  );
   const addComposerItem = (type) => {
     const labelMap = {
       emoji: "表情：😊",
@@ -2546,6 +3598,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
   if (!selected) {
     return (
       <div className="wecom-workbench">
+        {renderWecomAccountList()}
         <aside className="wecom-session-list">
           <div className="session-search">
             <Input.Search placeholder="搜索客户、群或消息" allowClear />
@@ -2593,7 +3646,9 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
     }
   ];
   return (
+    <>
       <div className="wecom-workbench">
+        {renderWecomAccountList()}
         <aside className="wecom-session-list">
         <div className="session-search">
           <Input.Search placeholder="搜索客户、群或消息" allowClear />
@@ -2605,11 +3660,11 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
           locale={{ emptyText: "当前企微暂无同步会话" }}
           renderItem={(item) => (
             <List.Item className={selected.key === item.key ? "session-item active" : "session-item"} onClick={() => setSelected(item)}>
-              <WecomAvatar item={item} unread={item.unread} />
+              <WecomAvatar item={item} />
               <div className="session-main">
                 <div className="session-title-row">
                   <Space className="session-title-main" size={6}>
-                    <Text strong ellipsis>{item.name}</Text>
+                    <Text ellipsis>{item.name}</Text>
                     <span className={`intent-pill intent-${item.intent}`}>{intentLabelMap[item.intent] || `${item.intent}意向`}</span>
                   </Space>
                   <Text type="secondary">10:20</Text>
@@ -2643,15 +3698,40 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
               {selected.type === "group" ? <Tag color="green">群聊</Tag> : null}
             </Space>
           </div>
-          <div className="hosting-switch-wrap">
-            <Text className="hosting-label">托管给AI</Text>
-            <Switch
-              className="hosting-switch"
-              checked={hostingMode === "ai"}
-              checkedChildren="开"
-              unCheckedChildren="关"
-              onChange={confirmHostingChange}
-            />
+          <button
+            className="chat-lifecycle-stage"
+            type="button"
+            onClick={() => {
+              setCustomerDrawerTab("lifecycle");
+              setCustomerDrawerOpen(true);
+            }}
+          >
+            <Text type="secondary">当前阶段</Text>
+            <Tag color="blue">{selected.lifecycle}</Tag>
+            <Text type="secondary">{currentStageIndex + 1}/{lifecycleStages.length}</Text>
+          </button>
+          <div className="chat-header-actions">
+            <Button
+              className="customer-drawer-trigger"
+              aria-label="客户资料"
+              icon={<UserOutlined />}
+              onClick={() => {
+                setCustomerDrawerTab("profile");
+                setCustomerDrawerOpen(true);
+              }}
+            >
+              客户资料
+            </Button>
+            <div className="hosting-switch-wrap">
+              <Text className="hosting-label">托管给AI</Text>
+              <Switch
+                className="hosting-switch"
+                checked={hostingMode === "ai"}
+                checkedChildren="开"
+                unCheckedChildren="关"
+                onChange={confirmHostingChange}
+              />
+            </div>
           </div>
         </div>
         <div className="wecom-message-area">
@@ -2700,113 +3780,123 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
           </div>
         </div>
         </main>
-        <aside className="customer-side-panel">
-        <Tabs
-          defaultActiveKey="profile"
-          items={[
-            {
-              key: "profile",
-              label: "用户信息",
-              children: (
-                <Space direction="vertical" size={16} className="full-width">
-                  <div className="profile-card">
-                    <WecomAvatar item={selected} size={58} />
-                    <div>
-                      <Title level={5}>{selected.name}</Title>
-                      <span className={`intent-pill intent-${selected.intent}`}>{intentLabelMap[selected.intent] || `${selected.intent}意向`}</span>
-                    </div>
-                  </div>
-                  <Descriptions size="small" column={1} bordered>
-                    <Descriptions.Item label="备注">{selected.remark}</Descriptions.Item>
-                    <Descriptions.Item label="电话">{selected.phone}</Descriptions.Item>
-                    <Descriptions.Item label="企微ID">{selected.wecomId}</Descriptions.Item>
-                    <Descriptions.Item label="添加时间">{selected.addedAt}</Descriptions.Item>
-                  </Descriptions>
-                  <Divider orientation="left">企微标签</Divider>
-                  <div className="tag-group-list">
-                    <div><Text type="secondary">用户运营</Text><Space wrap>{selected.tags.slice(0, 2).map((item) => <Tag color="blue" key={item}>{item}</Tag>)}</Space></div>
-                    <div><Text type="secondary">客户状态</Text><Space wrap>{selected.tags.slice(2).concat(selected.lifecycle).map((item) => <Tag key={item}>{item}</Tag>)}</Space></div>
-                    <div><Text type="secondary">渠道来源</Text><Space wrap><Tag color="cyan">企微</Tag><Tag color="cyan">SCRM</Tag></Space></div>
-                  </div>
-                </Space>
-              )
-            },
-            {
-              key: "orders",
-              label: "订单信息",
-              children: (
-                <Space direction="vertical" size={12} className="full-width">
-                  {(selected.orders || []).map((order) => (
-                    <Card size="small" key={order.id} className="order-mini-card">
-                      <Descriptions size="small" column={1}>
-                        <Descriptions.Item label="订单号">{order.id}</Descriptions.Item>
-                        <Descriptions.Item label="产品">{order.product}</Descriptions.Item>
-                        <Descriptions.Item label="金额">{order.amount}</Descriptions.Item>
-                        <Descriptions.Item label="状态">{order.status}</Descriptions.Item>
-                        <Descriptions.Item label="付款时间">{order.paidAt}</Descriptions.Item>
-                      </Descriptions>
-                    </Card>
-                  ))}
-                </Space>
-              )
-            },
-            {
-              key: "lifecycle",
-              label: "生命周期",
-              children: (
-                <div className="lifecycle-list">
-                  {lifecycleStages.map((stage, index) => (
-                    <div key={stage.title} className={index === currentStageIndex ? "lifecycle-item current" : index < currentStageIndex ? "lifecycle-item done" : "lifecycle-item"}>
-                      <div className="lifecycle-index">{index + 1}</div>
+      </div>
+      <Drawer
+        title={`${selected.name} · 客户资料`}
+        open={customerDrawerOpen}
+        onClose={() => setCustomerDrawerOpen(false)}
+        width={420}
+        className="customer-side-drawer"
+      >
+        <div className="customer-side-panel drawer-mode">
+          <Tabs
+            activeKey={customerDrawerTab}
+            onChange={setCustomerDrawerTab}
+            items={[
+              {
+                key: "profile",
+                label: "用户信息",
+                children: (
+                  <Space direction="vertical" size={16} className="full-width">
+                    <div className="profile-card">
+                      <WecomAvatar item={selected} size={58} />
                       <div>
-                        <Text strong>{stage.title}</Text>
-                        <Paragraph type="secondary">{stage.desc}</Paragraph>
-                        <Space wrap>{(stage.skills || []).map((item) => <Tag key={item}>{item}</Tag>)}</Space>
+                        <Title level={5}>{selected.name}</Title>
+                        <span className={`intent-pill intent-${selected.intent}`}>{intentLabelMap[selected.intent] || `${selected.intent}意向`}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )
-            },
-            {
-              key: "plans",
-              label: "聊天计划",
-              children: (
-                <div className="chat-plan-list">
-                  {chatPlans.map((plan) => (
-                    <Card size="small" key={plan.key} className="chat-plan-card">
-                      <Space direction="vertical" size={8} className="full-width">
-                        <Space className="full-width" align="start" style={{ justifyContent: "space-between" }}>
-                          <Space direction="vertical" size={4}>
-                            <Text strong>{plan.topic}</Text>
-                            <Space size={6} wrap>
-                              <Tag color={plan.sourceColor}>{plan.source}</Tag>
+                    <Descriptions size="small" column={1} bordered>
+                      <Descriptions.Item label="备注">{selected.remark}</Descriptions.Item>
+                      <Descriptions.Item label="电话">{selected.phone}</Descriptions.Item>
+                      <Descriptions.Item label="企微ID">{selected.wecomId}</Descriptions.Item>
+                      <Descriptions.Item label="添加时间">{selected.addedAt}</Descriptions.Item>
+                    </Descriptions>
+                    <Divider orientation="left">企微标签</Divider>
+                    <div className="tag-group-list">
+                      <div><Text type="secondary">用户运营</Text><Space wrap>{selected.tags.slice(0, 2).map((item) => <Tag color="blue" key={item}>{item}</Tag>)}</Space></div>
+                      <div><Text type="secondary">客户状态</Text><Space wrap>{selected.tags.slice(2).concat(selected.lifecycle).map((item) => <Tag key={item}>{item}</Tag>)}</Space></div>
+                      <div><Text type="secondary">渠道来源</Text><Space wrap><Tag color="cyan">企微</Tag><Tag color="cyan">SCRM</Tag></Space></div>
+                    </div>
+                  </Space>
+                )
+              },
+              {
+                key: "orders",
+                label: "订单信息",
+                children: (
+                  <Space direction="vertical" size={12} className="full-width">
+                    {(selected.orders || []).map((order) => (
+                      <Card size="small" key={order.id} className="order-mini-card">
+                        <Descriptions size="small" column={1}>
+                          <Descriptions.Item label="订单号">{order.id}</Descriptions.Item>
+                          <Descriptions.Item label="产品">{order.product}</Descriptions.Item>
+                          <Descriptions.Item label="金额">{order.amount}</Descriptions.Item>
+                          <Descriptions.Item label="状态">{order.status}</Descriptions.Item>
+                          <Descriptions.Item label="付款时间">{order.paidAt}</Descriptions.Item>
+                        </Descriptions>
+                      </Card>
+                    ))}
+                  </Space>
+                )
+              },
+              {
+                key: "lifecycle",
+                label: "生命周期",
+                children: (
+                  <div className="lifecycle-list">
+                    {lifecycleStages.map((stage, index) => (
+                      <div key={stage.title} className={index === currentStageIndex ? "lifecycle-item current" : index < currentStageIndex ? "lifecycle-item done" : "lifecycle-item"}>
+                        <div className="lifecycle-index">{index + 1}</div>
+                        <div>
+                          <Text strong>{stage.title}</Text>
+                          <Paragraph type="secondary">{stage.desc}</Paragraph>
+                          <Space wrap>{(stage.skills || []).map((item) => <Tag key={item}>{item}</Tag>)}</Space>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              },
+              {
+                key: "plans",
+                label: "聊天计划",
+                children: (
+                  <div className="chat-plan-list">
+                    {chatPlans.map((plan) => (
+                      <Card size="small" key={plan.key} className="chat-plan-card">
+                        <Space direction="vertical" size={8} className="full-width">
+                          <Space className="full-width" align="start" style={{ justifyContent: "space-between" }}>
+                            <Space direction="vertical" size={4}>
+                              <Text strong>{plan.topic}</Text>
+                              <Space size={6} wrap>
+                                <Tag color={plan.sourceColor}>{plan.source}</Tag>
+                              </Space>
                             </Space>
+                            <Tag color="processing">{plan.planTime}</Tag>
                           </Space>
-                          <Tag color="processing">{plan.planTime}</Tag>
+                          <Text>{plan.content}</Text>
+                          {plan.source === "会话生成" ? (
+                            <div className="plan-quote">
+                              <Text type="secondary">关联聊天记录 · {plan.quoteTime}</Text>
+                              <Paragraph>{plan.quote}</Paragraph>
+                            </div>
+                          ) : (
+                            <div className="plan-quote plan-skill-source">
+                              <Text type="secondary">来自 Skill 定时任务</Text>
+                              <Paragraph>{plan.triggerRule}触发执行</Paragraph>
+                            </div>
+                          )}
                         </Space>
-                        <Text>{plan.content}</Text>
-                        {plan.source === "会话生成" ? (
-                          <div className="plan-quote">
-                            <Text type="secondary">关联聊天记录 · {plan.quoteTime}</Text>
-                            <Paragraph>{plan.quote}</Paragraph>
-                          </div>
-                        ) : (
-                          <div className="plan-quote plan-skill-source">
-                            <Text type="secondary">来自 Skill 定时任务</Text>
-                            <Paragraph>{plan.triggerRule}触发执行</Paragraph>
-                          </div>
-                        )}
-                      </Space>
-                    </Card>
-                  ))}
-                </div>
-              )
-            }
-          ]}
-        />
-        </aside>
-      </div>
+                      </Card>
+                    ))}
+                  </div>
+                )
+              }
+            ]}
+          />
+        </div>
+      </Drawer>
+    </>
   );
 }
 
@@ -3086,34 +4176,45 @@ function AppShell({ user, onLogout }) {
     company: <CompanyPage platform={platform} />,
     agent: <AgentPage />,
     strategy: <StrategyPage />,
+    tools: <ToolsPage />,
+    sop: <SopPage />,
     knowledge: <KnowledgePage />,
     wecom: <WecomPage />,
     sales: <SalesPage />,
     humanization: <HumanizationPage />,
-    conversations: <ConversationsPage activeWecom={activeWecom} activeConversationKey={activeConversationKey} visibleWecomKeys={visibleWecomKeys} />,
+    conversations: (
+      <ConversationsPage
+        activeWecom={activeWecom}
+        activeConversationKey={activeConversationKey}
+        visibleWecomKeys={visibleWecomKeys}
+        onActiveWecomChange={(key) => {
+          setActiveWecom(key);
+          setActiveConversationKey("");
+        }}
+      />
+    ),
     suggestions: <SuggestionsPage />,
     settings: <SettingsPage platform={platform} />
   })[route], [route, platform, activeWecom, activeConversationKey, visibleWecomKeys.join("|")]);
 
   return (
     <Layout className="app-layout">
-      <Sider className="app-sider" width={176} collapsedWidth={80} collapsed={collapsed} trigger={null}>
+      <Sider className="app-sider" width={220} collapsedWidth={80} collapsed={collapsed} trigger={null}>
         <div className="brand">
-          <div className="brand-mark">AI</div>
-          {!collapsed ? <Title level={4}>AISA</Title> : null}
-          <Tooltip title={collapsed ? "展开导航" : "收起导航"} placement={collapsed ? "right" : "bottom"}>
-            <Button
-              className="sider-collapse-button"
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed((value) => !value)}
-            />
-          </Tooltip>
+          <div className="brand-mark"><RobotOutlined /></div>
+          {!collapsed ? <Title level={4}>AI 平台</Title> : null}
         </div>
-        <Menu theme="dark" mode="inline" selectedKeys={[route]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
-        {!collapsed ? <Card className="sider-status" size="small">
-          <Space><Badge status="success" /><div><Text strong>企微通道正常</Text><br /><Text type="secondary">最近同步 14:20</Text></div></Space>
-        </Card> : null}
+        <Menu theme="light" mode="inline" selectedKeys={[route]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
+        <Tooltip title={collapsed ? "展开导航" : "收起导航"} placement={collapsed ? "right" : "top"}>
+          <Button
+            className="sider-collapse-button"
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed((value) => !value)}
+          >
+            {!collapsed ? "收起" : null}
+          </Button>
+        </Tooltip>
       </Sider>
       <Layout>
         <Header className="app-header">
@@ -3134,15 +4235,6 @@ function AppShell({ user, onLogout }) {
                       options={orgOptions}
                     />
                   ) : null}
-                  <Select
-                    className="wecom-account-switch"
-                    value={activeWecom}
-                    onChange={(value) => {
-                      setActiveWecom(value);
-                      setActiveConversationKey("");
-                    }}
-                    options={visibleWecomAccounts.map((item) => ({ value: item.key, label: `${item.label}（${item.account}）` }))}
-                  />
                 </>
               ) : null}
             </div>

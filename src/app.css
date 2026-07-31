@@ -173,76 +173,138 @@ body {
   top: 0;
   height: 100dvh;
   overflow: hidden;
-  background: #111827 !important;
+  border-right: 1px solid #e5edf7;
+  background: #ffffff !important;
+  box-shadow: 12px 0 34px rgba(24, 40, 72, 0.06);
 }
 
 .app-sider .brand {
   position: relative;
-  height: 76px;
-  padding: 14px 10px 14px 14px;
+  height: 132px;
+  padding: 22px 24px 18px;
+  align-items: flex-start;
 }
 
 .app-sider.ant-layout-sider-collapsed .brand {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  height: 118px;
+  height: 112px;
   padding: 14px 0 12px;
 }
 
+.app-sider .brand .brand-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #4f63ff 0%, #3137ee 100%);
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 0 9px 18px rgba(53, 62, 241, 0.26);
+}
+
 .app-sider .brand h4 {
-  color: #fff;
+  color: #090d1a;
   margin: 0;
 }
 
 .app-sider .brand h4 {
-  font-size: 18px;
+  padding-top: 8px;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: 0;
 }
 
 .sider-collapse-button {
-  margin-left: auto;
-  flex: 0 0 auto;
-  color: #aeb9cb;
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  left: 20px;
+  display: inline-flex;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #dfe8f5;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #5b6a82;
+  font-size: 16px;
+  font-weight: 650;
+  box-shadow: 0 6px 18px rgba(24, 40, 72, 0.06);
 }
 
 .sider-collapse-button:hover,
 .sider-collapse-button:focus-visible {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #c9dcff !important;
+  color: #245df4 !important;
+  background: #f4f8ff !important;
 }
 
 .app-sider.ant-layout-sider-collapsed .sider-collapse-button {
-  margin-left: 0;
+  right: 14px;
+  left: 14px;
+  width: 52px;
+  padding: 0;
 }
 
-.app-sider .ant-menu-dark {
+.app-sider .ant-menu-light {
+  height: calc(100dvh - 204px);
+  overflow-y: auto;
+  border-inline-end: 0 !important;
   background: transparent;
-  padding-inline: 8px;
+  padding: 0 16px 70px;
 }
 
-.app-sider.ant-layout-sider-collapsed .ant-menu-dark {
+.app-sider.ant-layout-sider-collapsed .ant-menu-light {
+  height: calc(100dvh - 178px);
   padding-inline: 10px;
 }
 
-.sider-status {
-  position: absolute;
-  right: 10px;
-  bottom: 20px;
-  left: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+.app-sider .ant-menu .ant-menu-item {
+  width: 100%;
+  height: 52px;
+  margin: 0 0 12px;
+  padding-inline: 20px !important;
+  border-radius: 8px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 52px;
 }
 
-.sider-status .ant-card-body {
-  padding: 10px;
+.app-sider.ant-layout-sider-collapsed .ant-menu .ant-menu-item {
+  display: flex;
+  width: 52px;
+  justify-content: center;
+  padding-inline: 0 !important;
 }
 
-.sider-status .ant-typography {
-  color: #eef4ff;
+.app-sider .ant-menu .ant-menu-item .ant-menu-item-icon {
+  min-width: 18px;
+  color: #070b16;
+  font-size: 16px;
 }
 
-.sider-status .ant-typography-secondary {
-  color: #aeb9cb;
+.app-sider .ant-menu .ant-menu-item:hover,
+.app-sider .ant-menu .ant-menu-item-active {
+  color: #245df4;
+  background: #f3f7ff;
+}
+
+.app-sider .ant-menu .ant-menu-item:hover .ant-menu-item-icon,
+.app-sider .ant-menu .ant-menu-item-selected .ant-menu-item-icon {
+  color: #245df4;
+}
+
+.app-sider .ant-menu .ant-menu-item-selected {
+  color: #0f172a;
+  background: #eef4ff;
+  box-shadow: inset 0 0 0 1px #d9e8ff, 0 6px 14px rgba(37, 99, 235, 0.08);
+}
+
+.app-sider .ant-menu .ant-menu-item-selected::after {
+  display: none;
 }
 
 .app-header {
@@ -470,6 +532,213 @@ body {
 
 .admin-table .ant-table-thead > tr > th {
   white-space: nowrap;
+}
+
+.tool-filter-row {
+  min-height: 78px;
+}
+
+.filter-form-item {
+  margin-bottom: 0;
+}
+
+.tool-filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 54px;
+}
+
+.tool-filter-divider {
+  height: 54px;
+  margin-right: 28px;
+  border-inline-start-color: #d8dee9;
+}
+
+.tool-table .ant-table-tbody > tr > td {
+  height: 56px;
+}
+
+.tool-table .ant-btn-link {
+  padding-inline: 0;
+}
+
+.sop-page > .ant-card {
+  border-color: #dfe7f4;
+}
+
+.sop-hero-card {
+  background:
+    linear-gradient(135deg, rgba(118, 74, 255, 0.08), transparent 34%),
+    linear-gradient(90deg, #fbfdff, #fff);
+}
+
+.sop-hero-card .ant-card-body {
+  padding: 28px 32px;
+}
+
+.sop-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.sop-hero-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid #d7ccff;
+  border-radius: 8px;
+  background: #f1ecff;
+  color: #722ed1;
+  font-size: 26px;
+}
+
+.sop-hero h2 {
+  margin: 4px 0 8px;
+  color: #111827;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.sop-eyebrow {
+  color: #8a9ab3;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+.sop-toolbar {
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sop-toolbar .ant-select {
+  min-width: 150px;
+}
+
+.sop-toolbar > .ant-input {
+  width: 180px;
+}
+
+.sop-search.ant-input-search {
+  width: min(560px, 100%);
+}
+
+.sop-table .ant-table-title {
+  padding: 14px 0 18px;
+}
+
+.sop-table .ant-table-tbody > tr > td {
+  height: 72px;
+  vertical-align: middle;
+}
+
+.sop-table .ant-btn-link {
+  padding-inline: 0;
+}
+
+.sop-stage-item {
+  align-items: flex-start !important;
+}
+
+.sop-stage-item .ant-typography {
+  margin-bottom: 4px;
+}
+
+.sop-stage-config {
+  background: #fbfdff;
+}
+
+.sop-stage-config .ant-form-item {
+  margin-bottom: 10px;
+}
+
+.sop-stage-remove {
+  display: flex;
+  align-items: end;
+  padding-bottom: 10px;
+}
+
+.sop-info-tile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 10px;
+  min-height: 82px;
+  padding: 12px;
+  border: 1px solid #e4eaf3;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.sop-info-tile .ant-typography-secondary {
+  grid-column: 1 / -1;
+}
+
+.sop-drawer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #d9e7ff;
+  border-radius: 8px;
+  background: #f4f8ff;
+}
+
+.sop-phase-card {
+  border-color: #e1e8f3;
+}
+
+.sop-phase-card .ant-card-head-title {
+  min-width: 0;
+}
+
+.sop-event-list {
+  margin-top: 12px;
+}
+
+.sop-event-list .ant-list-item {
+  padding: 12px 0;
+}
+
+.sop-event-block {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sop-event-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sop-strategy-chain {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.sop-strategy-node {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid #edf1f7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.sop-strategy-node .ant-typography {
+  margin-bottom: 0;
+}
+
+.full-input {
+  width: 100%;
 }
 
 .intervention-card {
@@ -1576,7 +1845,7 @@ body {
 .wecom-workbench {
   --conversation-header-height: 64px;
   display: grid;
-  grid-template-columns: 320px minmax(520px, 1fr) 360px;
+  grid-template-columns: 228px 304px minmax(560px, 1fr);
   min-height: calc(100dvh - 128px);
   overflow: hidden;
   border: 1px solid #d9e2ef;
@@ -1584,14 +1853,80 @@ body {
   background: #fff;
 }
 
+.wecom-account-list,
 .wecom-session-list,
 .customer-side-panel {
   min-width: 0;
   background: #fbfcff;
 }
 
+.wecom-account-list,
 .wecom-session-list {
   border-right: 1px solid #edf1f7;
+}
+
+.wecom-account-list {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #ffffff;
+}
+
+.wecom-account-list-head {
+  display: flex;
+  height: var(--conversation-header-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 18px;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.wecom-account-items {
+  height: calc(100dvh - 206px);
+  overflow-y: auto;
+}
+
+.wecom-account-item {
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center !important;
+  padding: 16px !important;
+  border-block-end: 1px solid #edf1f7 !important;
+}
+
+.wecom-account-item:hover {
+  background: #f4f8ff;
+}
+
+.wecom-account-item.active {
+  background: #e8f7ff;
+  box-shadow: inset 3px 0 0 #1677ff;
+}
+
+.wecom-account-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #eef6ff;
+  color: #1677ff;
+}
+
+.wecom-account-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.wecom-account-name {
+  color: #111827;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.wecom-account-main .ant-tag {
+  width: fit-content;
+  margin-inline-end: 0;
 }
 
 .session-search {
@@ -1768,6 +2103,38 @@ body {
   margin: 0;
 }
 
+.chat-lifecycle-stage {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f6faff;
+  cursor: pointer;
+  font: inherit;
+  white-space: nowrap;
+}
+
+.chat-lifecycle-stage:hover,
+.chat-lifecycle-stage:focus-visible {
+  border-color: #91caff;
+  background: #eef6ff;
+}
+
+.chat-lifecycle-stage .ant-tag {
+  margin-inline-end: 0;
+}
+
+.chat-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .hosting-switch-wrap {
   display: inline-flex;
   align-items: center;
@@ -1917,6 +2284,16 @@ body {
 .customer-side-panel {
   overflow-y: auto;
   border-left: 1px solid #edf1f7;
+}
+
+.customer-side-drawer .ant-drawer-body {
+  padding: 0;
+  background: #fbfcff;
+}
+
+.customer-side-panel.drawer-mode {
+  min-height: 100%;
+  border-left: 0;
 }
 
 .customer-side-panel .ant-tabs-nav {
@@ -2207,6 +2584,29 @@ body {
     background: #fff;
   }
 
+  .tool-filter-actions {
+    justify-content: flex-start;
+    min-height: auto;
+  }
+
+  .tool-filter-divider {
+    display: none;
+  }
+
+  .sop-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .sop-hero-card .ant-card-body {
+    padding: 22px;
+  }
+
+  .sop-toolbar .ant-select,
+  .sop-toolbar > .ant-input,
+  .sop-search.ant-input-search {
+    width: 100%;
+  }
+
   .app-header {
     height: auto;
     min-height: 96px;
@@ -2232,11 +2632,13 @@ body {
     overflow: visible;
   }
 
+  .wecom-account-list,
   .wecom-session-list,
   .customer-side-panel {
     border: 0;
   }
 
+  .wecom-account-items,
   .session-list,
   .wecom-message-area {
     height: auto;
