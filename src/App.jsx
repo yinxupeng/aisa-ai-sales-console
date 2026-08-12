@@ -52,7 +52,6 @@ import {
   PlusOutlined,
   SendOutlined,
   SmileOutlined,
-  ForkOutlined,
   ToolOutlined,
   UploadOutlined,
   RobotOutlined,
@@ -221,273 +220,47 @@ const agentTools = [
   }
 ];
 
-const sopTasks = [
+const knowledgeBases = [
   {
-    key: "sop-1",
-    name: "转化sop（正式测试807-813）",
-    code: "NEW_TEST",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "好友通过后欢迎", trigger: "加好友后 1 分钟", action: "发送欢迎语并收集孩子年级", tool: "生成课程顾问话术" },
-      { day: "D1", title: "需求澄清", trigger: "次日 10:00", action: "追问英语基础、学习目标和可试听时间", tool: "获取学员信息" },
-      { day: "D3", title: "试听邀约", trigger: "客户未预约试听", action: "推荐测评试听课并创建跟进提醒", tool: "创建试听跟进" },
-      { day: "D7", title: "异议处理", trigger: "客户表达价格或时间顾虑", action: "生成个性化异议处理话术", tool: "生成课程顾问话术" },
-      { day: "D10", title: "成交推动", trigger: "高意向标签命中", action: "提醒真人销售确认名额和报名链接", tool: "企微机器人通知" },
-      { day: "D14", title: "沉默唤醒", trigger: "连续 3 天未回复", action: "发送低打扰唤醒内容", tool: "跳转skill" },
-      { day: "D21", title: "结束归档", trigger: "转化周期结束", action: "生成客户跟进总结并释放托管资源", tool: "结束托管工具" }
-    ],
-    status: "已停用",
-    updatedAt: "2026-07-28 15:12:42",
-    owner: "李老师企微",
-    boundSales: ["李老师企微"],
-    target: "新加企微好友后，按阶段完成破冰、需求澄清、试听邀约、异议处理和成交提醒。"
+    key: "kb-course",
+    name: "小学英语课程知识库",
+    category: "课程知识",
+    desc: "沉淀课程体系、适合人群、学习路径和试听课说明，供销售智能体和课程推荐 Skill 使用。",
+    status: "启用",
+    owner: "知识库运营",
+    updated: "2026-08-08 18:20",
+    entries: [
+      { key: "ke-1", title: "小学英语诊断试听课说明", type: "文本知识", media: "文本", tags: ["试听课", "诊断"], status: "启用", updated: "2026-08-08 18:20" },
+      { key: "ke-2", title: "自然拼读课程海报", type: "图片素材", media: "图片", tags: ["自然拼读", "海报"], status: "启用", updated: "2026-08-07 15:12" },
+      { key: "ke-3", title: "课程顾问标准讲解音频", type: "语音素材", media: "语音", tags: ["讲解", "销售"], status: "启用", updated: "2026-08-06 11:30" }
+    ]
   },
   {
-    key: "sop-2",
-    name: "转化sop-（第一轮测试731-806）",
-    code: "NEW_TEST_COPY_2",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "自动欢迎", trigger: "加好友后立即", action: "介绍身份并询问咨询目标", tool: "生成课程顾问话术" },
-      { day: "D1", title: "资料补全", trigger: "客户回复后", action: "补全手机号、年级和薄弱点", tool: "获取学员信息" },
-      { day: "D3", title: "试听推进", trigger: "未预约试听", action: "推送试听时间选项", tool: "创建试听跟进" },
-      { day: "D7", title: "转人工提醒", trigger: "客户高意向", action: "通知销售人工确认报名方案", tool: "企微机器人通知" },
-      { day: "D10", title: "复盘总结", trigger: "SOP执行结束", action: "整理执行记录", tool: "结束托管工具" },
-      { day: "D14", title: "二次触达", trigger: "客户未成交", action: "发送阶段性优惠和课程价值点", tool: "生成课程顾问话术" },
-      { day: "D21", title: "归档", trigger: "无响应", action: "标记低意向并沉淀标签", tool: "更新学员标签" }
-    ],
-    status: "草稿",
-    updatedAt: "2026-07-28 15:12:13",
-    owner: "陈老师企微",
-    boundSales: ["陈老师企微"],
-    target: "验证新好友转化链路的触达节奏和自动化话术质量。"
+    key: "kb-policy",
+    name: "价格政策与异议处理库",
+    category: "政策规则",
+    desc: "维护价格套餐、优惠规则、退费边界和常见异议处理话术，优先绑定到价格相关 Skill。",
+    status: "启用",
+    owner: "平台运营",
+    updated: "2026-08-08 13:45",
+    entries: [
+      { key: "ke-4", title: "课程套餐价格边界", type: "文本知识", media: "文本", tags: ["价格", "套餐"], status: "启用", updated: "2026-08-08 13:45" },
+      { key: "ke-5", title: "暑期活动政策PDF", type: "文件素材", media: "文件", tags: ["活动", "PDF"], status: "停用", updated: "2026-08-05 09:18" }
+    ]
   },
   {
-    key: "sop-3",
-    name: "转化sop-（内部测试729-731）",
-    code: "NEW_TEST_COPY_NEW",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "欢迎语", trigger: "新好友通过", action: "建立课程顾问身份", tool: "生成课程顾问话术" },
-      { day: "D1", title: "客户画像", trigger: "客户首轮回复", action: "查询客户画像和历史试听", tool: "调用三方接口获取信息" },
-      { day: "D2", title: "课程推荐", trigger: "识别年级和薄弱点", action: "匹配课程包", tool: "生成课程顾问话术" },
-      { day: "D4", title: "提醒试听", trigger: "已预约试听", action: "课前提醒", tool: "企微机器人通知" },
-      { day: "D7", title: "试听反馈", trigger: "试听结束", action: "输出反馈和下一步建议", tool: "创建试听跟进" },
-      { day: "D10", title: "成交跟进", trigger: "高意向未报名", action: "推送报名提醒", tool: "生成课程顾问话术" },
-      { day: "D14", title: "结束托管", trigger: "周期结束", action: "生成总结", tool: "结束托管工具" }
-    ],
-    status: "已停用",
-    updatedAt: "2026-07-28 15:10:03",
-    owner: "周老师企微",
-    boundSales: ["周老师企微"],
-    target: "内部测试 AI 销售从线索接待到试听反馈的完整路径。"
-  },
-  {
-    key: "sop-4",
-    name: "添加好友-28号",
-    code: "NEW_TEST_COPY_3",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "好友欢迎", trigger: "加好友后 30 秒", action: "自动发送欢迎语", tool: "生成课程顾问话术" },
-      { day: "D1", title: "兴趣判断", trigger: "客户回复", action: "识别咨询方向并打标签", tool: "更新学员标签" },
-      { day: "D2", title: "资料同步", trigger: "手机号已获得", action: "同步三方客户档案", tool: "调用三方接口获取信息" },
-      { day: "D5", title: "课程介绍", trigger: "客户中高意向", action: "发送匹配课程介绍", tool: "生成课程顾问话术" },
-      { day: "D7", title: "人工提醒", trigger: "需报价", action: "通知销售介入", tool: "企微机器人通知" },
-      { day: "D10", title: "唤醒", trigger: "未回复", action: "低频唤醒", tool: "跳转skill" },
-      { day: "D14", title: "复盘", trigger: "结束", action: "输出 SOP 执行摘要", tool: "结束托管工具" }
-    ],
-    status: "启用中",
-    updatedAt: "2026-07-28 14:31:05",
-    owner: "吴老师企微",
-    boundSales: ["吴老师企微"],
-    target: "对 7 月 28 日新增好友批量执行销售跟进 SOP。"
-  },
-  {
-    key: "sop-5",
-    name: "添加好友2",
-    code: "NEW_TEST_COPY",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "破冰", trigger: "加好友后", action: "询问孩子年级", tool: "生成课程顾问话术" },
-      { day: "D1", title: "补充需求", trigger: "客户回复", action: "收集学习目标", tool: "获取学员信息" },
-      { day: "D3", title: "邀约试听", trigger: "未预约", action: "创建试听跟进", tool: "创建试听跟进" },
-      { day: "D5", title: "阶段提醒", trigger: "待确认", action: "通知销售", tool: "企微机器人通知" },
-      { day: "D7", title: "二次沟通", trigger: "中意向", action: "补充课程价值", tool: "生成课程顾问话术" },
-      { day: "D10", title: "沉默处理", trigger: "沉默 3 天", action: "切换唤醒策略", tool: "跳转skill" },
-      { day: "D14", title: "归档", trigger: "SOP结束", action: "总结客户状态", tool: "结束托管工具" }
-    ],
-    status: "已停用",
-    updatedAt: "2026-07-28 12:57:25",
-    owner: "林老师企微",
-    boundSales: ["林老师企微"],
-    target: "标准新好友跟进流程，用于低风险线索试运行。"
-  },
-  {
-    key: "sop-6",
-    name: "添加好友DAY10_SOP",
-    code: "NEW_SOP",
-    startEvent: "FRIEND_ADD",
-    timelineStrategy: "FRIEND_ADD_DAILY_BOUNDARY",
-    version: "v1",
-    accountScope: "1个账号",
-    stages: [
-      { day: "D0", title: "欢迎", trigger: "加好友后", action: "欢迎并说明服务", tool: "生成课程顾问话术" },
-      { day: "D3", title: "需求确认", trigger: "首轮沟通后", action: "确认学习诉求", tool: "获取学员信息" },
-      { day: "D10", title: "重点触达", trigger: "加好友第 10 天", action: "发起复访和课程推荐", tool: "生成课程顾问话术" }
-    ],
-    status: "已停用",
-    updatedAt: "2026-07-25 18:07:42",
-    owner: "李老师企微",
-    boundSales: ["李老师企微"],
-    target: "面向较长决策周期客户，在第 10 天集中做复访触达。"
+    key: "kb-faq",
+    name: "家长高频问题知识库",
+    category: "FAQ",
+    desc: "按家长咨询问题沉淀标准回答，包括上课方式、师资、效果边界、校内同步等。",
+    status: "启用",
+    owner: "课程运营",
+    updated: "2026-08-07 20:10",
+    entries: [
+      { key: "ke-6", title: "线上课和线下课区别", type: "文本知识", media: "文本", tags: ["上课方式"], status: "启用", updated: "2026-08-07 20:10" },
+      { key: "ke-7", title: "阅读理解错题样例", type: "图片素材", media: "图片", tags: ["阅读", "错题"], status: "启用", updated: "2026-08-06 16:22" }
+    ]
   }
-];
-
-const sopEventTypes = [
-  { code: "FRIEND_ADD", name: "新加好友", desc: "客户通过企微好友后启动 SOP", timeline: "FRIEND_ADD_DAILY_BOUNDARY" },
-  { code: "FEICE", name: "飞策事件", desc: "上课、下单或直播事件回调触发", timeline: "事件时间" },
-  { code: "TIMER", name: "定时判定", desc: "按运营配置定时启动", timeline: "固定时间" },
-  { code: "WECOM_MSG", name: "客户行为", desc: "客户消息、回复、互动行为触发", timeline: "行为时间" }
-];
-
-const sopConditionFields = [
-  { category: "BASIC_INFO", label: "基础信息", fields: ["gender", "region"] },
-  { category: "FRIEND_ADDED_TIME", label: "加好友时间", fields: ["friend_added_at BETWEEN"] },
-  { category: "COURSE_INFO", label: "课程信息", fields: ["attended_days 包含/不包含 D1-D6"] },
-  { category: "LESSON_STATUS", label: "上课状态", fields: ["attendance_status = ATTENDED/ABSENT"] },
-  { category: "HOMEWORK_INFO", label: "作业信息", fields: ["submitted", "submitted_homework_days D0-D6"] },
-  { category: "ORDER_STATUS", label: "订单状态", fields: ["order_status = PENDING/SUCCESS/FAILED"] },
-  { category: "BEHAVIOR", label: "客户行为", fields: ["has_replied", "recent_reply_days"] }
-];
-
-const sopMessageVariables = [
-  "${nickName}",
-  "${now}",
-  "${date}",
-  "${time}",
-  "${attr.d1ClassTime}",
-  "${attr.d2ClassTime}",
-  "${attr.d3LiveUrl}",
-  "${attr.d6LiveUrl}"
-];
-
-const sopStatusMeta = {
-  DRAFT: { label: "草稿", color: "warning" },
-  ENABLED: { label: "启用中", color: "success" },
-  DISABLED: { label: "已停用", color: "default" }
-};
-
-const normalizeSopStatus = (value) => {
-  if (value === "启用中" || value === "ENABLED") return "ENABLED";
-  if (value === "草稿" || value === "DRAFT") return "DRAFT";
-  return "DISABLED";
-};
-
-const buildSopPhases = (record) => {
-  if (record.phases) return record.phases;
-  return (record.stages || []).map((stage, index) => {
-    const phaseId = `${record.key}-phase-${index + 1}`;
-    const eventId = `${phaseId}-event-1`;
-    const dayOffset = Number(String(stage.day || "D0").replace(/\D/g, "")) || 0;
-    return {
-      id: phaseId,
-      name: stage.title,
-      sort: index + 1,
-      chatAgentCode: index === 0 ? "day0_agent" : `day${Math.min(dayOffset, 6)}_agent_release`,
-      defaultTimeDayOffset: dayOffset,
-      defaultTimeOfDay: dayOffset === 0 ? "18:00:00" : "10:00:00",
-      description: stage.action,
-      events: [
-        {
-          id: eventId,
-          name: stage.trigger,
-          sort: 1,
-          triggerType: dayOffset === 0 ? "INSTANCE_CREATED" : "SCHEDULED",
-          scheduleDayOffset: dayOffset,
-          scheduleTimeOfDay: dayOffset === 0 ? "18:00:00" : "10:00:00",
-          pollEnabled: index % 3 === 1,
-          pollIntervalMinutes: 30,
-          pollCount: 3,
-          enabled: true,
-          description: stage.action,
-          strategies: [
-            {
-              id: `${eventId}-strategy-1`,
-              name: index % 2 === 0 ? "默认 Agent 生成策略" : "固定消息兜底策略",
-              sort: 1,
-              strategyType: index % 2 === 0 ? "AGENT" : "FIXED_MESSAGE",
-              sendChannel: index % 2 === 0 ? "JUZI" : "WECOM_APP",
-              agentCode: stage.tool,
-              prompt: `结合客户当前阶段，执行：${stage.action}。回复需自然，避免承诺效果。`,
-              targetMode: index % 2 === 0 ? "ALL" : "CUSTOM",
-              conditionRule: index % 2 === 0 ? null : {
-                version: 1,
-                op: "AND",
-                rules: [{ category: "BEHAVIOR", source: "profile", field: "has_replied", op: "=", value: true }]
-              },
-              messageType: "TEXT",
-              messageContent: `${"${nickName}"}，这是今天的学习跟进提醒，方便的话我帮您确认下一步安排。`,
-              messageVars: ["${nickName}", "${date}"]
-            }
-          ]
-        }
-      ]
-    };
-  });
-};
-
-const normalizeSopRecord = (record) => {
-  const status = normalizeSopStatus(record.status);
-  const phases = buildSopPhases(record);
-  return {
-    ...record,
-    status,
-    stateVersion: record.stateVersion || Math.max(1, phases.length * 17),
-    sopInfo: record.sopInfo || {
-      sopCode: record.code,
-      name: record.name,
-      description: record.target,
-      eventTypeCode: record.startEvent,
-      timelinePolicyCode: record.timelineStrategy,
-      timelinePolicyVersion: Number(String(record.version || "v1").replace(/\D/g, "")) || 1,
-      timelineResolverType: "DAILY_BOUNDARY",
-      timelineTimezone: "Asia/Shanghai",
-      defaultTimeOfDay: "18:00:00",
-      notifyMode: "FAILED_ONLY",
-      notifyGroupCode: "SOP_FAILED_NOTICE"
-    },
-    salesScope: record.salesScope || (record.boundSales || []).map((label) => managedWecomAccounts.find((item) => item.label === label)?.key || label),
-    phases,
-    runtime: record.runtime || {
-      runningInstances: 126 + phases.length * 3,
-      pausedInstances: phases.length % 3,
-      finishedInstances: 860 + phases.length * 19,
-      finishedLast7Days: 148,
-      failedTasks: phases.length % 2 ? 3 : 1,
-      notifiedFailedTasks: phases.length % 2 ? 2 : 1
-    }
-  };
-};
-
-const knowledge = [
-  { key: "k1", title: "AI销售助手产品介绍", type: "产品知识", source: "文本内容", status: "启用", updated: "2026-05-30" },
-  { key: "k2", title: "企微自动接待FAQ", type: "FAQ", source: "文本内容", status: "启用", updated: "2026-05-30" },
-  { key: "k3", title: "价格与套餐说明", type: "政策规则", source: "知识文件", status: "停用", updated: "2026-05-28" }
 ];
 
 const salesAccounts = [
@@ -512,7 +285,7 @@ const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "sop", "knowledge", "settings", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "customers", "sales", "agent", "humanization", "knowledge", "settings", "tools"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -532,7 +305,7 @@ const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "strategy", "customers", "sales", "agent", "humanization", "sop", "knowledge", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "customers", "sales", "agent", "humanization", "knowledge", "tools"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };
@@ -1516,13 +1289,14 @@ const proactivePlans = [
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
-  { key: "strategy", icon: <BarChartOutlined />, label: "Skill 管理" },
   { key: "sales", icon: <TeamOutlined />, label: "企微托管" },
-  { key: "agent", icon: <RobotOutlined />, label: "角色配置" },
+  { key: "agentManager", icon: <RobotOutlined />, label: "智能体管理" },
+  { key: "strategy", icon: <BarChartOutlined />, label: "Skill 管理" },
+  { key: "tools", icon: <ToolOutlined />, label: "工具管理" },
+  { key: "knowledge", icon: <FileTextOutlined />, label: "知识库管理" },
   { key: "humanization", icon: <SmileOutlined />, label: "拟人化设置" },
-  { key: "sop", icon: <ForkOutlined />, label: "SOP管理" },
-  { key: "settings", icon: <SettingOutlined />, label: "系统配置" },
-  { key: "tools", icon: <ToolOutlined />, label: "工具管理" }
+  { key: "agent", icon: <RobotOutlined />, label: "角色管理" },
+  { key: "settings", icon: <SettingOutlined />, label: "系统管理" }
 ];
 
 const pageTitle = Object.fromEntries(menuItems.map((item) => [item.key, item.label]));
@@ -1943,6 +1717,422 @@ function AgentModals({ modal, setModal, editingAgent }) {
   );
 }
 
+function IntelligentAgentPage() {
+  const { message } = AntApp.useApp();
+  const createDefaultModelConfig = (item = {}) => ({
+    provider: item.modelConfig?.provider || "DASHSCOPE",
+    model: item.modelConfig?.model || "qwen3.5-omni-flash",
+    baseUrl: item.modelConfig?.baseUrl || "https://dashscope.aliyuncs.com",
+    maxTokens: item.modelConfig?.maxTokens || 2048,
+    temperature: item.modelConfig?.temperature ?? 0.7,
+    topP: item.modelConfig?.topP ?? 0.9,
+    frequencyPenalty: item.modelConfig?.frequencyPenalty ?? 0,
+    presencePenalty: item.modelConfig?.presencePenalty ?? 0,
+    maxIterations: item.modelConfig?.maxIterations || 10
+  });
+  const createDefaultPrompt = (item = {}) => item.prompt || `# ${item.name || "智能体"}系统提示词
+
+你是企业微信场景下的AI销售智能体，需要围绕客户当前生命周期阶段完成沟通。
+
+## 角色定位
+${item.description || item.roleDescription || "根据所属角色配置完成客户接待、需求确认、产品推荐和后续跟进。"}
+
+## 执行要求
+1. 先理解客户意图，再选择合适的工具或 Skill。
+2. 回答要自然、克制、专业，避免过度承诺。
+3. 涉及价格、交付、合同、隐私等敏感问题时优先转人工确认。
+4. 每轮沟通后判断是否需要推进生命周期阶段。`;
+  const getDefaultStageSkill = (stageIndex) => strategies[stageIndex % strategies.length]?.name || strategies[0]?.name;
+  const buildInitialRows = () => agents.map((item, index) => ({
+    key: `ia-${item.key}`,
+    name: `${item.name}智能体`,
+    roleName: item.name,
+    positioning: item.type,
+    description: item.roleDescription,
+    boundWecomKeys: managedWecomAccounts.slice(index, index + Math.max(1, item.sales || 1)).map((account) => account.key),
+    enabled: item.status === "启用",
+    version: "v1",
+    modelConfig: createDefaultModelConfig(),
+    prompt: createDefaultPrompt(item),
+    toolKeys: agentTools.filter((tool) => tool.enabled).slice(0, 3).map((tool) => tool.key),
+    stages: lifecycleStages.map((stage, stageIndex) => ({
+      key: `ia-${item.key}-stage-${stageIndex + 1}`,
+      name: stage.title,
+      order: stageIndex + 1,
+      description: stage.desc,
+      skills: [getDefaultStageSkill(stageIndex)].filter(Boolean),
+      enabled: true
+    }))
+  }));
+  const [rows, setRows] = useState(buildInitialRows);
+  const [editingAgent, setEditingAgent] = useState(null);
+  const [configAgent, setConfigAgent] = useState(null);
+  const [editingStage, setEditingStage] = useState(null);
+  const [collapsedStageKeys, setCollapsedStageKeys] = useState([]);
+  const skillOptions = strategies.map((item) => ({ value: item.name, label: item.name }));
+  const roleOptions = agents.map((item) => ({ value: item.name, label: `${item.name}（${item.type}）` }));
+  const currentConfigAgent = configAgent ? rows.find((item) => item.key === configAgent.key) || configAgent : null;
+
+  const syncRow = (agentKey, updater) => {
+    setRows((items) => items.map((item) => item.key === agentKey ? updater(item) : item));
+  };
+
+  const saveAgent = (values) => {
+    const role = agents.find((item) => item.name === values.roleName);
+    const next = {
+      ...(editingAgent || {}),
+      ...values,
+      positioning: role?.type || values.positioning || "-",
+      description: values.description || role?.roleDescription || "",
+      enabled: values.enabled !== false,
+      boundWecomKeys: values.boundWecomKeys || [],
+      version: editingAgent?.version || "v1",
+      modelConfig: createDefaultModelConfig(editingAgent),
+      prompt: createDefaultPrompt({ ...role, ...editingAgent, ...values }),
+      toolKeys: editingAgent?.toolKeys || agentTools.filter((tool) => tool.enabled).slice(0, 2).map((tool) => tool.key),
+      stages: editingAgent?.stages || lifecycleStages.slice(0, 3).map((stage, index) => ({
+        key: `ia-stage-${Date.now()}-${index}`,
+        name: stage.title,
+        order: index + 1,
+        description: stage.desc,
+        skills: [getDefaultStageSkill(index)].filter(Boolean),
+        enabled: true
+      }))
+    };
+    if (editingAgent?.key) {
+      setRows((items) => items.map((item) => item.key === editingAgent.key ? next : item));
+    } else {
+      setRows((items) => [{ ...next, key: `ia-${Date.now()}` }, ...items]);
+    }
+    setEditingAgent(null);
+  };
+
+  const saveStage = (values) => {
+    const stage = {
+      ...(editingStage.stage || {}),
+      ...values,
+      key: editingStage.stage?.key || `ia-stage-${Date.now()}`,
+      enabled: values.enabled !== false,
+      skills: values.skills || []
+    };
+    syncRow(editingStage.agent.key, (agent) => ({
+      ...agent,
+      stages: editingStage.stage?.key
+        ? agent.stages.map((item) => item.key === stage.key ? stage : item)
+        : [...agent.stages, { ...stage, order: agent.stages.length + 1 }]
+    }));
+    setEditingStage(null);
+  };
+
+  const buildSkillTasks = (skill, stage, stageIndex) => {
+    const baseDelay = Math.max(1, stageIndex + 1);
+    return [
+      { name: `${skill?.name || "Skill"}启动执行`, trigger: "AGENT_START", delay: `阶段开始后 ${baseDelay} 分钟` },
+      { name: "客户状态检查", trigger: "SCHEDULED_CHECK", delay: `阶段开始后 ${baseDelay + 2} 分钟` },
+      { name: "阶段结果同步", trigger: "TASK_FINISH", delay: `阶段开始后 ${baseDelay + 4} 分钟` }
+    ];
+  };
+
+  const renderStageSkillDetails = (stage, stageIndex) => {
+    const names = stage.skills || [];
+    if (!names.length) {
+      return <Text type="secondary">当前阶段暂未绑定 Skill。</Text>;
+    }
+    return (
+      <div className="agent-stage-skill-list">
+        {names.map((skillName) => {
+          const skill = strategies.find((item) => item.name === skillName) || { name: skillName, type: "未配置", trigger: "-", channel: "-", input: "-", output: "-", calls: 0, status: "启用" };
+          const tasks = buildSkillTasks(skill, stage, stageIndex);
+          const startTime = `阶段开始后 ${Math.max(1, stageIndex + 1)} 分钟`;
+          const endTime = `阶段开始后 ${Math.max(4, stageIndex + 4)} 分钟`;
+          return (
+            <div className="agent-stage-skill-card" key={skillName}>
+              <div className="stage-skill-head">
+                <Space wrap>
+                  <Text strong>Skill：{skill.name}</Text>
+                  <Tag color="blue">开始：{startTime}</Tag>
+                  <Tag color="purple">结束：{endTime}</Tag>
+                </Space>
+                <Button type="link">任务管理 &gt;</Button>
+              </div>
+              <div className="stage-skill-task-list">
+                {tasks.map((task, taskIndex) => (
+                  <div className="stage-skill-task" key={`${skillName}-${task.name}`}>
+                    <Badge count={taskIndex + 1} color="#dbe4f0" />
+                    <Text>定时任务{taskIndex + 1}：{task.name}</Text>
+                    <Tag>{task.trigger}</Tag>
+                    <Tag color="orange">开始：{task.delay}</Tag>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const columns = [
+    { title: "智能体", dataIndex: "name", width: 150 },
+    { title: "角色", dataIndex: "roleName", width: 120, render: (value) => <Tag color="blue">{value}</Tag> },
+    { title: "定位", dataIndex: "positioning", width: 130 },
+    { title: "说明", dataIndex: "description", width: 420, render: (value) => <Text ellipsis={{ tooltip: value }}>{value || "-"}</Text> },
+    { title: "阶段数", dataIndex: "stages", width: 96, render: (stages = []) => <Tag color="purple">{stages.length}个</Tag> },
+    { title: "已配置企微", dataIndex: "boundWecomKeys", width: 110, render: (items = []) => <Tag color="blue">{items.length}个</Tag> },
+    { title: "状态", dataIndex: "enabled", width: 90, render: (value, record) => <Switch checked={value} onChange={(checked) => syncRow(record.key, (item) => ({ ...item, enabled: checked }))} /> },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 190,
+      render: (_, record) => (
+        <Space wrap={false}>
+          <Button type="link" onClick={() => setEditingAgent(record)}>编辑</Button>
+          <Button type="link" onClick={() => setConfigAgent(record)}>配置</Button>
+          <Button type="link" danger onClick={() => Modal.confirm({ title: "删除智能体", content: `确认删除 ${record.name}？`, okText: "删除", okButtonProps: { danger: true }, cancelText: "取消", onOk: () => setRows((items) => items.filter((item) => item.key !== record.key)) })}>删除</Button>
+        </Space>
+      )
+    }
+  ];
+
+  if (currentConfigAgent) {
+    const selectedToolKeys = currentConfigAgent.toolKeys || [];
+    const skillCount = (currentConfigAgent.stages || []).reduce((sum, stage) => sum + (stage.skills || []).length, 0);
+    const toolColumns = [
+      {
+        title: "选择",
+        dataIndex: "key",
+        width: 72,
+        render: (value) => (
+          <Checkbox
+            checked={selectedToolKeys.includes(value)}
+            onChange={(event) => syncRow(currentConfigAgent.key, (agent) => {
+              const keys = agent.toolKeys || [];
+              return {
+                ...agent,
+                toolKeys: event.target.checked ? Array.from(new Set([...keys, value])) : keys.filter((key) => key !== value)
+              };
+            })}
+          />
+        )
+      },
+      { title: "工具名称", dataIndex: "name", width: 180 },
+      { title: "工具说明", dataIndex: "description", render: (value) => <Text type="secondary">{value}</Text> },
+      { title: "状态", dataIndex: "enabled", width: 88, render: (value) => statusTag(value) }
+    ];
+    const skillTabExtra = <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingStage({ agent: currentConfigAgent, stage: null })}>添加阶段</Button>;
+    return (
+      <Space direction="vertical" size={16} className="page-stack intelligent-agent-page">
+        <Card
+          title={
+            <PanelTitle
+              title={`${currentConfigAgent.name} · 配置`}
+              desc="集中配置智能体的模型、提示词、工具和阶段 Skill，让 AI 销售按角色与流程执行。"
+              before={<Button icon={<ArrowLeftOutlined />} onClick={() => setConfigAgent(null)}>返回智能体列表</Button>}
+              extra={<Button type="primary" icon={<CheckCircleOutlined />} onClick={() => message.success("智能体配置已保存")}>保存配置</Button>}
+            />
+          }
+        >
+          <div className="agent-config-overview">
+            <div className="agent-basic-summary">
+              <Descriptions column={2} size="small">
+                <Descriptions.Item label="智能体名称">{currentConfigAgent.name}</Descriptions.Item>
+                <Descriptions.Item label="所属角色">{currentConfigAgent.roleName}</Descriptions.Item>
+                <Descriptions.Item label="角色定位">{currentConfigAgent.positioning}</Descriptions.Item>
+                <Descriptions.Item label="版本">{currentConfigAgent.version || "v1"}</Descriptions.Item>
+                <Descriptions.Item label="状态">{statusTag(currentConfigAgent.enabled)}</Descriptions.Item>
+                <Descriptions.Item label="绑定企微">{(currentConfigAgent.boundWecomKeys || []).length} 个账号</Descriptions.Item>
+                <Descriptions.Item label="模型">{currentConfigAgent.modelConfig?.model || "-"}</Descriptions.Item>
+                <Descriptions.Item label="工具 / Skill">{selectedToolKeys.length} 个工具 / {skillCount} 个 Skill</Descriptions.Item>
+                <Descriptions.Item label="说明" span={2}>{currentConfigAgent.description || "-"}</Descriptions.Item>
+              </Descriptions>
+            </div>
+          </div>
+          <Tabs
+            className="agent-config-tabs"
+            defaultActiveKey="model"
+            items={[
+              {
+                key: "model",
+                label: "模型配置",
+                children: (
+                  <Form
+                    key={`${currentConfigAgent.key}-model`}
+                    layout="vertical"
+                    initialValues={currentConfigAgent.modelConfig}
+                    onValuesChange={(_, values) => syncRow(currentConfigAgent.key, (agent) => ({ ...agent, modelConfig: { ...agent.modelConfig, ...values } }))}
+                  >
+                    <div className="agent-model-layout">
+                      <Card size="small" title="模型基础配置" className="agent-config-card">
+                        <Row gutter={[18, 2]}>
+                          <Col span={24}><Form.Item label="Provider" name="provider"><Select options={["DASHSCOPE", "OpenAI", "Azure OpenAI", "自定义模型"].map((value) => ({ value }))} /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="模型" name="model"><Input placeholder="请输入模型名称" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="Base URL" name="baseUrl"><Input placeholder="请输入模型服务地址" /></Form.Item></Col>
+                        </Row>
+                      </Card>
+                      <Card size="small" title="常用参数" className="agent-config-card soft">
+                        <Row gutter={[18, 2]}>
+                          <Col span={24}><Form.Item label="temperature" name="temperature"><InputNumber min={0} max={2} step={0.1} className="full-input" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="max_tokens" name="maxTokens"><InputNumber min={256} max={32000} className="full-input" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="top_p" name="topP"><InputNumber min={0} max={1} step={0.05} className="full-input" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="frequency_penalty" name="frequencyPenalty"><InputNumber min={-2} max={2} step={0.1} className="full-input" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="presence_penalty" name="presencePenalty"><InputNumber min={-2} max={2} step={0.1} className="full-input" /></Form.Item></Col>
+                          <Col span={24}><Form.Item label="max_iterations" name="maxIterations"><InputNumber min={1} max={50} className="full-input" /></Form.Item></Col>
+                        </Row>
+                      </Card>
+                    </div>
+                  </Form>
+                )
+              },
+              {
+                key: "prompt",
+                label: "提示词",
+                children: (
+                  <Card size="small" title="系统提示词" className="agent-config-card">
+                    <Input.TextArea
+                      className="agent-prompt-editor"
+                      rows={18}
+                      value={currentConfigAgent.prompt}
+                      onChange={(event) => syncRow(currentConfigAgent.key, (agent) => ({ ...agent, prompt: event.target.value }))}
+                      placeholder="请输入该智能体的系统提示词、角色边界、执行要求和禁用行为。"
+                    />
+                  </Card>
+                )
+              },
+              {
+                key: "tools",
+                label: "工具配置",
+                children: (
+                  <Table className="admin-table agent-tool-table" rowKey="key" columns={toolColumns} dataSource={agentTools} pagination={false} />
+                )
+              },
+              {
+                key: "skills",
+                label: "Skill配置",
+                children: (
+                  <Space direction="vertical" size={12} className="full-width">
+                    <div className="agent-skill-tab-head">
+                      <Text type="secondary">按生命周期阶段组织当前智能体的沟通流程，每个阶段可绑定多个 Skill。</Text>
+                      {skillTabExtra}
+                    </div>
+                    <div className="agent-flow-config">
+                      {currentConfigAgent.stages.map((stage, index) => {
+                        const collapsed = collapsedStageKeys.includes(stage.key);
+                        return (
+                          <Card
+                            key={stage.key}
+                            className="agent-stage-card"
+                            size="small"
+                            title={<Space><Badge count={index + 1} color="#635bff" /><Text>{stage.name}</Text></Space>}
+                            extra={
+                              <Space>
+                                <Button type="link" onClick={() => setCollapsedStageKeys((keys) => collapsed ? keys.filter((key) => key !== stage.key) : [...keys, stage.key])}>{collapsed ? "展开阶段" : "收起阶段"}</Button>
+                                <Button type="link" onClick={() => setEditingStage({ agent: currentConfigAgent, stage })}>编辑阶段</Button>
+                                <Button type="link" danger onClick={() => syncRow(currentConfigAgent.key, (agent) => ({ ...agent, stages: agent.stages.filter((item) => item.key !== stage.key) }))}>移除</Button>
+                              </Space>
+                            }
+                          >
+                            {collapsed ? null : (
+                              <>
+                                <Paragraph type="secondary">{stage.description}</Paragraph>
+                                {renderStageSkillDetails(stage, index)}
+                              </>
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </Space>
+                )
+              }
+            ]}
+          />
+        </Card>
+        <IntelligentAgentStageModal stage={editingStage?.stage} skillOptions={skillOptions} open={Boolean(editingStage)} onClose={() => setEditingStage(null)} onSave={saveStage} />
+      </Space>
+    );
+  }
+
+  return (
+    <Space direction="vertical" size={16} className="page-stack intelligent-agent-page">
+      <Card
+        title={
+          <PanelTitle
+            title="智能体列表"
+            desc="统一管理智能体基础信息与流程配置入口，按角色创建智能体并绑定阶段 Skill。"
+            extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingAgent({})}>新增智能体</Button>}
+          />
+        }
+      >
+        <Space className="toolbar" wrap>
+          <Select defaultValue="全部角色" options={[{ value: "全部角色" }, ...roleOptions]} />
+          <Select defaultValue="全部状态" options={["全部状态", "启用", "停用"].map((value) => ({ value }))} />
+          <Input.Search placeholder="搜索智能体、角色或说明" allowClear />
+        </Space>
+        <Table className="admin-table intelligent-agent-table" rowKey="key" columns={columns} dataSource={rows} pagination={false} scroll={{ x: 1250 }} />
+      </Card>
+      <IntelligentAgentModal agent={editingAgent} roleOptions={roleOptions} onClose={() => setEditingAgent(null)} onSave={saveAgent} />
+    </Space>
+  );
+}
+
+function IntelligentAgentModal({ agent, roleOptions, onClose, onSave }) {
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if (agent) {
+      form.resetFields();
+      form.setFieldsValue({
+        name: agent.name || "",
+        roleName: agent.roleName || "销售",
+        description: agent.description || "",
+        boundWecomKeys: agent.boundWecomKeys || [],
+        enabled: agent.enabled !== false
+      });
+    }
+  }, [agent, form]);
+  return (
+    <Modal title={agent?.key ? "编辑智能体" : "新增智能体"} open={Boolean(agent)} onCancel={onClose} onOk={() => form.submit()} okText="确认" cancelText="取消" width={820}>
+      <Form form={form} layout="vertical" onFinish={onSave}>
+        <Row gutter={16}>
+          <Col span={12}><Form.Item label="智能体名称" name="name" rules={[{ required: true, message: "请输入智能体名称" }]}><Input placeholder="例如：销售转化智能体" /></Form.Item></Col>
+          <Col span={12}><Form.Item label="所属角色" name="roleName" rules={[{ required: true, message: "请选择角色" }]}><Select options={roleOptions} /></Form.Item></Col>
+          <Col span={24}><Form.Item label="说明" name="description"><Input.TextArea rows={5} placeholder="请描述该智能体在企微沟通中的定位、边界、服务目标和禁用行为。" /></Form.Item></Col>
+          <Col span={18}><Form.Item label="配置企微账号" name="boundWecomKeys"><Select mode="multiple" options={managedWecomAccounts.map((item) => ({ value: item.key, label: `${item.label}（${item.department}）` }))} /></Form.Item></Col>
+          <Col span={6}><Form.Item label="状态" name="enabled" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用" /></Form.Item></Col>
+        </Row>
+      </Form>
+    </Modal>
+  );
+}
+
+function IntelligentAgentStageModal({ stage, skillOptions, open, onClose, onSave }) {
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+      form.setFieldsValue({
+        name: stage?.name || "",
+        order: stage?.order || 0,
+        description: stage?.description || "",
+        skills: stage?.skills || [],
+        enabled: stage?.enabled !== false
+      });
+    }
+  }, [open, stage, form]);
+  return (
+    <Modal title={stage?.key ? "编辑阶段" : "新增阶段"} open={open} onCancel={onClose} onOk={() => form.submit()} okText="确认" cancelText="取消" width={760}>
+      <Form form={form} layout="vertical" onFinish={onSave}>
+        <Row gutter={16}>
+          <Col span={14}><Form.Item label="阶段名称" name="name" rules={[{ required: true, message: "请输入阶段名称" }]}><Input placeholder="例如：需求确认阶段" /></Form.Item></Col>
+          <Col span={5}><Form.Item label="排序" name="order"><InputNumber min={0} className="full-input" /></Form.Item></Col>
+          <Col span={5}><Form.Item label="阶段状态" name="enabled" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用" /></Form.Item></Col>
+          <Col span={24}><Form.Item label="绑定 Skill" name="skills"><Select mode="multiple" placeholder="请选择 Skill" options={skillOptions} /></Form.Item></Col>
+          <Col span={24}><Form.Item label="阶段说明" name="description"><Input.TextArea rows={4} placeholder="说明该阶段的沟通目标、执行边界和转入下一阶段条件。" /></Form.Item></Col>
+        </Row>
+      </Form>
+    </Modal>
+  );
+}
+
 function StrategyPage() {
   const [editingSkill, setEditingSkill] = useState(null);
   const [strategyRows, setStrategyRows] = useState(strategies);
@@ -2194,554 +2384,18 @@ function ToolsPage() {
   );
 }
 
-function SopPage() {
-  const [form] = Form.useForm();
-  const [phaseForm] = Form.useForm();
-  const [eventForm] = Form.useForm();
-  const [strategyForm] = Form.useForm();
-  const [sopRows, setSopRows] = useState(() => sopTasks.map(normalizeSopRecord));
-  const [keyword, setKeyword] = useState("");
-  const [status, setStatus] = useState("ALL");
-  const [startEvent, setStartEvent] = useState("");
-  const [editingSop, setEditingSop] = useState(null);
-  const [viewingSop, setViewingSop] = useState(null);
-  const [editingPhase, setEditingPhase] = useState(null);
-  const [editingEvent, setEditingEvent] = useState(null);
-  const [editingStrategy, setEditingStrategy] = useState(null);
-
-  useEffect(() => {
-    if (editingSop) {
-      const sop = normalizeSopRecord(editingSop);
-      form.resetFields();
-      form.setFieldsValue({
-        name: sop.sopInfo.name,
-        code: sop.sopInfo.sopCode,
-        startEvent: sop.sopInfo.eventTypeCode,
-        timelineStrategy: sop.sopInfo.timelinePolicyCode,
-        version: `v${sop.sopInfo.timelinePolicyVersion}`,
-        status: sop.status,
-        target: sop.sopInfo.description,
-        notifyMode: sop.sopInfo.notifyMode,
-        notifyGroupCode: sop.sopInfo.notifyGroupCode,
-        defaultTimeOfDay: sop.sopInfo.defaultTimeOfDay,
-        boundSales: sop.salesScope
-      });
-    }
-  }, [editingSop, form]);
-
-  useEffect(() => {
-    if (editingPhase) {
-      phaseForm.resetFields();
-      phaseForm.setFieldsValue(editingPhase.phase);
-    }
-  }, [editingPhase, phaseForm]);
-
-  useEffect(() => {
-    if (editingEvent) {
-      eventForm.resetFields();
-      eventForm.setFieldsValue(editingEvent.event);
-    }
-  }, [editingEvent, eventForm]);
-
-  useEffect(() => {
-    if (editingStrategy) {
-      strategyForm.resetFields();
-      strategyForm.setFieldsValue(editingStrategy.strategy);
-    }
-  }, [editingStrategy, strategyForm]);
-
-  const filteredRows = sopRows.filter((item) => {
-    const keywordText = keyword.trim().toLowerCase();
-    const matchesKeyword = !keywordText || [item.sopInfo.name, item.sopInfo.sopCode].some((value) => String(value).toLowerCase().includes(keywordText));
-    const matchesStatus = status === "ALL" || item.status === status;
-    const matchesEvent = !startEvent || item.sopInfo.eventTypeCode === startEvent;
-    return matchesKeyword && matchesStatus && matchesEvent;
-  });
-
-  const createSopDraft = () => ({
-    key: "",
-    status: "DRAFT",
-    stateVersion: 1,
-    sopInfo: {
-      sopCode: "",
-      name: "",
-      description: "",
-      eventTypeCode: "FRIEND_ADD",
-      timelinePolicyCode: "FRIEND_ADD_DAILY_BOUNDARY",
-      timelinePolicyVersion: 1,
-      timelineResolverType: "DAILY_BOUNDARY",
-      timelineTimezone: "Asia/Shanghai",
-      defaultTimeOfDay: "18:00:00",
-      notifyMode: "FAILED_ONLY",
-      notifyGroupCode: "SOP_FAILED_NOTICE"
-    },
-    salesScope: [managedWecomAccounts[0]?.key].filter(Boolean),
-    phases: [
-      {
-        id: `phase-${Date.now()}`,
-        name: "好友欢迎",
-        sort: 1,
-        chatAgentCode: "day0_agent",
-        defaultTimeDayOffset: 0,
-        defaultTimeOfDay: "18:00:00",
-        description: "发送欢迎语并收集基础信息",
-        events: []
-      }
-    ],
-    runtime: { runningInstances: 0, pausedInstances: 0, finishedInstances: 0, finishedLast7Days: 0, failedTasks: 0, notifiedFailedTasks: 0 }
-  });
-
-  const statusColor = (value) => {
-    return sopStatusMeta[value]?.color || "default";
-  };
-
-  const statusLabel = (value) => sopStatusMeta[value]?.label || value;
-
-  const updateSopByKey = (key, updater) => {
-    setSopRows((items) => items.map((item) => (item.key === key ? normalizeSopRecord(updater(item)) : item)));
-    setViewingSop((item) => (item?.key === key ? normalizeSopRecord(updater(item)) : item));
-  };
-
-  const handleSave = (values) => {
-    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
-    const salesScope = values.boundSales || [];
-    const nextSop = {
-      ...editingSop,
-      name: values.name,
-      code: values.code,
-      startEvent: values.startEvent,
-      timelineStrategy: values.timelineStrategy,
-      version: values.version,
-      target: values.target,
-      status: values.status,
-      salesScope,
-      boundSales: salesScope.map((key) => managedWecomAccounts.find((item) => item.key === key)?.label || key),
-      accountScope: `${salesScope.length}个账号`,
-      updatedAt: now,
-      stateVersion: (editingSop.stateVersion || 0) + 1,
-      sopInfo: {
-        ...editingSop.sopInfo,
-        name: values.name,
-        sopCode: values.code,
-        description: values.target,
-        eventTypeCode: values.startEvent,
-        timelinePolicyCode: values.timelineStrategy,
-        timelinePolicyVersion: Number(String(values.version || "v1").replace(/\D/g, "")) || 1,
-        timelineResolverType: values.timelineStrategy === "FRIEND_ADD_DAILY_BOUNDARY" ? "DAILY_BOUNDARY" : "FIXED_TIME",
-        timelineTimezone: "Asia/Shanghai",
-        defaultTimeOfDay: values.defaultTimeOfDay,
-        notifyMode: values.notifyMode,
-        notifyGroupCode: values.notifyGroupCode
-      }
-    };
-    if (editingSop.key) {
-      setSopRows((items) => items.map((item) => (item.key === editingSop.key ? normalizeSopRecord(nextSop) : item)));
-      setViewingSop((item) => (item?.key === editingSop.key ? normalizeSopRecord(nextSop) : item));
-    } else {
-      setSopRows((items) => [normalizeSopRecord({ ...nextSop, key: `sop-${Date.now()}` }), ...items]);
-    }
-    setEditingSop(null);
-  };
-
-  const handleDuplicate = (record) => {
-    const copy = {
-      ...record,
-      key: `sop-${Date.now()}`,
-      name: `${record.sopInfo.name}-复制`,
-      code: `${record.sopInfo.sopCode}_COPY`,
-      status: "DRAFT",
-      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "),
-      stateVersion: 1,
-      sopInfo: { ...record.sopInfo, name: `${record.sopInfo.name}-复制`, sopCode: `${record.sopInfo.sopCode}_COPY` }
-    };
-    setSopRows((items) => [normalizeSopRecord(copy), ...items]);
-  };
-
-  const handleToggle = (record) => {
-    const nextStatus = record.status === "ENABLED" ? "DISABLED" : "ENABLED";
-    updateSopByKey(record.key, (item) => ({ ...item, status: nextStatus, updatedAt: new Date().toISOString().slice(0, 19).replace("T", " "), stateVersion: item.stateVersion + 1 }));
-  };
-
-  const handleSavePhase = (values) => {
-    const phase = { ...editingPhase.phase, ...values, id: editingPhase.phase.id || `phase-${Date.now()}`, events: editingPhase.phase.events || [], sort: editingPhase.phase.sort || editingPhase.sop.phases.length + 1 };
-    updateSopByKey(editingPhase.sop.key, (sop) => ({
-      ...sop,
-      phases: editingPhase.phase.id ? sop.phases.map((item) => (item.id === phase.id ? phase : item)) : [...sop.phases, phase],
-      stateVersion: sop.stateVersion + 1
-    }));
-    setEditingPhase(null);
-  };
-
-  const handleSaveEvent = (values) => {
-    const event = { ...editingEvent.event, ...values, id: editingEvent.event.id || `event-${Date.now()}`, strategies: editingEvent.event.strategies || [], sort: editingEvent.event.sort || editingEvent.phase.events.length + 1 };
-    updateSopByKey(editingEvent.sop.key, (sop) => ({
-      ...sop,
-      phases: sop.phases.map((phase) => phase.id === editingEvent.phase.id ? { ...phase, events: editingEvent.event.id ? phase.events.map((item) => (item.id === event.id ? event : item)) : [...phase.events, event] } : phase),
-      stateVersion: sop.stateVersion + 1
-    }));
-    setEditingEvent(null);
-  };
-
-  const handleSaveStrategy = (values) => {
-    const strategy = { ...editingStrategy.strategy, ...values, id: editingStrategy.strategy.id || `strategy-${Date.now()}`, sort: editingStrategy.strategy.sort || editingStrategy.event.strategies.length + 1 };
-    updateSopByKey(editingStrategy.sop.key, (sop) => ({
-      ...sop,
-      phases: sop.phases.map((phase) => phase.id === editingStrategy.phase.id ? {
-        ...phase,
-        events: phase.events.map((event) => event.id === editingStrategy.event.id ? { ...event, strategies: editingStrategy.strategy.id ? event.strategies.map((item) => (item.id === strategy.id ? strategy : item)) : [...event.strategies, strategy] } : event)
-      } : phase),
-      stateVersion: sop.stateVersion + 1
-    }));
-    setEditingStrategy(null);
-  };
-
-  const createEventDraft = (phase) => ({
-    id: "",
-    name: `${phase.name}触达`,
-    triggerType: phase.defaultTimeDayOffset === 0 ? "INSTANCE_CREATED" : "SCHEDULED",
-    scheduleDayOffset: phase.defaultTimeDayOffset,
-    scheduleTimeOfDay: phase.defaultTimeOfDay,
-    delayMinutes: 30,
-    pollEnabled: false,
-    pollIntervalMinutes: 30,
-    pollCount: 3,
-    enabled: true,
-    description: ""
-  });
-
-  const createStrategyDraft = () => ({
-    id: "",
-    name: "新策略",
-    targetMode: "ALL",
-    strategyType: "AGENT",
-    sendChannel: "JUZI",
-    agentCode: "生成课程顾问话术",
-    prompt: "基于客户画像、最近聊天记录和当前阶段目标生成一条自然的销售跟进话术。",
-    messageType: "TEXT",
-    messageContent: "您好 ${nickName}，我帮您确认一下今天的课程安排。",
-    messageVars: ["${nickName}", "${date}"]
-  });
-
-  const renderConditionRule = (rule) => {
-    if (!rule) return "全部用户";
-    return `${rule.op}：${rule.rules.map((item) => `${item.category}.${item.field} ${item.op} ${item.value}`).join("；")}`;
-  };
-
-  const columns = [
-    {
-      title: "SOP",
-      dataIndex: ["sopInfo", "name"],
-      width: 280,
-      render: (_, record) => (
-        <div>
-          <Text strong>{record.sopInfo.name}</Text>
-          <br />
-          <Text type="secondary">{record.sopInfo.sopCode}</Text>
-        </div>
-      )
-    },
-    {
-      title: "启动事件",
-      dataIndex: ["sopInfo", "eventTypeCode"],
-      width: 160,
-      render: (value) => <Tag color="blue">{value}</Tag>
-    },
-    {
-      title: "时间轴策略",
-      dataIndex: ["sopInfo", "timelinePolicyCode"],
-      width: 250,
-      render: (_, record) => (
-        <div>
-          <Text>{record.sopInfo.timelinePolicyCode}</Text>
-          <br />
-          <Text type="secondary">v{record.sopInfo.timelinePolicyVersion} · {record.sopInfo.timelineResolverType}</Text>
-        </div>
-      )
-    },
-    {
-      title: "范围与阶段",
-      dataIndex: "accountScope",
-      width: 140,
-      render: (_, record) => (
-        <div>
-          <Text>{record.salesScope.length}个账号</Text>
-          <br />
-          <Text type="secondary">{record.phases.length}个阶段</Text>
-        </div>
-      )
-    },
-    { title: "状态", dataIndex: "status", width: 110, render: (value) => <Tag color={statusColor(value)}>{statusLabel(value)}</Tag> },
-    { title: "版本", dataIndex: "stateVersion", width: 90, render: (value) => <Text type="secondary">#{value}</Text> },
-    { title: "更新时间", dataIndex: "updatedAt", width: 180 },
-    {
-      title: "操作",
-      fixed: "right",
-      width: 270,
-      render: (_, record) => (
-        <Space wrap={false}>
-          <Button type="link" onClick={() => setViewingSop(record)}>配置</Button>
-          <Button type="link" onClick={() => setEditingSop(record)}>编辑</Button>
-          <Button type="link" onClick={() => handleDuplicate(record)}>复制</Button>
-          <Button type="link" onClick={() => setViewingSop(record)}>运行明细</Button>
-          <Button type="link" danger={record.status === "ENABLED"} onClick={() => handleToggle(record)}>{record.status === "ENABLED" ? "停用" : "启用"}</Button>
-        </Space>
-      )
-    }
-  ];
-
-  return (
-    <>
-      <Space direction="vertical" size={16} className="page-stack sop-page">
-        <Card className="sop-hero-card">
-          <div className="sop-hero">
-            <div className="sop-hero-icon"><ForkOutlined /></div>
-            <div>
-              <Text className="sop-eyebrow">AI PLATFORM</Text>
-              <Title level={2}>SOP管理</Title>
-              <Text type="secondary">管理 AI 销售 SOP 模板、启动事件、阶段事件、策略 fallback 和运行实例。</Text>
-            </div>
-            <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => setEditingSop(createSopDraft())}>创建SOP</Button>
-          </div>
-        </Card>
-        <Row gutter={16}>
-          <Col xs={24} md={6}><Card><Statistic title="启用中 SOP" value={sopRows.filter((item) => item.status === "ENABLED").length} prefix={<CheckCircleOutlined />} /></Card></Col>
-          <Col xs={24} md={6}><Card><Statistic title="运行实例" value={sopRows.reduce((sum, item) => sum + item.runtime.runningInstances, 0)} prefix={<CloudSyncOutlined />} /></Card></Col>
-          <Col xs={24} md={6}><Card><Statistic title="失败任务" value={sopRows.reduce((sum, item) => sum + item.runtime.failedTasks, 0)} prefix={<AlertOutlined />} /></Card></Col>
-          <Col xs={24} md={6}><Card><Statistic title="策略数量" value={sopRows.reduce((sum, item) => sum + item.phases.reduce((phaseSum, phase) => phaseSum + phase.events.reduce((eventSum, event) => eventSum + event.strategies.length, 0), 0), 0)} prefix={<ForkOutlined />} /></Card></Col>
-        </Row>
-        <Card>
-          <Space className="toolbar sop-toolbar" wrap>
-            <Input.Search className="sop-search" placeholder="搜索 SOP 名称或编码" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
-            <Select value={status} onChange={setStatus} options={[{ value: "ALL", label: "全部状态" }, ...Object.entries(sopStatusMeta).map(([value, meta]) => ({ value, label: meta.label }))]} />
-            <Select placeholder="启动事件" value={startEvent || undefined} onChange={setStartEvent} allowClear options={sopEventTypes.map((item) => ({ value: item.code, label: `${item.name}（${item.code}）` }))} />
-            <Button type="primary">查询</Button>
-            <Button onClick={() => { setKeyword(""); setStatus("ALL"); setStartEvent(""); }}>刷新</Button>
-          </Space>
-          <Table
-            className="admin-table sop-table"
-            rowKey="key"
-            columns={columns}
-            dataSource={filteredRows}
-            pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
-            scroll={{ x: 1320 }}
-            title={() => <PanelTitle title="SOP任务列表" desc="为 AI 销售配置从触发事件到阶段动作的标准运营流程。" />}
-          />
-        </Card>
-      </Space>
-      <Drawer title={viewingSop ? `${viewingSop.sopInfo.name} · SOP配置` : "SOP配置"} open={Boolean(viewingSop)} onClose={() => setViewingSop(null)} width={1080}>
-        {viewingSop ? (
-          <Tabs
-            items={[
-              {
-                key: "basic",
-                label: "基础配置",
-                children: (
-                  <Space direction="vertical" size={18} className="page-stack">
-                    <Descriptions bordered column={2} size="small">
-                      <Descriptions.Item label="SOP编码">{viewingSop.sopInfo.sopCode}</Descriptions.Item>
-                      <Descriptions.Item label="当前状态"><Tag color={statusColor(viewingSop.status)}>{statusLabel(viewingSop.status)}</Tag></Descriptions.Item>
-                      <Descriptions.Item label="启动事件">{viewingSop.sopInfo.eventTypeCode}</Descriptions.Item>
-                      <Descriptions.Item label="时间轴策略">{viewingSop.sopInfo.timelinePolicyCode} v{viewingSop.sopInfo.timelinePolicyVersion}</Descriptions.Item>
-                      <Descriptions.Item label="解析器类型">{viewingSop.sopInfo.timelineResolverType}</Descriptions.Item>
-                      <Descriptions.Item label="默认时区">{viewingSop.sopInfo.timelineTimezone}</Descriptions.Item>
-                      <Descriptions.Item label="失败通知">{viewingSop.sopInfo.notifyMode}</Descriptions.Item>
-                      <Descriptions.Item label="通知群">{viewingSop.sopInfo.notifyGroupCode}</Descriptions.Item>
-                      <Descriptions.Item label="销售范围" span={2}>{viewingSop.salesScope.map((key) => managedWecomAccounts.find((item) => item.key === key)?.label || key).join("、")}</Descriptions.Item>
-                      <Descriptions.Item label="策略摘要" span={2}>截止时间 12:00，阶段边界 18:00；解析器 DAILY_BOUNDARY，时区 Asia/Shanghai。</Descriptions.Item>
-                      <Descriptions.Item label="说明" span={2}>{viewingSop.sopInfo.description}</Descriptions.Item>
-                    </Descriptions>
-                    <Card size="small" title="可用启动事件">
-                      <Row gutter={[12, 12]}>
-                        {sopEventTypes.map((item) => (
-                          <Col xs={24} md={12} key={item.code}>
-                            <div className="sop-info-tile">
-                              <Text strong>{item.name}</Text>
-                              <Tag>{item.code}</Tag>
-                              <Text type="secondary">{item.desc}</Text>
-                            </div>
-                          </Col>
-                        ))}
-                      </Row>
-                    </Card>
-                  </Space>
-                )
-              },
-              {
-                key: "builder",
-                label: "阶段事件策略",
-                children: (
-                  <Space direction="vertical" size={14} className="page-stack">
-                    <div className="sop-drawer-actions">
-                      <Text type="secondary">每日18点边界 v1 · DAILY_BOUNDARY；阶段窗口以启动事件发生时间为锚点自动计算，相邻阶段首尾连续。</Text>
-                      <Button icon={<PlusOutlined />} onClick={() => setEditingPhase({ sop: viewingSop, phase: { id: "", name: "新阶段", chatAgentCode: "day1_agent_release", defaultTimeDayOffset: viewingSop.phases.length, defaultTimeOfDay: "10:00:00", description: "", events: [] } })}>添加阶段</Button>
-                    </div>
-                    {viewingSop.phases.map((phase) => (
-                      <Card
-                        key={phase.id}
-                        size="small"
-                        className="sop-phase-card"
-                        title={<Space><Tag color="purple">阶段 {phase.sort}</Tag><Text strong>{phase.name}</Text><Text type="secondary">{phase.defaultTimeDayOffset === 0 ? "窗口开始当天" : `第 ${phase.defaultTimeDayOffset} 天`} {phase.defaultTimeOfDay}</Text></Space>}
-                        extra={<Space><Button type="link" onClick={() => setEditingPhase({ sop: viewingSop, phase })}>编辑阶段</Button><Button type="link" onClick={() => setEditingEvent({ sop: viewingSop, phase, event: createEventDraft(phase) })}>添加事件</Button></Space>}
-                      >
-                        <Text type="secondary">阶段闲聊 Agent：{phase.chatAgentCode}；{phase.description}</Text>
-                        <List
-                          className="sop-event-list"
-                          dataSource={phase.events}
-                          renderItem={(event) => (
-                            <List.Item>
-                              <div className="sop-event-block">
-                                <div className="sop-event-head">
-                                  <Space wrap>
-                                    <Tag color={event.enabled ? "green" : "default"}>{event.enabled ? "启用" : "停用"}</Tag>
-                                    <Text strong>{event.name}</Text>
-                                    <Tag>{event.triggerType}</Tag>
-                                    <Text type="secondary">{event.triggerType === "SCHEDULED" ? `D+${event.scheduleDayOffset} ${event.scheduleTimeOfDay}` : event.triggerType === "CHAIN_DELAYED" ? `前置事件完成 ${event.delayMinutes} 分钟后` : "立即触发"}</Text>
-                                    {event.pollEnabled ? <Tag color="orange">开启轮询 {event.pollIntervalMinutes}分钟 x {event.pollCount}</Tag> : null}
-                                  </Space>
-                                  <Space><Button type="link" onClick={() => setEditingEvent({ sop: viewingSop, phase, event })}>编辑事件</Button><Button type="link" onClick={() => setEditingStrategy({ sop: viewingSop, phase, event, strategy: createStrategyDraft() })}>添加策略</Button></Space>
-                                </div>
-                                <Text type="secondary">{event.description}</Text>
-                                <div className="sop-strategy-chain">
-                                  {event.strategies.map((strategy) => (
-                                    <div className="sop-strategy-node" key={strategy.id}>
-                                      <Space wrap>
-                                        <Tag color={strategy.strategyType === "AGENT" ? "blue" : "cyan"}>{strategy.strategyType === "AGENT" ? "Agent 生成" : "固定消息"}</Tag>
-                                        <Text strong>{strategy.name}</Text>
-                                        <Tag>{strategy.sendChannel === "JUZI" ? "句子私聊" : "企微应用"}</Tag>
-                                        <Tag>{strategy.targetMode === "ALL" ? "全部用户" : "自定义用户"}</Tag>
-                                      </Space>
-                                      <Paragraph type="secondary">{strategy.strategyType === "AGENT" ? strategy.prompt : strategy.messageContent}</Paragraph>
-                                      <Text type="secondary">{renderConditionRule(strategy.conditionRule)}</Text>
-                                      <Button type="link" onClick={() => setEditingStrategy({ sop: viewingSop, phase, event, strategy })}>编辑策略</Button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </List.Item>
-                          )}
-                        />
-                      </Card>
-                    ))}
-                  </Space>
-                )
-              },
-              {
-                key: "runtime",
-                label: "运行明细",
-                children: (
-                  <Space direction="vertical" size={16} className="page-stack">
-                    <Row gutter={12}>
-                      <Col xs={12} md={4}><Card><Statistic title="运行中" value={viewingSop.runtime.runningInstances} /></Card></Col>
-                      <Col xs={12} md={4}><Card><Statistic title="已暂停" value={viewingSop.runtime.pausedInstances} /></Card></Col>
-                      <Col xs={12} md={4}><Card><Statistic title="已完成" value={viewingSop.runtime.finishedInstances} /></Card></Col>
-                      <Col xs={12} md={4}><Card><Statistic title="近7天完成" value={viewingSop.runtime.finishedLast7Days} /></Card></Col>
-                      <Col xs={12} md={4}><Card><Statistic title="失败任务" value={viewingSop.runtime.failedTasks} /></Card></Col>
-                      <Col xs={12} md={4}><Card><Statistic title="已通知失败" value={viewingSop.runtime.notifiedFailedTasks} /></Card></Col>
-                    </Row>
-                    <Table
-                      size="small"
-                      rowKey="id"
-                      columns={[
-                        { title: "客户", dataIndex: "customer" },
-                        { title: "当前阶段", dataIndex: "phase" },
-                        { title: "事件结果", dataIndex: "result", render: (value) => <Tag color={value === "SUCCESS" ? "green" : value === "FAILED" ? "red" : "blue"}>{value}</Tag> },
-                        { title: "最近执行", dataIndex: "updatedAt" },
-                        { title: "操作", render: () => <Space><Button size="small">暂停</Button><Button size="small">手动触发</Button><Button size="small" danger>终止</Button></Space> }
-                      ]}
-                      dataSource={[
-                        { id: "ins-1", customer: "张妈妈", phase: viewingSop.phases[0]?.name, result: "RUNNING", updatedAt: "2026-07-29 10:22" },
-                        { id: "ins-2", customer: "王妈妈", phase: viewingSop.phases[1]?.name || viewingSop.phases[0]?.name, result: "SUCCESS", updatedAt: "2026-07-29 09:18" },
-                        { id: "ins-3", customer: "刘爸爸", phase: viewingSop.phases[2]?.name || viewingSop.phases[0]?.name, result: "FAILED", updatedAt: "2026-07-28 21:40" }
-                      ]}
-                      pagination={false}
-                    />
-                  </Space>
-                )
-              }
-            ]}
-          />
-        ) : null}
-      </Drawer>
-      <Modal
-        title={editingSop?.key ? "编辑SOP" : "创建SOP"}
-        open={Boolean(editingSop)}
-        onCancel={() => setEditingSop(null)}
-        onOk={() => form.submit()}
-        okText="保存"
-        cancelText="取消"
-        width={980}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Row gutter={16}>
-            <Col xs={24} md={12}><Form.Item label="SOP名称" name="name" rules={[{ required: true, message: "请输入SOP名称" }]}><Input placeholder="例如：新好友转化SOP" /></Form.Item></Col>
-            <Col xs={24} md={12}><Form.Item label="SOP编码" name="code" rules={[{ required: true, message: "请输入SOP编码" }]}><Input placeholder="例如：FRIEND_ADD_CONVERT" /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="启动事件" name="startEvent"><Select options={sopEventTypes.map((item) => ({ value: item.code, label: `${item.name}（${item.code}）` }))} /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="时间轴策略" name="timelineStrategy"><Select options={["FRIEND_ADD_DAILY_BOUNDARY", "EVENT_TIME", "FIXED_TIME"].map((value) => ({ value }))} /></Form.Item></Col>
-            <Col xs={24} md={4}><Form.Item label="版本" name="version"><Input /></Form.Item></Col>
-            <Col xs={24} md={4}><Form.Item label="状态" name="status"><Select options={Object.entries(sopStatusMeta).map(([value, meta]) => ({ value, label: meta.label }))} /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="默认触发时刻" name="defaultTimeOfDay"><Input placeholder="18:00:00" /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="失败通知" name="notifyMode"><Select options={[{ value: "FAILED_ONLY", label: "仅失败通知" }, { value: "NONE", label: "不通知" }, { value: "ALL", label: "全部通知" }]} /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="通知群" name="notifyGroupCode"><Input placeholder="SOP_FAILED_NOTICE" /></Form.Item></Col>
-            <Col span={24}><Form.Item label="销售范围" name="boundSales" rules={[{ required: true, message: "请选择销售范围" }]}><Select mode="multiple" options={managedWecomAccounts.map((item) => ({ value: item.key, label: `${item.label}（${item.account}）` }))} /></Form.Item></Col>
-            <Col span={24}><Form.Item label="SOP目标" name="target"><Input.TextArea rows={3} placeholder="说明该 SOP 对 AI 销售的业务目标、适用客户和执行边界。" /></Form.Item></Col>
-          </Row>
-          <Divider orientation="left">配置原则</Divider>
-          <Paragraph type="secondary">基础信息和销售范围独立保存；阶段、事件、策略在配置详情中分层维护。条件策略排在前面，多条 ALL 策略连续排列在链尾，按保存顺序执行 fallback，第一条成功产出内容后停止。</Paragraph>
-        </Form>
-      </Modal>
-      <Modal title={editingPhase?.phase?.id ? "编辑阶段" : "添加阶段"} open={Boolean(editingPhase)} onCancel={() => setEditingPhase(null)} onOk={() => phaseForm.submit()} okText="保存" cancelText="取消">
-        <Form form={phaseForm} layout="vertical" onFinish={handleSavePhase}>
-          <Form.Item label="阶段名称" name="name" rules={[{ required: true, message: "请输入阶段名称" }]}><Input /></Form.Item>
-          <Form.Item label="阶段闲聊 Agent" name="chatAgentCode"><Select options={["day0_agent", "day1_agent_release", "day2_agent_release", "day3_agent_release", "day6_agent_release", "multimodel_homework_agent"].map((value) => ({ value }))} /></Form.Item>
-          <Row gutter={12}>
-            <Col span={12}><Form.Item label="事件默认日期" name="defaultTimeDayOffset"><InputNumber min={0} addonBefore="D+" className="full-input" /></Form.Item></Col>
-            <Col span={12}><Form.Item label="默认触发时刻" name="defaultTimeOfDay"><Input /></Form.Item></Col>
-          </Row>
-          <Form.Item label="阶段说明" name="description"><Input.TextArea rows={3} /></Form.Item>
-        </Form>
-      </Modal>
-      <Modal title={editingEvent?.event?.id ? "编辑事件" : "添加事件"} open={Boolean(editingEvent)} onCancel={() => setEditingEvent(null)} onOk={() => eventForm.submit()} okText="保存" cancelText="取消">
-        <Form form={eventForm} layout="vertical" onFinish={handleSaveEvent}>
-          <Form.Item label="事件名称" name="name" rules={[{ required: true, message: "请输入事件名称" }]}><Input /></Form.Item>
-          <Form.Item label="触发类型" name="triggerType"><Select options={[{ value: "INSTANCE_CREATED", label: "立即触发" }, { value: "SCHEDULED", label: "固定时刻" }, { value: "CHAIN_IMMEDIATE", label: "前置事件完成立即" }, { value: "CHAIN_DELAYED", label: "前置事件完成 N 分钟后" }]} /></Form.Item>
-          <Row gutter={12}>
-            <Col span={8}><Form.Item label="相对日期" name="scheduleDayOffset"><InputNumber min={0} addonBefore="D+" className="full-input" /></Form.Item></Col>
-            <Col span={8}><Form.Item label="固定时刻" name="scheduleTimeOfDay"><Input /></Form.Item></Col>
-            <Col span={8}><Form.Item label="延迟分钟" name="delayMinutes"><InputNumber min={0} className="full-input" /></Form.Item></Col>
-          </Row>
-          <Row gutter={12}>
-            <Col span={8}><Form.Item label="开启轮询" name="pollEnabled" valuePropName="checked"><Switch /></Form.Item></Col>
-            <Col span={8}><Form.Item label="轮询间隔" name="pollIntervalMinutes"><InputNumber min={1} addonAfter="分钟" className="full-input" /></Form.Item></Col>
-            <Col span={8}><Form.Item label="执行次数" name="pollCount"><InputNumber min={1} className="full-input" /></Form.Item></Col>
-          </Row>
-          <Form.Item label="事件说明" name="description"><Input.TextArea rows={3} /></Form.Item>
-        </Form>
-      </Modal>
-      <Modal title={editingStrategy?.strategy?.id ? "编辑策略" : "添加策略"} open={Boolean(editingStrategy)} onCancel={() => setEditingStrategy(null)} onOk={() => strategyForm.submit()} okText="保存" cancelText="取消" width={880}>
-        <Form form={strategyForm} layout="vertical" onFinish={handleSaveStrategy}>
-          <Row gutter={12}>
-            <Col xs={24} md={12}><Form.Item label="策略名称" name="name" rules={[{ required: true, message: "请输入策略名称" }]}><Input /></Form.Item></Col>
-            <Col xs={24} md={6}><Form.Item label="策略类型" name="strategyType"><Select options={[{ value: "AGENT", label: "Agent 生成" }, { value: "FIXED_MESSAGE", label: "固定消息" }]} /></Form.Item></Col>
-            <Col xs={24} md={6}><Form.Item label="发送渠道" name="sendChannel"><Select options={[{ value: "JUZI", label: "句子私聊" }, { value: "WECOM_APP", label: "企微应用" }]} /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="目标用户范围" name="targetMode"><Radio.Group optionType="button" options={[{ value: "ALL", label: "全部用户" }, { value: "CUSTOM", label: "自定义用户" }]} /></Form.Item></Col>
-            <Col xs={24} md={16}><Form.Item label="Agent" name="agentCode"><Select options={[...strategies.map((item) => item.name), ...agentTools.map((item) => item.name)].map((value) => ({ value }))} /></Form.Item></Col>
-            <Col span={24}><Form.Item label="生成指令 / 固定消息内容" name="prompt"><Input.TextArea rows={3} placeholder="Agent 生成时作为 prompt；固定消息可在下方填写消息正文。" /></Form.Item></Col>
-            <Col xs={24} md={8}><Form.Item label="消息类型" name="messageType"><Select options={["TEXT", "IMAGE", "WEB", "VIDEO", "FILE", "MINI_PROGRAM", "VOICE"].map((value) => ({ value }))} /></Form.Item></Col>
-            <Col xs={24} md={16}><Form.Item label="模板变量" name="messageVars"><Select mode="multiple" options={sopMessageVariables.map((value) => ({ value }))} /></Form.Item></Col>
-            <Col span={24}><Form.Item label="固定消息正文" name="messageContent"><Input.TextArea rows={3} placeholder="支持 ${nickName}、${date} 等服务端变量。" /></Form.Item></Col>
-          </Row>
-          <Card size="small" title="条件构建器">
-            <Paragraph type="secondary">自定义用户可用 AND/OR 组合条件，例如基础信息、加好友时间、上课状态、订单状态、客户行为。当前原型展示字段池，真实接口使用 conditionRule JSON 保存。</Paragraph>
-            <Space wrap>{sopConditionFields.map((item) => <Tag key={item.category}>{item.label}：{item.fields.join("、")}</Tag>)}</Space>
-          </Card>
-        </Form>
-      </Modal>
-    </>
-  );
-}
 
 function StrategyEditor({ skill, onBack }) {
+  const { message } = AntApp.useApp();
   const lifecycleOptions = lifecycleStages.map((item) => ({ value: item.title, label: item.title }));
+  const knowledgeBaseOptions = knowledgeBases.map((item) => ({ value: item.key, label: item.name }));
+  const defaultKnowledgeBaseKeys = skill.name === "生成课程顾问话术"
+    ? ["kb-course", "kb-policy", "kb-faq"]
+    : skill.name === "获取学员信息"
+      ? ["kb-course", "kb-faq"]
+      : [];
+  const defaultToolKeys = agentTools.filter((tool) => tool.enabled).slice(0, 3).map((tool) => tool.key);
+  const toolOptions = agentTools.map((tool) => ({ value: tool.key, label: tool.name }));
   const userTagOptions = [
     "已付费",
     "高意向",
@@ -2758,6 +2412,7 @@ function StrategyEditor({ skill, onBack }) {
   const relativeTimeUnitOptions = ["分钟", "小时", "天"].map((value) => ({ value }));
   const [form] = Form.useForm();
   const createScheduleRule = () => ({
+    taskEffectiveCondition: "加好友",
     operationTaskType: "输入该 Skill 的定时任务描述",
     taskEffectiveTriggerMode: "延后触发",
     taskEffectiveAmount: 1,
@@ -2769,8 +2424,15 @@ function StrategyEditor({ skill, onBack }) {
       scheduleRules: rules.map((rule, index) => (index === ruleIndex ? { ...rule, ...values } : rule))
     });
   };
+  const taskEffectiveConditionOptions = ["加好友", "agent生效", "加好友自然日"].map((value) => ({ value }));
+  const [selectedKnowledgeBaseKeys, setSelectedKnowledgeBaseKeys] = useState(skill.knowledgeBaseKeys || defaultKnowledgeBaseKeys);
+  const [selectedToolKeys, setSelectedToolKeys] = useState(skill.toolKeys || defaultToolKeys);
+  const selectedKnowledgeBases = knowledgeBases.filter((item) => selectedKnowledgeBaseKeys.includes(item.key));
+  const selectedTools = agentTools.filter((item) => selectedToolKeys.includes(item.key));
   const [debugInput, setDebugInput] = useState("");
   const [debugTrace, setDebugTrace] = useState(null);
+  const defaultDebugPresetDescription = "孩子三年级，英语基础一般，阅读总丢分。想先了解试听课怎么安排，费用大概多少？";
+  const [debugPresetDescription, setDebugPresetDescription] = useState(defaultDebugPresetDescription);
   const logicSections = [
     {
       title: "角色",
@@ -2855,7 +2517,7 @@ function StrategyEditor({ skill, onBack }) {
     }
   ];
   const [debugMessages, setDebugMessages] = useState(() => [
-    { key: "u-1", from: "user", text: "孩子三年级，英语基础一般，阅读总丢分。想先了解试听课怎么安排，费用大概多少？" },
+    { key: "u-1", from: "user", text: defaultDebugPresetDescription },
     ...buildDebugAiMessages("text")
   ]);
   const appendDebugRun = (message) => {
@@ -2870,6 +2532,11 @@ function StrategyEditor({ skill, onBack }) {
     if (!text) return;
     appendDebugRun({ key: `u-text-${Date.now()}`, from: "user", kind: "text", text });
     setDebugInput("");
+  };
+  const runDebugPreset = () => {
+    const text = debugPresetDescription.trim();
+    if (!text) return;
+    appendDebugRun({ key: `u-preset-${Date.now()}`, from: "user", kind: "text", text });
   };
   const sendDebugMedia = (kind) => {
     appendDebugRun({
@@ -2893,233 +2560,351 @@ function StrategyEditor({ skill, onBack }) {
           </Space>
         </div>
       </Card>
-      <div className="skill-builder-grid">
-        <section className="skill-logic-pane">
-          <div className="builder-pane-head">
-            <Title level={4}>技能逻辑描述</Title>
-          </div>
-          <SkillLogicRichEditor defaultValue={logicText} />
-        </section>
-        <section className="skill-config-pane">
-          <div className="builder-pane-head">
-            <Title level={4}>编排</Title>
-          </div>
-          <Form
-            form={form}
-            layout="vertical"
-            key={skill.key}
-            initialValues={{
-              name: skill.name,
-              effectiveEvent: "企微加好友",
-              effectiveTag: "已预约体验课",
-              effectiveTagAttribute: "状态标签",
-              effectiveTriggerMode: "延后触发",
-              effectiveAmount: 1,
-              effectiveUnit: "分钟",
-              scheduleRules: [],
-              endTriggerMode: "延后触发",
-              endAmount: 7,
-              endUnit: "天"
-            }}
-          >
-            <div className="orchestration-form">
-              <div className="orchestration-section">
-                <Text className="orchestration-section-title">1. Skill 名称</Text>
-                <Form.Item name="name"><Input /></Form.Item>
-              </div>
-              <div className="orchestration-section">
-                <Text className="orchestration-section-title">2. Skill 生效条件配置</Text>
-                <Form.Item label="选择生效触发条件" name="effectiveEvent" className="schedule-base-item">
-		                  <Radio.Group>
-		                    <Radio value="企微加好友">企微加好友</Radio>
-		                    <Radio value="用户标签">用户标签</Radio>
-		                    <Radio value="固定时间">固定时间</Radio>
-	                  </Radio.Group>
-                </Form.Item>
-                <Form.Item noStyle shouldUpdate={(prev, next) => prev.effectiveEvent !== next.effectiveEvent}>
-                  {({ getFieldValue }) => {
-	                    const effectiveEvent = getFieldValue("effectiveEvent");
-	                    return effectiveEvent === "用户标签" ? (
-	                      <div className="tag-condition-group">
-	                        <Text strong>选择用户标签及标准属性</Text>
-	                        <div className="tag-condition-row">
-	                          <Form.Item name="effectiveTag">
-	                            <Select
-	                              placeholder="选择用户标签，例如：已付费、高意向、720期次"
-	                              options={userTagOptions}
-	                            />
-	                          </Form.Item>
-	                          <Form.Item name="effectiveTagAttribute">
-	                            <Select
-	                              placeholder="选择标签属性"
-	                              options={tagAttributeOptions}
-	                            />
-	                          </Form.Item>
+      <Card className="skill-editor-tabs-card">
+        <Tabs
+          className="skill-editor-tabs"
+          defaultActiveKey="logic"
+          items={[
+            {
+              key: "logic",
+              label: "逻辑与任务编排",
+              children: (
+                <div className="skill-logic-config-grid">
+                  <section className="skill-logic-pane">
+                    <div className="builder-pane-head">
+                      <Title level={4}>技能逻辑描述</Title>
+                    </div>
+                    <SkillLogicRichEditor defaultValue={logicText} />
+                  </section>
+                  <section className="skill-config-pane">
+                    <div className="builder-pane-head">
+                      <Title level={4}>任务编排</Title>
+                    </div>
+                    <Form
+                      form={form}
+                      layout="vertical"
+                      key={skill.key}
+	                      initialValues={{
+	                        name: skill.name,
+	                        effectiveEvent: "企微加好友",
+                        effectiveTag: "已预约体验课",
+                        effectiveTagAttribute: "状态标签",
+                        effectiveTriggerMode: "延后触发",
+                        effectiveAmount: 1,
+                        effectiveUnit: "分钟",
+                        scheduleRules: [],
+                        endTriggerMode: "延后触发",
+                        endAmount: 7,
+                        endUnit: "天"
+                      }}
+                    >
+                      <div className="orchestration-form">
+	                        <div className="orchestration-section">
+	                          <Text className="orchestration-section-title">1. Skill 名称</Text>
+	                          <Form.Item name="name"><Input /></Form.Item>
 	                        </div>
-	                      </div>
-	                    ) : null;
-                  }}
-                </Form.Item>
-                <Form.Item
-                  noStyle
-	                  shouldUpdate={(prev, next) => (
-	                    prev.effectiveEvent !== next.effectiveEvent ||
-	                    prev.effectiveTagAttribute !== next.effectiveTagAttribute
-	                  )}
-                >
-	                  {({ getFieldValue }) => {
-	                    const effectiveEvent = getFieldValue("effectiveEvent");
-	                    const effectiveTagAttribute = getFieldValue("effectiveTagAttribute");
-	                    if (effectiveEvent === "固定时间") {
-	                      return (
-		                        <Form.Item label="设置固定生效时间" name="effectiveFixedAt" className="schedule-fixed-time-item">
-	                          <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择具体日期时分秒" />
-	                        </Form.Item>
-	                      );
-	                    }
-	                    if (effectiveEvent === "用户标签" && effectiveTagAttribute === "状态标签") {
-	                      return (
-	                        <div className="effective-time-notice">
-                          <Text strong>生效时间：立即生效</Text>
-                          <Text type="secondary">当前选择的是状态标签，状态命中后会立即触发该 Skill，不需要配置相对时间或固定时间。</Text>
+	                        <div className="orchestration-section">
+	                          <Text className="orchestration-section-title">2. Skill 生效条件配置</Text>
+                          <Form.Item label="选择生效触发条件" name="effectiveEvent" className="schedule-base-item">
+                            <Radio.Group>
+                              <Radio value="企微加好友">企微加好友</Radio>
+                              <Radio value="用户标签">用户标签</Radio>
+                              <Radio value="固定时间">固定时间</Radio>
+                            </Radio.Group>
+                          </Form.Item>
+                          <Form.Item noStyle shouldUpdate={(prev, next) => prev.effectiveEvent !== next.effectiveEvent}>
+                            {({ getFieldValue }) => {
+                              const effectiveEvent = getFieldValue("effectiveEvent");
+                              return effectiveEvent === "用户标签" ? (
+                                <div className="tag-condition-group">
+                                  <Text strong>选择用户标签及标准属性</Text>
+                                  <div className="tag-condition-row">
+                                    <Form.Item name="effectiveTag">
+                                      <Select placeholder="选择用户标签，例如：已付费、高意向、720期次" options={userTagOptions} />
+                                    </Form.Item>
+                                    <Form.Item name="effectiveTagAttribute">
+                                      <Select placeholder="选择标签属性" options={tagAttributeOptions} />
+                                    </Form.Item>
+                                  </div>
+                                </div>
+                              ) : null;
+                            }}
+                          </Form.Item>
+                          <Form.Item noStyle shouldUpdate={(prev, next) => prev.effectiveEvent !== next.effectiveEvent || prev.effectiveTagAttribute !== next.effectiveTagAttribute}>
+                            {({ getFieldValue }) => {
+                              const effectiveEvent = getFieldValue("effectiveEvent");
+                              const effectiveTagAttribute = getFieldValue("effectiveTagAttribute");
+                              if (effectiveEvent === "固定时间") {
+                                return (
+                                  <Form.Item label="设置固定生效时间" name="effectiveFixedAt" className="schedule-fixed-time-item">
+                                    <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" placeholder="选择具体日期时分秒" />
+                                  </Form.Item>
+                                );
+                              }
+                              if (effectiveEvent === "用户标签" && effectiveTagAttribute === "状态标签") {
+                                return (
+                                  <div className="effective-time-notice">
+                                    <Text strong>生效时间：立即生效</Text>
+                                    <Text type="secondary">当前选择的是状态标签，状态命中后会立即触发该 Skill，不需要配置相对时间或固定时间。</Text>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="relative-time-row">
+                                  <Form.Item label="触发时间设置" name="effectiveTriggerMode">
+                                    <Select options={["延后触发"].map((value) => ({ value }))} />
+                                  </Form.Item>
+                                  <div className="relative-time-value-group">
+                                    <Form.Item name="effectiveAmount"><InputNumber min={1} precision={0} placeholder="请输入时间" /></Form.Item>
+                                    <Form.Item name="effectiveUnit"><Select options={relativeTimeUnitOptions} /></Form.Item>
+                                  </div>
+                                </div>
+                              );
+                            }}
+                          </Form.Item>
                         </div>
-                      );
-                    }
-		                    return (
-		                      <>
-			                        <div className="relative-time-row">
-			                          <Form.Item label="触发时间设置" name="effectiveTriggerMode">
-			                            <Select options={["延后触发"].map((value) => ({ value }))} />
-			                          </Form.Item>
-		                          <div className="relative-time-value-group">
-		                            <Form.Item name="effectiveAmount">
-		                              <InputNumber min={1} precision={0} placeholder="请输入时间" />
-		                            </Form.Item>
-		                            <Form.Item name="effectiveUnit">
-		                              <Select options={relativeTimeUnitOptions} />
-		                            </Form.Item>
-		                          </div>
-	                        </div>
-	                      </>
-	                    );
-                  }}
-                </Form.Item>
-              </div>
-	              <div className="orchestration-section">
-	                <Text className="orchestration-section-title">3. Skill 定时任务配置</Text>
-	                <Text type="secondary">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
-		                <Form.List name="scheduleRules">
-	                  {(fields, { add, remove }) => (
-	                    <div className="schedule-rule-list">
-                        {fields.length === 0 ? (
-                          <div className="schedule-empty-state">
-                            <Text type="secondary">暂无定时任务，可点击新增任务进行配置。</Text>
+	                        <div className="orchestration-section">
+	                          <Text className="orchestration-section-title">3. Skill 定时任务配置</Text>
+                          <Text type="secondary">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
+                          <Form.List name="scheduleRules">
+                            {(fields, { add, remove }) => (
+                              <div className="schedule-rule-list">
+                                {fields.length === 0 ? (
+                                  <div className="schedule-empty-state">
+                                    <Text type="secondary">暂无定时任务，可点击新增任务进行配置。</Text>
+                                  </div>
+                                ) : null}
+                                {fields.map((field, index) => (
+                                  <div className="schedule-rule-row" key={field.key}>
+                                    <Form.Item className="schedule-condition-item" label="任务生效时间条件" name={[field.name, "taskEffectiveCondition"]} initialValue="加好友">
+                                      <Select options={taskEffectiveConditionOptions} />
+                                    </Form.Item>
+                                    <Form.Item className="schedule-operation-item" label={`定时任务${index + 1}`} name={[field.name, "operationTaskType"]}>
+                                      <Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} placeholder="输入该 Skill 的定时任务描述" />
+                                    </Form.Item>
+                                    <div className="relative-time-row schedule-rule-relative-time">
+                                      <Form.Item label="触发时间设置" name={[field.name, "taskEffectiveTriggerMode"]}>
+                                        <Select options={["延后触发"].map((value) => ({ value }))} />
+                                      </Form.Item>
+                                      <div className="relative-time-value-group">
+                                        <Form.Item name={[field.name, "taskEffectiveAmount"]}><InputNumber min={1} precision={0} placeholder="请输入时间" /></Form.Item>
+                                        <Form.Item name={[field.name, "taskEffectiveUnit"]}><Select options={relativeTimeUnitOptions} /></Form.Item>
+                                      </div>
+                                    </div>
+                                    <div className="schedule-rule-actions">
+                                      <Button type="link" danger className="schedule-remove-button" onClick={() => remove(field.name)}>删除</Button>
+                                    </div>
+                                  </div>
+                                ))}
+                                <Button type="dashed" className="schedule-add-button" icon={<PlusOutlined />} onClick={() => add(createScheduleRule())}>新增任务</Button>
+                              </div>
+                            )}
+                          </Form.List>
+                        </div>
+	                        <div className="orchestration-section">
+	                          <Text className="orchestration-section-title">4. Skill 结束条件配置</Text>
+                          <div className="schedule-end-config">
+                            <Text type="secondary" className="schedule-end-tip">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
+                            <div className="relative-time-row schedule-end-row">
+                              <Form.Item label="触发时间设置" name="endTriggerMode">
+                                <Select options={["延后触发"].map((value) => ({ value }))} />
+                              </Form.Item>
+                              <div className="relative-time-value-group">
+                                <Form.Item name="endAmount"><InputNumber min={1} precision={0} placeholder="请输入时间" /></Form.Item>
+                                <Form.Item name="endUnit"><Select options={relativeTimeUnitOptions} /></Form.Item>
+                              </div>
+                            </div>
                           </div>
-                        ) : null}
-			                      {fields.map((field, index) => (
-			                        <div className="schedule-rule-row" key={field.key}>
-		                          <Form.Item className="schedule-operation-item" label={`定时任务${index + 1}`} name={[field.name, "operationTaskType"]}>
-		                            <Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} placeholder="输入该 Skill 的定时任务描述" />
-		                          </Form.Item>
-		                          <div className="relative-time-row schedule-rule-relative-time">
-		                            <Form.Item label="触发时间设置" name={[field.name, "taskEffectiveTriggerMode"]}>
-		                              <Select options={["延后触发"].map((value) => ({ value }))} />
-		                            </Form.Item>
-	                            <div className="relative-time-value-group">
-	                              <Form.Item name={[field.name, "taskEffectiveAmount"]}>
-	                                <InputNumber min={1} precision={0} placeholder="请输入时间" />
-	                              </Form.Item>
-	                              <Form.Item name={[field.name, "taskEffectiveUnit"]}>
-	                                <Select options={relativeTimeUnitOptions} />
-	                              </Form.Item>
-	                            </div>
-                          </div>
-		                          <div className="schedule-rule-actions">
-		                            <Button type="link" danger className="schedule-remove-button" onClick={() => remove(field.name)}>删除</Button>
-		                          </div>
-	                        </div>
-	                      ))}
-                        <Button
-                          type="dashed"
-                          className="schedule-add-button"
-                          icon={<PlusOutlined />}
-                          onClick={() => add(createScheduleRule())}
-                        >
-                          新增任务
-                        </Button>
-	                    </div>
-	                  )}
-	                </Form.List>
-              </div>
-	              <div className="orchestration-section">
-	                <Text className="orchestration-section-title">4. Skill 结束条件配置</Text>
-	                <div className="schedule-end-config">
-	                  <Text type="secondary" className="schedule-end-tip">该定时任务会在 Skill 生效后，按照下方相对时间执行。</Text>
-	                  <div className="relative-time-row schedule-end-row">
-	                    <Form.Item label="触发时间设置" name="endTriggerMode">
-	                      <Select options={["延后触发"].map((value) => ({ value }))} />
-	                    </Form.Item>
-	                    <div className="relative-time-value-group">
-	                      <Form.Item name="endAmount">
-	                        <InputNumber min={1} precision={0} placeholder="请输入时间" />
-	                      </Form.Item>
-	                      <Form.Item name="endUnit">
-	                        <Select options={relativeTimeUnitOptions} />
-	                      </Form.Item>
-	                    </div>
-	                  </div>
-	                </div>
-              </div>
-            </div>
-          </Form>
-        </section>
-        <section className="skill-preview-pane">
-          <div className="builder-pane-head">
-            <Title level={4}>预览与调试</Title>
-            <Space>
-              <Tooltip title="运行调试"><Button shape="circle" type="primary" icon={<CloudSyncOutlined />} /></Tooltip>
-            </Space>
-          </div>
-          <div className="debug-chat">
-            {debugMessages.map((message) => (
-              <div key={message.key} className={message.from === "user" ? "debug-message user" : "debug-message ai"}>
-                <Text type="secondary">{message.from === "user" ? "模拟用户" : skill.name}</Text>
-                <div className={message.kind === "voice" ? "debug-media-line voice" : message.kind === "image" ? "debug-media-line image" : "debug-message-text"}>
-                  {message.kind === "voice" ? <AudioOutlined /> : null}
-                  {message.kind === "image" ? <PictureOutlined /> : null}
-                  <span>{message.text}</span>
+                        </div>
+                      </div>
+                    </Form>
+                  </section>
                 </div>
-                {message.from === "ai" ? (
-                  <Button
-                    type="link"
-                    size="small"
-                    className="debug-trace-link"
-                    icon={<FileSearchOutlined />}
-                    onClick={() => setDebugTrace(message.trace)}
+              )
+            },
+            {
+              key: "debug",
+              label: "预览调试",
+              children: (
+                <div className="skill-debug-layout">
+                  <div className="debug-user-preset">
+                    <div className="builder-pane-head">
+                      <Title level={4}>用户预设</Title>
+                    </div>
+                    <div className="debug-preset-input">
+                      <Input.TextArea
+                        value={debugPresetDescription}
+                        autoSize={{ minRows: 18, maxRows: 28 }}
+                        placeholder="输入用户预设的文本描述，例如孩子年级、英语基础、咨询意向、生命周期、用户标签等模拟上下文。"
+                        onChange={(event) => setDebugPresetDescription(event.target.value)}
+                      />
+                      <Button className="debug-preset-save" type="primary" block onClick={() => message.success("用户预设已保存")}>保存用户预设</Button>
+                    </div>
+                  </div>
+                  <section className="skill-preview-pane">
+                    <div className="builder-pane-head">
+                      <Title level={4}>对话调试</Title>
+                      <Space>
+                        <Tooltip title="运行调试"><Button shape="circle" type="primary" icon={<CloudSyncOutlined />} onClick={runDebugPreset} /></Tooltip>
+                      </Space>
+                    </div>
+                    <div className="skill-debug-workbench">
+                      <div className="debug-chat-shell">
+                        <div className="debug-chat">
+                          {debugMessages.map((message) => (
+                            <div key={message.key} className={message.from === "user" ? "debug-message user" : "debug-message ai"}>
+                              <Text type="secondary">{message.from === "user" ? "模拟用户" : skill.name}</Text>
+                              <div className={message.kind === "voice" ? "debug-media-line voice" : message.kind === "image" ? "debug-media-line image" : "debug-message-text"}>
+                                {message.kind === "voice" ? <AudioOutlined /> : null}
+                                {message.kind === "image" ? <PictureOutlined /> : null}
+                                <span>{message.text}</span>
+                              </div>
+                              {message.from === "ai" ? (
+                                <Button type="link" size="small" className="debug-trace-link" icon={<FileSearchOutlined />} onClick={() => setDebugTrace(message.trace)}>查看逻辑</Button>
+                              ) : null}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="debug-input-bar">
+                          <Tooltip title="模拟用户语音"><Button shape="circle" icon={<AudioOutlined />} onClick={() => sendDebugMedia("voice")} /></Tooltip>
+                          <Tooltip title="模拟用户图片"><Button shape="circle" icon={<PictureOutlined />} onClick={() => sendDebugMedia("image")} /></Tooltip>
+                          <Input value={debugInput} placeholder="输入模拟用户的聊天内容..." onChange={(event) => setDebugInput(event.target.value)} onPressEnter={sendDebugText} />
+                          <Button type="primary" icon={<SendOutlined />} onClick={sendDebugText}>发送</Button>
+                        </div>
+                      </div>
+                      <aside className="debug-logic-panel">
+                        <Title level={4}>运行逻辑</Title>
+                        <div className="debug-stage-card">
+                          <div className="debug-stage-head">
+                            <Space size={8} wrap>
+                              <Text strong className="debug-stage-title">阶段1</Text>
+                              <Tag color="processing">进行中</Tag>
+                            </Space>
+                            <Button type="link" size="small">查看配置</Button>
+                          </div>
+                          <Space wrap className="debug-stage-tags">
+                            <Tag color="orange">生效：加好友后 1 分钟 进入</Tag>
+                            <Tag color="blue">时长：agent 生效后 4 分钟</Tag>
+                          </Space>
+                          <div className="debug-stage-time">
+                            <span><Text type="secondary">计划</Text> <Text className="debug-time">08-09 17:32</Text> <Text type="secondary">→</Text> <Text className="debug-time">08-09 17:36</Text></span>
+                            <span><Text type="secondary">进入</Text> <Text strong>08-09 17:32</Text> <Text type="secondary">至今</Text></span>
+                          </div>
+                          <div className="debug-task-card">
+                            <Text strong className="debug-task-count">定时任务 · 3</Text>
+                            {[
+                              { title: "要用户的手机号", delay: "agent 生效后 1 分钟 触发", at: "08-09 17:33" },
+                              { title: "要用户的姓名", delay: "agent 生效后 2 分钟 触发", at: "08-09 17:34" },
+                              { title: "要用户的地址", delay: "agent 生效后 3 分钟 触发", at: "08-09 17:35" }
+                            ].map((task, index) => (
+                              <div className="debug-task-row" key={task.title}>
+                                <div className="debug-task-main">
+                                  <Badge count={index + 1} color="#e6f1ff" />
+                                  <Text strong>{task.title}</Text>
+                                  <Tag color="warning">待执行</Tag>
+                                </div>
+                                <div className="debug-task-meta">
+                                  <Tag color="orange">{task.delay}</Tag>
+                                  <Text className="debug-time">触发 {task.at}</Text>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <Tag className="debug-skill-path">销售-阶段1-添加用户微信-了解用户</Tag>
+                        </div>
+                      </aside>
+                    </div>
+                  </section>
+                </div>
+              )
+            },
+            {
+              key: "resources",
+              label: "资源管理",
+              children: (
+                <Space direction="vertical" size={16} className="full-width skill-relation-tab">
+                  <Card
+                    title={
+                      <PanelTitle
+                        title="关联知识库"
+                        desc="管理该 Skill 执行时可引用的知识库，知识库内容会作为任务执行时的业务上下文。"
+                      />
+                    }
                   >
-                    查看执行过程
-                  </Button>
-                ) : null}
-              </div>
-            ))}
-          </div>
-          <div className="debug-input-bar">
-            <Tooltip title="模拟用户语音">
-              <Button shape="circle" icon={<AudioOutlined />} onClick={() => sendDebugMedia("voice")} />
-            </Tooltip>
-            <Tooltip title="模拟用户图片">
-              <Button shape="circle" icon={<PictureOutlined />} onClick={() => sendDebugMedia("image")} />
-            </Tooltip>
-            <Input
-              value={debugInput}
-              placeholder="输入模拟用户的聊天内容..."
-              onChange={(event) => setDebugInput(event.target.value)}
-              onPressEnter={sendDebugText}
-            />
-            <Button type="primary" icon={<SendOutlined />} onClick={sendDebugText}>发送</Button>
-          </div>
-        </section>
-      </div>
+                    <Form layout="vertical">
+                      <Form.Item label="选择知识库">
+                        <Select
+                          mode="multiple"
+                          value={selectedKnowledgeBaseKeys}
+                          placeholder="选择该 Skill 可引用的知识库"
+                          options={knowledgeBaseOptions}
+                          onChange={setSelectedKnowledgeBaseKeys}
+                        />
+                      </Form.Item>
+                    </Form>
+                    <Table
+                      className="admin-table"
+                      rowKey="key"
+                      pagination={false}
+                      scroll={{ x: 920 }}
+                      columns={[
+                        { title: "已关联知识库", dataIndex: "name", width: 220 },
+                        { title: "分类", dataIndex: "category", width: 110 },
+                        { title: "知识条目", dataIndex: "entries", width: 100, render: (items = []) => `${items.length} 条` },
+                        { title: "维护人", dataIndex: "owner", width: 110 },
+                        { title: "状态", dataIndex: "status", width: 90, render: statusTag },
+                        { title: "更新时间", dataIndex: "updated", width: 150 }
+                      ]}
+                      dataSource={selectedKnowledgeBases}
+                    />
+                  </Card>
+                </Space>
+              )
+            },
+            {
+              key: "tools",
+              label: "Tool 管理",
+              children: (
+                <Space direction="vertical" size={16} className="full-width skill-relation-tab">
+                  <Card
+                    title={
+                      <PanelTitle
+                        title="关联工具"
+                        desc="管理该 Skill 可调用的工具，工具用于执行外部查询、通知、跳转和托管动作。"
+                      />
+                    }
+                  >
+                    <Form layout="vertical">
+                      <Form.Item label="选择工具">
+                        <Select
+                          mode="multiple"
+                          value={selectedToolKeys}
+                          placeholder="选择该 Skill 可调用的工具"
+                          options={toolOptions}
+                          onChange={setSelectedToolKeys}
+                        />
+                      </Form.Item>
+                    </Form>
+                    <Table
+                      className="admin-table"
+                      rowKey="key"
+                      pagination={false}
+                      scroll={{ x: 980 }}
+                      columns={[
+                        { title: "已关联工具", dataIndex: "name", width: 220 },
+                        { title: "工具说明", dataIndex: "description", ellipsis: true },
+                        { title: "状态", dataIndex: "enabled", width: 90, render: statusTag },
+                        { title: "更新时间", dataIndex: "updatedAt", width: 170 }
+                      ]}
+                      dataSource={selectedTools}
+                    />
+                  </Card>
+                </Space>
+              )
+            }
+          ]}
+        />
+      </Card>
       <Modal
         title={debugTrace?.title || "执行过程"}
         open={Boolean(debugTrace)}
@@ -3250,51 +3035,220 @@ function LifecycleModal({ stage, skillOptions, onClose, onSave }) {
 }
 
 function KnowledgePage() {
-  const [modal, setModal] = useState("");
-  const [knowledgeRows, setKnowledgeRows] = useState(knowledge);
-  const columns = [
-    { title: "标题", dataIndex: "title" },
-    { title: "类型", dataIndex: "type" },
-    { title: "内容形式", dataIndex: "source" },
-    { title: "状态", dataIndex: "status", render: statusTag },
-    { title: "更新时间", dataIndex: "updated" },
+  const [baseRows, setBaseRows] = useState(knowledgeBases);
+  const [selectedBaseKey, setSelectedBaseKey] = useState("");
+  const [editingBase, setEditingBase] = useState(null);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [mediaFilter, setMediaFilter] = useState("全部媒体");
+  const [keyword, setKeyword] = useState("");
+  const selectedBase = baseRows.find((item) => item.key === selectedBaseKey);
+  const entryRows = (selectedBase?.entries || []).filter((item) => {
+    const matchesMedia = mediaFilter === "全部媒体" || item.media === mediaFilter;
+    const keywordText = keyword.trim().toLowerCase();
+    const matchesKeyword = !keywordText || [item.title, item.type, item.media, ...(item.tags || [])].some((value) => String(value).toLowerCase().includes(keywordText));
+    return matchesMedia && matchesKeyword;
+  });
+  const mediaOptions = ["全部媒体", "文本", "图片", "语音", "文件"].map((value) => ({ value }));
+
+  const saveBase = (values) => {
+    const nextBase = {
+      ...editingBase,
+      ...values,
+      updated: new Date().toISOString().slice(0, 16).replace("T", " "),
+      entries: editingBase?.entries || []
+    };
+    if (editingBase?.key) {
+      setBaseRows((items) => items.map((item) => (item.key === editingBase.key ? nextBase : item)));
+    } else {
+      const created = { ...nextBase, key: `kb-${Date.now()}` };
+      setBaseRows((items) => [...items, created]);
+      setSelectedBaseKey(created.key);
+    }
+    setEditingBase(null);
+  };
+
+  const saveEntry = (values) => {
+    if (!selectedBase) return;
+    const nextEntry = {
+      ...editingEntry,
+      ...values,
+      tags: values.tags || [],
+      updated: new Date().toISOString().slice(0, 16).replace("T", " ")
+    };
+    setBaseRows((items) => items.map((item) => {
+      if (item.key !== selectedBase.key) return item;
+      const entries = editingEntry?.key
+        ? item.entries.map((entry) => (entry.key === editingEntry.key ? nextEntry : entry))
+        : [...item.entries, { ...nextEntry, key: `ke-${Date.now()}` }];
+      return { ...item, entries, updated: nextEntry.updated };
+    }));
+    setEditingEntry(null);
+  };
+
+  const baseColumns = [
+    {
+      title: "知识库",
+      width: 520,
+      dataIndex: "name",
+      render: (value, record) => (
+        <div className="knowledge-base-cell">
+          <Tooltip title={record.desc} placement="topLeft" overlayClassName="knowledge-base-tooltip">
+            <span className="knowledge-base-title">{value}</span>
+          </Tooltip>
+        </div>
+      )
+    },
+    { title: "分类", dataIndex: "category", width: 110 },
+    { title: "知识条目", dataIndex: "entries", width: 100, render: (items = []) => `${items.length} 条` },
+    { title: "维护人", dataIndex: "owner", width: 110 },
+    { title: "状态", dataIndex: "status", width: 88, render: statusTag },
+    { title: "更新时间", dataIndex: "updated", width: 150 },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 180,
+      render: (_, record) => (
+        <Space wrap={false}>
+          <Button type="link" onClick={() => setSelectedBaseKey(record.key)}>管理条目</Button>
+          <Button type="link" onClick={() => setEditingBase(record)}>编辑</Button>
+        </Space>
+      )
+    }
+  ];
+  const entryColumns = [
+    { title: "知识条目", dataIndex: "title", width: 220 },
+    { title: "类型", dataIndex: "type", width: 120 },
+    {
+      title: "媒体",
+      dataIndex: "media",
+      width: 100,
+      render: (value) => {
+        const icon = value === "图片" ? <PictureOutlined /> : value === "语音" ? <AudioOutlined /> : <FileTextOutlined />;
+        return <Tag icon={icon} color={value === "文本" ? "blue" : value === "图片" ? "green" : value === "语音" ? "purple" : "gold"}>{value}</Tag>;
+      }
+    },
+    { title: "标签", dataIndex: "tags", render: (items = []) => <Space wrap>{items.map((item) => <Tag key={item}>{item}</Tag>)}</Space> },
+    { title: "状态", dataIndex: "status", width: 88, render: statusTag },
+    { title: "更新时间", dataIndex: "updated", width: 150 },
     {
       title: "操作",
       fixed: "right",
       width: 130,
       render: (_, record) => (
         <Space wrap={false}>
-          <Button type="link" onClick={() => setModal("edit")}>编辑</Button>
-          <Button type="link" danger onClick={() => Modal.confirm({ title: "删除资源", content: `确认删除 ${record.title}？`, okText: "删除", okButtonProps: { danger: true }, cancelText: "取消", onOk: () => setKnowledgeRows((items) => items.filter((item) => item.key !== record.key)) })}>删除</Button>
+          <Button type="link" onClick={() => setEditingEntry(record)}>编辑</Button>
+          <Button type="link" danger onClick={() => Modal.confirm({
+            title: "删除知识条目",
+            content: `确认删除 ${record.title}？`,
+            okText: "删除",
+            okButtonProps: { danger: true },
+            cancelText: "取消",
+            onOk: () => setBaseRows((items) => items.map((item) => item.key === selectedBase.key ? { ...item, entries: item.entries.filter((entry) => entry.key !== record.key) } : item))
+          })}>删除</Button>
         </Space>
       )
     }
   ];
   return (
     <>
-      <Card title={<PanelTitle title="资源列表" desc="维护产品知识、FAQ、销售话术和文件类素材，供角色配置和Skill调用。" extra={<><Button onClick={() => setModal("file")}>上传文件</Button><Button type="primary" onClick={() => setModal("text")}>新增资源</Button></>} />}>
-        <Space className="toolbar" wrap>
-          <Select defaultValue="全部类型" options={["全部类型", "公司介绍", "产品知识", "FAQ", "销售话术"].map((value) => ({ value }))} />
-          <Select defaultValue="全部状态" options={["全部状态", "启用", "停用"].map((value) => ({ value }))} />
-          <Input.Search placeholder="搜索知识标题或内容" allowClear />
-        </Space>
-        <Table className="admin-table" rowKey="key" columns={columns} dataSource={knowledgeRows} pagination={false} scroll={{ x: 900 }} />
-      </Card>
-      <KnowledgeModal modal={modal} onClose={() => setModal("")} />
+      <Space direction="vertical" size={16} className="page-stack knowledge-page">
+        {!selectedBase ? (
+          <Card
+            className="knowledge-base-panel"
+            title={<PanelTitle title="知识库列表" desc="一个知识库可包含多条文本、图片、语音或文件知识，供 Skill 设置时选择引用。" extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingBase({})}>新增知识库</Button>} />}
+          >
+            <Table
+              className="admin-table"
+              rowKey="key"
+              columns={baseColumns}
+              dataSource={baseRows}
+              pagination={false}
+              scroll={{ x: 1280 }}
+            />
+          </Card>
+        ) : (
+          <>
+            <div className="knowledge-entry-back">
+              <Button icon={<ArrowLeftOutlined />} onClick={() => setSelectedBaseKey("")}>返回知识库列表</Button>
+            </div>
+            <Card
+              className="knowledge-entry-panel"
+              title={<PanelTitle title={selectedBase.name} desc="知识条目管理" extra={<><Button onClick={() => setEditingBase(selectedBase)}>编辑知识库</Button><Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingEntry({})}>新增知识条目</Button></>} />}
+            >
+              <div className="knowledge-base-info-strip">
+                <span><Text type="secondary">知识库说明：</Text>{selectedBase.desc}</span>
+                <span><Text type="secondary">分类：</Text>{selectedBase.category}</span>
+                <span><Text type="secondary">维护人：</Text>{selectedBase.owner}</span>
+              </div>
+              <Space className="toolbar" wrap>
+                <Select value={mediaFilter} options={mediaOptions} onChange={setMediaFilter} />
+                <Input.Search value={keyword} placeholder="搜索知识标题、类型或标签" allowClear onChange={(event) => setKeyword(event.target.value)} />
+              </Space>
+              <Table className="admin-table knowledge-entry-table" rowKey="key" columns={entryColumns} dataSource={entryRows} pagination={false} scroll={{ x: 1080 }} />
+            </Card>
+          </>
+        )}
+      </Space>
+      <KnowledgeBaseModal base={editingBase} onClose={() => setEditingBase(null)} onSave={saveBase} />
+      <KnowledgeEntryModal entry={editingEntry} onClose={() => setEditingEntry(null)} onSave={saveEntry} />
     </>
   );
 }
 
-function KnowledgeModal({ modal, onClose }) {
-  const isFileMode = modal === "file";
+function KnowledgeBaseModal({ base, onClose, onSave }) {
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if (base) {
+      form.resetFields();
+      form.setFieldsValue({
+        name: base.name || "",
+        category: base.category || "课程知识",
+        desc: base.desc || "",
+        status: base.status || "启用",
+        owner: base.owner || "知识库运营"
+      });
+    }
+  }, [base, form]);
   return (
-    <Modal title={modal === "edit" ? "编辑知识" : isFileMode ? "上传知识文件" : "新增知识"} open={Boolean(modal)} onCancel={onClose} onOk={onClose} okText="保存知识" cancelText="取消" width={860}>
-      <Form layout="vertical">
+    <Modal title={base?.key ? "编辑知识库" : "新增知识库"} open={Boolean(base)} onCancel={onClose} onOk={() => form.submit()} okText="保存知识库" cancelText="取消" width={860}>
+      <Form form={form} layout="vertical" onFinish={onSave}>
         <Row gutter={16}>
-          <Col span={14}><Form.Item label="标题"><Input placeholder="例如：AI销售助手产品介绍" defaultValue={modal === "edit" ? "AI销售助手产品介绍" : ""} /></Form.Item></Col>
-          <Col span={10}><Form.Item label="知识类型"><Select defaultValue="产品知识" options={["公司介绍", "产品知识", "FAQ", "销售话术", "案例知识", "政策规则"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={14}><Form.Item label="知识库名称" name="name" rules={[{ required: true, message: "请输入知识库名称" }]}><Input placeholder="例如：价格政策与异议处理库" /></Form.Item></Col>
+          <Col span={10}><Form.Item label="分类" name="category"><Select options={["课程知识", "政策规则", "FAQ", "销售话术", "案例素材", "异议处理", "活动政策"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={24}><Form.Item label="知识库说明" name="desc"><Input.TextArea rows={4} placeholder="说明该知识库适用的业务场景、使用边界和维护规则。" /></Form.Item></Col>
+          <Col span={12}><Form.Item label="维护人" name="owner"><Input /></Form.Item></Col>
+          <Col span={12}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
         </Row>
-        <Form.Item label="富文本内容">
+      </Form>
+    </Modal>
+  );
+}
+
+function KnowledgeEntryModal({ entry, onClose, onSave }) {
+  const [form] = Form.useForm();
+  const mediaType = Form.useWatch("media", form);
+  useEffect(() => {
+    if (entry) {
+      form.resetFields();
+      form.setFieldsValue({
+        title: entry.title || "",
+        type: entry.type || "文本知识",
+        media: entry.media || "文本",
+        tags: entry.tags || [],
+        status: entry.status || "启用",
+        content: entry.content || ""
+      });
+    }
+  }, [entry, form]);
+  return (
+    <Modal title={entry?.key ? "编辑知识条目" : "新增知识条目"} open={Boolean(entry)} onCancel={onClose} onOk={() => form.submit()} okText="保存知识条目" cancelText="取消" width={900}>
+      <Form form={form} layout="vertical" onFinish={onSave}>
+        <Row gutter={16}>
+          <Col span={12}><Form.Item label="标题" name="title" rules={[{ required: true, message: "请输入知识标题" }]}><Input placeholder="例如：线上课和线下课区别" /></Form.Item></Col>
+          <Col span={6}><Form.Item label="知识类型" name="type"><Select options={["文本知识", "图片素材", "语音素材", "文件素材"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={6}><Form.Item label="媒体类型" name="media"><Select options={["文本", "图片", "语音", "文件"].map((value) => ({ value }))} /></Form.Item></Col>
+        </Row>
+        <Form.Item label="文本内容">
           <div className="rich-editor">
             <div className="rich-toolbar">
               <Button size="small">加粗</Button>
@@ -3303,21 +3257,25 @@ function KnowledgeModal({ modal, onClose }) {
               <Button size="small">链接</Button>
               <Button size="small" icon={<UploadOutlined />}>插入图片</Button>
             </div>
-            <Input.TextArea
-              rows={8}
-              placeholder="支持录入文字说明、图片描述、文件摘要和销售话术。后续可接入真实富文本编辑器。"
-              defaultValue={modal === "edit" ? "适用于企微销售自动接待场景，支持客户问题识别、产品介绍、方案推荐与必要时转人工。" : ""}
-            />
+            <Form.Item name="content" noStyle>
+              <Input.TextArea
+                rows={8}
+                placeholder="支持录入文字说明、图片描述、语音摘要、文件摘要和销售话术。"
+              />
+            </Form.Item>
           </div>
         </Form.Item>
-        <Form.Item label="附件素材">
-          <Upload.Dragger multiple beforeUpload={() => false} accept=".png,.jpg,.jpeg,.webp,.ppt,.pptx,.pdf,.doc,.docx">
+        <Form.Item label={mediaType === "语音" ? "上传语音素材" : mediaType === "图片" ? "上传图片素材" : "附件素材"}>
+          <Upload.Dragger multiple beforeUpload={() => false} accept=".png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a,.ppt,.pptx,.pdf,.doc,.docx">
             <p className="upload-icon"><FileTextOutlined /></p>
-            <p>上传图片、PPT、PDF、Word 等知识素材</p>
-            <Text type="secondary">文件将作为知识内容的补充资料，便于后续解析入库。</Text>
+            <p>上传图片、语音、PPT、PDF、Word 等知识素材</p>
+            <Text type="secondary">素材将作为知识内容的补充资料，后续可接入 OCR、ASR 和文件解析。</Text>
           </Upload.Dragger>
         </Form.Item>
-        {isFileMode ? <Text type="secondary">上传后仍可补充富文本说明，便于AI理解文件使用场景。</Text> : null}
+        <Row gutter={16}>
+          <Col span={16}><Form.Item label="标签" name="tags"><Select mode="tags" placeholder="输入标签后回车，例如：价格、试听课、阅读" /></Form.Item></Col>
+          <Col span={8}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
+        </Row>
       </Form>
     </Modal>
   );
@@ -4174,10 +4132,10 @@ function AppShell({ user, onLogout }) {
     dashboard: <Dashboard setRoute={setRoute} conversationsData={scopedConversations} />,
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
+    agentManager: <IntelligentAgentPage />,
     agent: <AgentPage />,
     strategy: <StrategyPage />,
     tools: <ToolsPage />,
-    sop: <SopPage />,
     knowledge: <KnowledgePage />,
     wecom: <WecomPage />,
     sales: <SalesPage />,
