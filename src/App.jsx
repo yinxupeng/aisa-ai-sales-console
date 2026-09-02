@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
 import {
   App as AntApp,
   Avatar,
@@ -19,6 +20,8 @@ import {
   List,
   Menu,
   Modal,
+  Pagination,
+  Popover,
   Radio,
   Row,
   Select,
@@ -50,14 +53,17 @@ import {
   DeleteOutlined,
   FileTextOutlined,
   FileSearchOutlined,
+  FilterOutlined,
   FolderOutlined,
   FolderOpenOutlined,
   LinkOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  MinusCircleOutlined,
   PaperClipOutlined,
   PictureOutlined,
   PlusOutlined,
+  QuestionCircleOutlined,
   SendOutlined,
   SmileOutlined,
   TagsOutlined,
@@ -908,22 +914,87 @@ const knowledgeBases = [
     owner: "知识库运营",
     updated: "2026-08-08 18:20",
     entries: [
-      { key: "ke-1", title: "小学英语诊断试听课说明", type: "文本知识", media: "文本", tags: ["试听课", "诊断"], status: "启用", updated: "2026-08-08 18:20" },
-      { key: "ke-2", title: "自然拼读课程海报", type: "图片素材", media: "图片", tags: ["自然拼读", "海报"], status: "启用", updated: "2026-08-07 15:12" },
-      { key: "ke-3", title: "课程顾问标准讲解音频", type: "语音素材", media: "语音", tags: ["讲解", "销售"], status: "启用", updated: "2026-08-06 11:30" }
+      {
+        key: "ke-1",
+        title: "19元体验课知识库",
+        type: "文档",
+        media: "文档",
+        fileName: "19元体验课知识库.docx",
+        filePath: "./Resource/19元体验课知识库.docx",
+        fileSize: "16 KB",
+        tags: ["体验课", "课程知识"],
+        status: "启用",
+        desc: "家长咨询19元体验课内容、课节安排和适合人群时引用。",
+        content: "# 19元体验课知识库\n\n## 资源摘要\n- 体验课为低门槛转化产品，用于帮助家长先理解孩子问题和课程服务方式。\n- AI在回答体验课问题时，应优先说明体验课目标、课节安排、适合人群和报名后的下一步。\n- 如家长询问具体价格、名额、老师时间，建议结合订单/排课工具或转人工确认。\n\n## 可使用场景\n- 家长问：体验课讲什么？\n- 家长问：孩子这种情况适不适合？\n- 家长问：买完体验课后怎么安排？",
+        updated: "2026-08-08 18:20"
+      },
+      {
+        key: "ke-2",
+        title: "课程海报图片素材",
+        type: "图片",
+        media: "图片",
+        fileName: "ChatGPT Image 2026年8月22日 17_18_17.png",
+        filePath: "./Resource/ChatGPT Image 2026年8月22日 17_18_17.png",
+        fileSize: "2.7 MB",
+        tags: ["课程海报", "图片素材"],
+        status: "启用",
+        desc: "家长需要课程介绍图、活动图或转发素材时，可发送该图片。",
+        content: "## 图片说明\n这是一张课程介绍类图片素材，可用于向家长展示服务内容、课程亮点或活动信息。\n\n## 适合发送场景\n- 家长问课程具体是什么形式。\n- 家长希望先看一张介绍图。\n- 销售需要在沟通中补充视觉材料。\n\n## 发送注意\n发送前需要结合当前用户问题，不要无上下文直接推送。",
+        updated: "2026-08-07 15:12"
+      },
+      {
+        key: "ke-3",
+        title: "咨询服务产品说明音频",
+        type: "音频",
+        media: "音频",
+        fileName: "咨询服务_产品说明.mp3",
+        filePath: "./Resource/咨询服务_产品说明.mp3",
+        fileSize: "260 KB",
+        tags: ["咨询服务", "音频素材"],
+        status: "启用",
+        desc: "家长希望了解咨询服务内容时，可作为音频素材或转写摘要引用。",
+        content: "## 音频摘要\n该音频用于介绍咨询服务的核心内容、服务流程和适合对象。\n\n## 可提炼话术\n- 咨询服务不是简单给建议，而是先帮助家长梳理孩子状态、家庭沟通方式和当前最紧急的问题。\n- 如果孩子已经出现明显情绪、人际或学习回避问题，建议先通过体验课或咨询评估明确方向。\n\n## 使用提醒\n如家长情绪较强或问题较复杂，建议转人工销售或专业老师进一步沟通。",
+        updated: "2026-08-06 11:30"
+      }
     ]
   },
   {
     key: "kb-policy",
-    name: "价格政策与异议处理库",
+    name: "产品资料与政策文件",
     category: "政策规则",
     desc: "维护价格套餐、优惠规则、退费边界和常见异议处理话术，优先绑定到价格相关 Skill。",
     status: "启用",
     owner: "平台运营",
     updated: "2026-08-08 13:45",
     entries: [
-      { key: "ke-4", title: "课程套餐价格边界", type: "文本知识", media: "文本", tags: ["价格", "套餐"], status: "启用", updated: "2026-08-08 13:45" },
-      { key: "ke-5", title: "暑期活动政策PDF", type: "文件素材", media: "文件", tags: ["活动", "PDF"], status: "停用", updated: "2026-08-05 09:18" }
+      {
+        key: "ke-4",
+        title: "3980课程知识库（同行者计划）",
+        type: "PDF",
+        media: "PDF",
+        fileName: "3980课程知识库（同行者计划·.pdf",
+        filePath: "./Resource/3980课程知识库（同行者计划·.pdf",
+        fileSize: "256 KB",
+        tags: ["3980", "同行者计划", "PDF"],
+        status: "启用",
+        desc: "家长咨询3980课程、同行者计划、课程交付内容时引用。",
+        content: "## PDF摘要\n该PDF用于说明3980课程知识库和同行者计划的产品内容。\n\n## 适合检索的问题\n- 3980课程包含什么服务？\n- 同行者计划和体验课有什么区别？\n- 正价课适合什么类型的家庭？\n\n## 使用提醒\n涉及价格、优惠、课时和服务承诺时，应以当前维护的政策文件或人工确认为准。",
+        updated: "2026-08-08 13:45"
+      },
+      {
+        key: "ke-5",
+        title: "菌群服务产品总览",
+        type: "文本",
+        media: "文本",
+        fileName: "菌群服务_产品总览.md",
+        filePath: "./Resource/菌群服务_产品总览.md",
+        fileSize: "8 KB",
+        tags: ["产品总览", "标签体系", "运营"],
+        status: "启用",
+        desc: "用于演示Markdown文档资源的维护和检索效果。",
+        content: "# PRD：客户自动标签清单与分组（提给平台）\n\n## 目标与使用场景\n自动打标范围见标签清单。命中即打上对应标签；同一用户可同时有多组、多个标签。\n\n本期平台侧需要支撑两个使用场景：\n1. 对话后台看到该用户当前标签，按分组展示。\n2. 按标签筛选用户，并对筛出的人发送即时消息。\n\n## 实现方式\n- 标签库：预置标签清单，并把标签打在用户身上。\n- 打标工具：供AI在对话中调用，把标签库里已有的标签打到用户身上。\n- 系统规则：行课数据、待支付、已约电话等由系统数据规则自动更新。",
+        updated: "2026-08-05 09:18"
+      }
     ]
   },
   {
@@ -935,8 +1006,31 @@ const knowledgeBases = [
     owner: "课程运营",
     updated: "2026-08-07 20:10",
     entries: [
-      { key: "ke-6", title: "线上课和线下课区别", type: "文本知识", media: "文本", tags: ["上课方式"], status: "启用", updated: "2026-08-07 20:10" },
-      { key: "ke-7", title: "阅读理解错题样例", type: "图片素材", media: "图片", tags: ["阅读", "错题"], status: "启用", updated: "2026-08-06 16:22" }
+      {
+        key: "ke-6",
+        title: "家庭守护计划视频",
+        type: "视频",
+        media: "视频",
+        fileName: "家庭守护计划.mp4",
+        filePath: "./Resource/家庭守护计划.mp4",
+        fileSize: "11 MB",
+        tags: ["家庭守护计划", "视频素材"],
+        status: "启用",
+        desc: "用于向家长介绍家庭守护计划，可作为视频素材发送或提炼摘要。",
+        content: "## 视频摘要\n该视频用于介绍家庭守护计划的服务理念、适合家庭和陪跑方式。\n\n## 适合发送场景\n- 家长想先了解服务整体形式。\n- 家长对长期陪跑价值不清楚。\n- 销售需要用视频材料辅助说明。\n\n## 使用提醒\n发送前先确认家长是否方便观看视频，避免在敏感情绪沟通中直接推送。",
+        updated: "2026-08-07 20:10"
+      },
+      {
+        key: "ke-7",
+        title: "常用课程与测评链接",
+        type: "链接集合",
+        media: "链接集合",
+        tags: ["课程链接", "测评链接"],
+        status: "启用",
+        desc: "用于演示链接集合，家长需要预约、测评或课程介绍链接时可检索发送。",
+        content: "## 常用链接\n- 19元体验课预约：https://www.guanxinlab.com/services/youth-companion\n- 青少年同行者计划介绍：https://www.guanxinlab.com/services/youth-companion\n- 家长测评问卷：https://www.guanxinlab.com/assessment/demo\n- 课程顾问咨询入口：https://www.guanxinlab.com/contact\n\n## 使用说明\n当家长明确提出要报名、预约、测评或查看课程介绍时，再发送对应链接。",
+        updated: "2026-08-06 16:22"
+      }
     ]
   }
 ];
@@ -957,101 +1051,398 @@ const managedWecomAccounts = [
 const tagRoleOptions = ["市场", "销售", "班主任"].map((value) => ({ label: value, value }));
 const tagGroupsSeed = [
   {
-    key: "tag-group-status",
-    name: "客户状态",
-    roles: ["销售", "班主任"],
-    aiWritable: false,
-    status: "启用",
-    tags: ["新加好友", "已上体验课", "体验课未报名", "已报名", "已删除企微"]
-  },
-  {
-    key: "tag-group-intent",
-    name: "客户意向",
-    roles: ["市场", "销售"],
+    key: "tag-group-child-problem",
+    name: "孩子问题画像",
+    roles: ["市场", "销售", "班主任"],
     aiWritable: true,
     status: "启用",
-    tags: ["高意向", "中意向", "低意向", "价格敏感", "需人工跟进"]
+    tags: ["厌学", "休学", "躺平", "手机成瘾", "叛逆对抗", "焦虑倾向", "抑郁倾向", "强迫行为", "社交困难", "情绪失控", "自伤风险", "睡眠问题", "学习动力弱"]
   },
   {
-    key: "tag-group-profile",
-    name: "用户画像",
+    key: "tag-group-family-relation",
+    name: "家庭关系画像",
     roles: ["销售", "班主任"],
     aiWritable: true,
     status: "启用",
-    tags: ["孩子厌学", "手机沉迷", "亲子冲突", "家长焦虑", "学习动力低"]
+    tags: ["亲子冲突高", "亲子冲突中", "亲子冲突低", "父母教育理念不一致", "家长高控制", "家长高焦虑", "孩子拒绝沟通", "家庭支持弱", "母亲主导沟通", "父亲缺位", "祖辈干预明显"]
   },
   {
-    key: "tag-group-product",
-    name: "咨询产品",
+    key: "tag-group-parent-awareness",
+    name: "家长认知阶段",
+    roles: ["销售", "班主任"],
+    aiWritable: true,
+    status: "启用",
+    tags: ["尚未意识到问题本质", "认为孩子只是懒", "开始接受心理因素", "认可家庭干预", "认可专业咨询", "对心理咨询抵触", "期待快速见效", "愿意长期陪伴改善"]
+  },
+  {
+    key: "tag-group-purchase-intent",
+    name: "购买意向",
     roles: ["市场", "销售"],
     aiWritable: true,
     status: "启用",
-    tags: ["咨询体验课", "咨询家庭守护", "咨询1v1", "咨询价格"]
+    tags: ["高意向", "中意向", "低意向", "明确拒绝", "价格敏感", "需要家人商量", "需要专家背书", "需要案例验证", "关注孩子是否配合", "关注效果保障", "关注隐私安全"]
   },
   {
-    key: "tag-group-wecom",
-    name: "企微关系",
-    roles: ["销售"],
+    key: "tag-group-product-interest",
+    name: "产品兴趣",
+    roles: ["市场", "销售", "班主任"],
+    aiWritable: true,
+    status: "启用",
+    tags: ["父母成长营意向", "同行者计划意向", "1V1心理咨询意向", "少年说意向", "家庭守护计划意向", "夏令营意向", "日间中心意向", "精神科问诊意向", "测评解读意向"]
+  },
+  {
+    key: "tag-group-follow-strategy",
+    name: "跟进策略",
+    roles: ["销售", "班主任"],
+    aiWritable: true,
+    status: "启用",
+    tags: ["适合先共情安抚", "适合推测评", "适合邀约直播课", "适合邀约专家连麦", "适合转人工深聊", "适合案例教育", "暂不强销售", "需要风险提示", "需要班主任介入", "需要心理专业人员介入"]
+  },
+  {
+    key: "tag-group-risk-warning",
+    name: "风险预警",
+    roles: ["销售", "班主任"],
     aiWritable: false,
     status: "启用",
-    tags: ["好友正常", "已删除销售", "拉黑风险"]
+    tags: ["删除企微风险", "投诉风险", "退款风险", "情绪敏感", "承诺敏感", "医疗边界敏感", "孩子高危风险", "家长崩溃求助", "不适合AI继续沟通"]
+  },
+  {
+    key: "tag-group-operation-audience",
+    name: "运营人群",
+    roles: ["市场", "销售", "班主任"],
+    aiWritable: true,
+    status: "启用",
+    tags: ["新线索", "直播课用户", "测评用户", "体验课用户", "体验后未报名", "已报名未转化高客单", "老客户复购", "沉默客户", "流失召回", "高价值客户"]
   }
 ];
 
-const customerTagGroups = [
-  {
-    key: "customer-relation",
-    name: "客户关系",
-    tags: [
-      { value: "好友正常", source: "企微同步" },
-      { value: "已删除销售", source: "企微同步" },
-      { value: "拉黑风险", source: "企微同步" }
-    ]
-  },
-  {
-    key: "customer-source",
-    name: "客户来源",
-    tags: [
-      { value: "视频号线索", source: "企微同步" },
-      { value: "转介绍", source: "企微同步" },
-      { value: "渠道线索", source: "企微同步" },
-      { value: "社群添加", source: "企微同步" }
-    ]
-  },
-  {
-    key: "customer-grade",
-    name: "年级阶段",
-    tags: ["一年级", "二年级", "三年级", "四年级", "五年级", "六年级", "小升初"].map((value) => ({ value, source: "标签库" }))
-  },
-  {
-    key: "customer-intent",
-    name: "客户意向",
-    tags: [
-      { value: "高意向", source: "AI打标" },
-      { value: "中意向", source: "AI打标" },
-      { value: "低意向", source: "AI打标" },
-      { value: "价格敏感", source: "人工调整" },
-      { value: "需人工跟进", source: "AI打标" },
-      { value: "观望", source: "人工调整" },
-      { value: "时间敏感", source: "人工调整" }
-    ]
-  },
-  {
-    key: "customer-problem",
-    name: "学习问题",
-    tags: ["词汇薄弱", "阅读理解", "单词记忆", "校内提分", "语法薄弱", "口语表达", "胆怯"].map((value) => ({ value, source: "AI打标" }))
-  },
-  {
-    key: "customer-course",
-    name: "咨询课程",
-    tags: ["试听课", "自然拼读", "寒假班", "启蒙英语", "暑假班", "短期课包", "专项课", "周末班"].map((value) => ({ value, source: "标签库" }))
-  },
-  {
-    key: "customer-follow",
-    name: "跟进状态",
-    tags: ["待试听", "新线索", "试听预约", "测评预约", "试听完成", "已报名", "报名链接", "课时方案", "资料已发", "家长群", "群运营"].map((value) => ({ value, source: "人工调整" }))
-  }
-];
+const aiGeneratedTagValues = new Set([
+  "厌学",
+  "休学",
+  "手机成瘾",
+  "焦虑倾向",
+  "抑郁倾向",
+  "强迫行为",
+  "亲子冲突高",
+  "亲子冲突中",
+  "家长高焦虑",
+  "孩子拒绝沟通",
+  "开始接受心理因素",
+  "高意向",
+  "中意向",
+  "低意向",
+  "价格敏感",
+  "需要专家背书",
+  "关注孩子是否配合",
+  "适合先共情安抚",
+  "适合推测评",
+  "适合邀约专家连麦",
+  "适合转人工深聊",
+  "需要心理专业人员介入",
+  "删除企微风险",
+  "孩子高危风险",
+  "体验后未报名",
+  "沉默客户"
+]);
+
+const customerTagGroups = tagGroupsSeed.map((group) => ({
+  key: group.key.replace("tag-group-", "customer-"),
+  name: group.name,
+  tags: group.tags.map((value) => ({
+    value,
+    source: aiGeneratedTagValues.has(value) ? "AI打标" : "标签库"
+  }))
+}));
+
+const tagSelectionGroups = customerTagGroups.map((group) => ({
+  key: group.key,
+  name: group.name,
+  tags: group.tags.map((tag) => ({
+    value: tag.value,
+    label: aiGeneratedTagValues.has(tag.value) ? `${tag.value}（AI）` : tag.value
+  }))
+}));
+
+const createTagRuleDefinition = ({ description, match, exclude, evidence }) => ({
+  description,
+  ruleText: `AI打标依据：
+${match.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+
+排除条件：
+${exclude.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+
+证据样例：
+${evidence.map((item, index) => `${index + 1}. “${item}”`).join("\n")}`
+});
+
+const tagAiRuleDefinitions = {
+  "厌学": createTagRuleDefinition({
+    description: "识别孩子对学校、学习或上课存在明显抗拒，且该问题已成为家长当前主要求助点的用户。",
+    match: ["家长明确描述孩子不想上学、不愿进教室、频繁逃避作业或上课。", "厌学表现持续出现，并影响到出勤、作业、考试或家庭沟通。", "最近会话、客户档案或课程反馈中至少两类信息互相印证该问题。"],
+    exclude: ["只是在某次考试后短暂抱怨学习累，不构成持续厌学。", "核心问题是课程难度、时间安排或价格顾虑，应打到对应标签。", "涉及明确医学诊断时，不用诊断词打标，只保留行为描述。"],
+    evidence: ["孩子现在一提上学就烦，作业也完全不碰。", "最近几周每天早上都说不想去学校。", "我们主要就是想解决孩子越来越排斥学习的问题。"]
+  }),
+  "休学": createTagRuleDefinition({
+    description: "识别孩子已经休学、长期请假、停课在家，或家长正在讨论是否休学的用户。",
+    match: ["家长明确提到孩子已办理休学、长期请假、停课在家或无法正常返校。", "沟通重点围绕复学、返校适应、在家学习安排或休学期间干预。", "休学状态来自客户表达、档案记录或课程顾问备注之一，并有上下文支撑。"],
+    exclude: ["短期病假、旅行请假或临时缺课不打该标签。", "只是担心未来可能休学，但当前没有明显停学风险时优先标记风险或跟进策略。", "不要把休学原因直接归因于疾病诊断。"],
+    evidence: ["孩子已经在家休学两个月了。", "学校那边让我们先办休学，等状态稳定再说。", "现在最担心的是后面怎么复学。"]
+  }),
+  "躺平": createTagRuleDefinition({
+    description: "识别孩子长期低行动、低参与、对学习和生活目标明显回避，家长用摆烂、躺平、不动等方式描述的用户。",
+    match: ["家长描述孩子长时间不学习、不出门、不配合沟通或对未来安排无所谓。", "低行动状态不是偶发情绪，而是持续影响作息、学习或家庭互动。", "对话中出现躺平、摆烂、什么都不想干、随便等语义，并被家长作为核心问题。"],
+    exclude: ["单次情绪低落、疲劳或考后放松不打该标签。", "主要表现是沉迷手机、亲子冲突或社交困难时，应优先使用更具体标签。", "不要用该标签给孩子做负面定性，必须基于行为描述。"],
+    evidence: ["孩子现在就是躺平，什么安排都不愿意动。", "每天在房间里，说以后怎么样都无所谓。", "我们说学习和学校，他就摆烂不回应。"]
+  }),
+  "手机成瘾": createTagRuleDefinition({
+    description: "识别手机、游戏、短视频等屏幕使用已明显影响学习、作息和亲子关系的用户。",
+    match: ["家长明确描述孩子长时间玩手机、游戏或刷短视频，且难以自控。", "手机使用已影响睡眠、上课、作业、情绪或家庭冲突。", "家长反复询问如何管手机、断网、收手机或减少游戏时间。"],
+    exclude: ["只是正常使用手机查资料、聊天或偶尔娱乐不打该标签。", "家长只表达担心但没有具体过度使用证据时，先不打标。", "不要使用成瘾医学诊断口径，只描述手机使用失控行为。"],
+    evidence: ["孩子每天抱着手机，半夜还在玩游戏。", "一收手机就爆发，作业也不写。", "我们最大的问题就是手机管不住。"]
+  }),
+  "叛逆对抗": createTagRuleDefinition({
+    description: "识别孩子在家庭沟通中持续顶撞、拒绝配合、对规则强烈反抗的用户。",
+    match: ["家长描述孩子经常顶嘴、摔门、拒绝沟通、故意反着来。", "对抗行为与学习、手机、作息或家庭规则频繁相关。", "家长主要诉求是改善亲子沟通、减少冲突或让孩子恢复配合。"],
+    exclude: ["正常青春期表达不同意见，且没有持续冲突或行为失控，不打该标签。", "主要是家长高控制导致的沟通问题时，可同时考虑家长高控制。", "涉及暴力、自伤或高危表达时，应优先进入风险标签或人工介入。"],
+    evidence: ["现在说什么他都跟我们对着干。", "一提学习就顶嘴摔门，完全没法沟通。", "孩子现在特别叛逆，不让管。"]
+  }),
+  "焦虑倾向": createTagRuleDefinition({
+    description: "识别孩子或家长描述孩子存在明显紧张、担心、害怕、压力大等焦虑样表现的用户。",
+    match: ["家长描述孩子经常紧张、担心失败、害怕考试、害怕返校或对结果过度担忧。", "焦虑表现影响睡眠、学习、出勤、社交或家庭沟通。", "对话中有持续压力、害怕、担心、崩溃前兆等表达，但未要求做医学诊断。"],
+    exclude: ["普通考前紧张或短期压力反应不打该标签。", "若家长本人焦虑更突出，应同时或优先标记家长高焦虑。", "不能标记为焦虑症等诊断标签。"],
+    evidence: ["孩子一到考试前就特别紧张，睡不好。", "他总担心去学校会出问题。", "最近压力很大，一说学习就害怕。"]
+  }),
+  "抑郁倾向": createTagRuleDefinition({
+    description: "识别家长描述孩子长期情绪低落、兴趣下降、退缩无力等抑郁样表现，但不做医疗诊断的用户。",
+    match: ["家长描述孩子持续情绪低落、没兴趣、少说话、无力、回避活动。", "状态持续一段时间，并影响学习、生活作息、社交或家庭互动。", "表达来自家长观察、档案备注或课程沟通记录，且属于当前核心担忧。"],
+    exclude: ["单次心情不好、考试失利后的短期难过不打该标签。", "出现自伤、自杀等极端词时优先标记高危风险并人工介入。", "不能使用抑郁症等明确诊断结论。"],
+    evidence: ["孩子最近一直情绪低落，什么都不想做。", "以前喜欢的事情现在也没兴趣了。", "我们担心他状态越来越沉下去。"]
+  }),
+  "强迫行为": createTagRuleDefinition({
+    description: "识别家长描述孩子反复检查、重复动作、过度确认或难以停止某些仪式化行为的用户。",
+    match: ["家长描述孩子反复检查、反复洗手、重复确认、必须按固定方式完成某事。", "这些行为已经影响学习效率、生活作息或家庭沟通。", "家长把重复行为作为当前求助重点，而非偶尔习惯。"],
+    exclude: ["普通细心、爱干净、做事有条理不打该标签。", "没有影响生活学习，只是家长主观觉得奇怪时不打标。", "不能诊断为强迫症，仅记录强迫样行为表现。"],
+    evidence: ["孩子写作业总要反复检查到很晚。", "他必须重复确认门锁，不然就很难安心。", "这些重复动作已经影响正常学习了。"]
+  }),
+  "社交困难": createTagRuleDefinition({
+    description: "识别孩子在同伴关系、学校互动或集体环境中存在明显适应困难的用户。",
+    match: ["家长描述孩子没有朋友、害怕社交、被同学排斥、不会处理同伴冲突。", "社交问题影响上学意愿、情绪状态、学习参与或家庭担忧。", "沟通中多次出现同学、朋友、班级关系、社交回避等内容。"],
+    exclude: ["孩子性格内向但功能正常、不造成困扰时不打该标签。", "单次同学矛盾或普通争执不打标。", "如果核心是校园欺凌或高危风险，应优先人工介入。"],
+    evidence: ["孩子在班里没什么朋友，不愿意参加集体活动。", "他很怕和同学相处，所以越来越不想去学校。", "同伴关系是我们现在最担心的问题。"]
+  }),
+  "情绪失控": createTagRuleDefinition({
+    description: "识别孩子或家长描述孩子频繁爆发、哭闹、摔东西、情绪难以平复的用户。",
+    match: ["家长描述孩子出现明显情绪爆发，如大哭、大喊、摔东西、冲出家门等。", "情绪失控与学习、手机、亲子沟通或上学场景反复关联。", "爆发频率或强度已经影响家庭沟通和服务跟进策略。"],
+    exclude: ["偶尔发脾气但能快速恢复，不打该标签。", "如果出现自伤、攻击他人或安全风险，应优先高危风险。", "不要把情绪失控等同于医学诊断。"],
+    evidence: ["一说学习他就情绪爆发，摔东西。", "孩子最近很容易崩溃，完全劝不住。", "每次收手机都会大哭大闹。"]
+  }),
+  "自伤风险": createTagRuleDefinition({
+    description: "识别家长提到孩子有自伤相关行为、威胁、工具准备或明显风险信号的用户，必须进入人工与安全流程。",
+    match: ["出现自伤、割手、撞墙、伤害自己、拿刀等明确行为或威胁表达。", "家长描述孩子有自伤历史、近期复发迹象或安全无法保证。", "会话中出现极端词汇并与孩子现实行为或家长担忧相关。"],
+    exclude: ["网络口头禅、玩笑表达且上下文明确无现实风险时，不直接自动写入，可生成风险提醒。", "无法确认风险真实性时，不自动营销跟进，应转人工核实。", "不要把该标签作为销售推进标签使用。"],
+    evidence: ["孩子说过不想活了，还拿东西划自己。", "他之前有过自伤，我们现在很害怕。", "昨晚情绪爆发时撞墙，说要伤害自己。"]
+  }),
+  "睡眠问题": createTagRuleDefinition({
+    description: "识别孩子睡眠节律、入睡困难、熬夜、早醒等问题已影响学习和情绪的用户。",
+    match: ["家长明确描述孩子长期晚睡、失眠、昼夜颠倒、早上起不来。", "睡眠问题影响上学、听课、情绪稳定或家庭冲突。", "睡眠问题与手机、焦虑、休学或学习动力等问题形成关联证据。"],
+    exclude: ["偶尔一两天晚睡、考试前短期睡不好不打该标签。", "只是课程时间不合适导致作息变化，应标记课程安排问题而非睡眠问题。", "不要给出医疗诊断或治疗建议。"],
+    evidence: ["孩子每天凌晨才睡，早上根本起不来。", "睡眠一直不好，白天上课没精神。", "晚上玩手机到很晚，作息完全乱了。"]
+  }),
+  "学习动力弱": createTagRuleDefinition({
+    description: "识别孩子学习目标感弱、主动性差、需要外部推动才能学习的用户。",
+    match: ["家长描述孩子不主动学习、没有目标、拖延严重、需要反复催促。", "问题持续影响作业、成绩、课程参与或升学规划。", "家长主要诉求是提升学习动力、学习习惯或内驱力。"],
+    exclude: ["只是某一科薄弱或学习方法问题，不直接打该标签。", "核心问题是厌学、休学或手机失控时，应优先更具体标签。", "不能用懒、差生等负面定性替代。"],
+    evidence: ["孩子学习完全没有动力，推一下动一下。", "作业一直拖，不催就不写。", "我们想先解决内驱力的问题。"]
+  }),
+  "亲子冲突高": createTagRuleDefinition({
+    description: "识别亲子冲突频繁、强度高，已明显影响沟通和服务推进的家庭。",
+    match: ["家长描述亲子之间频繁争吵、冷战、摔门、威胁或长期无法沟通。", "冲突围绕学习、手机、上学、作息等核心议题反复发生。", "家长表达明显无力、担忧或不知道如何继续沟通。"],
+    exclude: ["偶尔争执且双方仍能沟通，不打高冲突。", "冲突主要由单次事件引发且已解决，可标记中或低。", "存在安全风险时优先风险标签。"],
+    evidence: ["现在每天都吵，一说学习就炸。", "我们和孩子已经基本没法正常沟通了。", "家里冲突很厉害，谁说都不听。"]
+  }),
+  "亲子冲突中": createTagRuleDefinition({
+    description: "识别亲子沟通存在反复摩擦，但仍有一定沟通空间的家庭。",
+    match: ["家长描述亲子之间经常争执、沟通不顺或孩子明显抵触管教。", "冲突频率中等，尚未达到长期失控或完全断联。", "对话中仍能看到家长愿意调整沟通方式，孩子偶尔能回应。"],
+    exclude: ["只有轻微分歧或单次争执，不打该标签。", "频繁强烈爆发、摔东西、长期冷战应标记亲子冲突高。", "主要问题是家长焦虑或孩子手机使用时，可同时考虑对应标签。"],
+    evidence: ["最近经常因为作业吵，但有时还能谈。", "他会顶嘴，不过情绪过去后还能说几句。", "我们沟通总是不顺，想知道怎么调整。"]
+  }),
+  "亲子冲突低": createTagRuleDefinition({
+    description: "识别家庭沟通整体稳定，亲子之间虽有问题但冲突强度较低的用户。",
+    match: ["家长描述和孩子能正常沟通，只是在学习、规划或方法上需要支持。", "没有频繁争吵、失控、冷战或拒绝沟通的证据。", "家长诉求偏课程了解、方法咨询、成长支持，而非冲突修复。"],
+    exclude: ["家长刻意淡化但对话中有明显高冲突证据时不打低冲突。", "孩子拒绝沟通或情绪爆发频繁时不打该标签。", "数据不足时不要为了补全画像强行打低冲突。"],
+    evidence: ["孩子愿意和我们聊，只是学习上有点没方向。", "家里沟通还可以，主要想找方法。", "我们没有特别大的冲突，就是想提前干预。"]
+  }),
+  "父母教育理念不一致": createTagRuleDefinition({
+    description: "识别父母双方在管教方式、课程选择、是否咨询或是否付费上存在明显分歧的家庭。",
+    match: ["家长明确提到夫妻双方对孩子问题判断、教育方式或报名决策不一致。", "分歧影响课程购买、服务配合、家庭执行或孩子沟通。", "对话中反复出现爸爸不同意、妈妈想报名、家里意见不统一等信息。"],
+    exclude: ["只是需要和家人商量购买，不一定是教育理念不一致。", "只有价格决策分歧时优先标记需要家人商量或价格敏感。", "不要推断未表达的一方态度。"],
+    evidence: ["我想让孩子试试，但他爸爸觉得没必要。", "我们夫妻在怎么管孩子上一直不一致。", "爸爸主张强管，我觉得这样冲突更大。"]
+  }),
+  "家长高控制": createTagRuleDefinition({
+    description: "识别家长在学习、手机、作息或生活安排上高度控制，并可能加剧亲子冲突的家庭。",
+    match: ["家长描述严格监控、频繁检查、强制安排、不断催促或替孩子做决定。", "孩子对控制行为出现明显抵触、冲突、躲避或情绪爆发。", "家长关注如何让孩子服从或快速改变，较少关注孩子感受。"],
+    exclude: ["正常规则建立和边界管理不打该标签。", "家长只是短期焦虑但愿意调整，不一定属于高控制。", "不要用该标签责备家长，应作为沟通策略提醒。"],
+    evidence: ["我每天盯着他写作业，不盯就不行。", "手机必须完全没收，不然他肯定控制不住。", "我们安排好了他就必须照做，但他现在很反抗。"]
+  }),
+  "家长高焦虑": createTagRuleDefinition({
+    description: "识别家长本人焦虑强、急迫、反复确认效果或担心孩子未来失控的用户。",
+    match: ["家长频繁表达很急、很崩溃、睡不着、怕耽误孩子、怕毁了未来。", "焦虑影响咨询节奏，表现为反复追问效果、价格、老师能力或安全边界。", "销售跟进需要先安抚和澄清问题，再推进产品介绍。"],
+    exclude: ["正常担心孩子学习或课程效果，不打高焦虑。", "如果核心是孩子焦虑表现，应同时或优先标记焦虑倾向。", "不要把家长焦虑作为负面评价。"],
+    evidence: ["我现在特别焦虑，晚上都睡不着。", "再这样下去孩子是不是就完了？", "我很急，想马上知道有没有办法。"]
+  }),
+  "孩子拒绝沟通": createTagRuleDefinition({
+    description: "识别孩子明显回避与父母、老师或咨询服务沟通的家庭。",
+    match: ["家长描述孩子不说话、关门、拉黑、拒绝回答、拒绝见老师或咨询师。", "拒绝沟通影响问题评估、课程参与或家庭干预执行。", "家长主要诉求是如何打开沟通、降低孩子防御。"],
+    exclude: ["孩子只是话少但能配合，不打该标签。", "单次不愿回答或临时情绪不好，不直接打标。", "如果拒绝沟通来自高冲突或高控制场景，可同时标记相关家庭关系标签。"],
+    evidence: ["孩子现在完全不和我们说话。", "一聊学习就回房间关门。", "他不愿意见老师，也不愿意做测评。"]
+  }),
+  "家庭支持弱": createTagRuleDefinition({
+    description: "识别家庭可投入时间、情绪支持、执行配合或照护资源不足的用户。",
+    match: ["家长提到没人配合、工作太忙、家庭成员互相推诿、孩子缺少稳定支持。", "支持不足影响课程执行、家庭作业、跟进反馈或长期改善计划。", "对话中出现单个家长独自承担、另一方缺位或家庭资源紧张。"],
+    exclude: ["只是暂时忙碌或一次无法参加课程，不打该标签。", "经济压力为主应考虑价格敏感。", "不能推断家庭关系差，必须有明确表达。"],
+    evidence: ["家里基本只有我一个人在管。", "爸爸不参与，老人也不理解。", "我们很难每天配合完成家庭练习。"]
+  }),
+  "母亲主导沟通": createTagRuleDefinition({
+    description: "识别主要由母亲负责咨询、购买决策和后续配合的家庭。",
+    match: ["会话中长期由母亲沟通，且她承担主要决策、执行或反馈。", "母亲明确提到自己在负责孩子学习、情绪或课程安排。", "后续服务需要围绕母亲的时间、认知和配合能力设计。"],
+    exclude: ["只知道当前聊天人是女性，但没有母亲身份或主导证据，不打标。", "父母共同决策或父亲明显主导时不打该标签。", "不应据此忽略其他家庭成员影响。"],
+    evidence: ["孩子一直是我这个妈妈在管。", "他爸爸基本不参与，都是我来沟通。", "后续课程我来安排和反馈。"]
+  }),
+  "父亲缺位": createTagRuleDefinition({
+    description: "识别父亲长期不参与孩子教育、沟通或服务配合，且对问题解决有影响的家庭。",
+    match: ["家长明确提到父亲不管、不参与、很少沟通或长期缺席。", "父亲缺位影响孩子状态、家庭支持、购买决策或课程执行。", "对话中该因素被家长作为重要背景或困扰反复提及。"],
+    exclude: ["只是父亲工作忙一次无法参加，不打该标签。", "父亲不同意购买但仍参与教育时，应考虑教育理念不一致或需要家人商量。", "不要扩大到家庭道德评价。"],
+    evidence: ["爸爸基本不管孩子，都是我一个人扛。", "孩子和爸爸几乎不沟通。", "这个问题跟他爸长期缺位也有关系。"]
+  }),
+  "祖辈干预明显": createTagRuleDefinition({
+    description: "识别爷爷奶奶、外公外婆等祖辈对教育方式、家庭规则或购买决策影响明显的家庭。",
+    match: ["家长提到祖辈溺爱、干预管教、反对课程或破坏规则执行。", "祖辈影响导致亲子规则不一致、孩子钻空子或家庭执行困难。", "服务建议需要考虑多代沟通和统一家庭策略。"],
+    exclude: ["祖辈只是普通照看孩子，不打该标签。", "单次提到老人接送或陪伴，不构成明显干预。", "不要将祖辈存在等同于负面影响。"],
+    evidence: ["奶奶总护着孩子，我们定的规则执行不了。", "老人觉得不用管，和我们的想法完全不一样。", "孩子一有事就找爷爷奶奶撑腰。"]
+  }),
+  "尚未意识到问题本质": createTagRuleDefinition({
+    description: "识别家长仍把孩子问题简单归因为懒、不听话、不努力，尚未理解情绪、关系或环境因素的用户。",
+    match: ["家长主要使用懒、叛逆、不懂事、不自觉等单一归因解释孩子问题。", "家长更关注如何让孩子立刻听话或恢复学习，而较少讨论背后原因。", "销售需要先做问题澄清和认知铺垫，再进入产品推荐。"],
+    exclude: ["家长已经能主动讨论心理、家庭沟通、学校环境等复杂因素时不打该标签。", "单句抱怨孩子懒，但后续能理性分析原因，不直接打标。", "不要把该标签作为对家长的负面评价。"],
+    evidence: ["他就是太懒了，逼一逼应该就好了。", "孩子没别的问题，就是不自觉。", "我不理解为什么现在孩子这么不听话。"]
+  }),
+  "认为孩子只是懒": createTagRuleDefinition({
+    description: "识别家长明确将问题核心归因为孩子懒惰、不努力、缺少自觉的用户。",
+    match: ["家长反复使用懒、不努力、不上进、不自觉等词描述孩子。", "家长倾向于要求孩子改变，而不是先理解压力、能力或关系因素。", "该认知影响销售沟通，需要先降低指责式表达。"],
+    exclude: ["家长偶尔说懒，但同时认可孩子有情绪或环境问题，不单独打该标签。", "孩子确实存在学习方法或能力问题时，应结合其它标签判断。", "不能把孩子定性为懒，只记录家长当前认知。"],
+    evidence: ["我觉得他就是懒，不愿意吃苦。", "不是不会，就是不努力。", "他只要自觉一点成绩肯定能上来。"]
+  }),
+  "开始接受心理因素": createTagRuleDefinition({
+    description: "识别家长开始认可孩子问题可能与情绪、压力、关系、心理因素有关的用户。",
+    match: ["家长主动提到压力、情绪、心理、亲子关系、学校适应等因素。", "家长从单纯责备孩子转向愿意理解原因。", "对心理教育、家庭沟通或专业支持有初步开放态度。"],
+    exclude: ["只是被销售引导后附和一句，缺少后续表达，不打标。", "明确抵触心理咨询或认为完全没必要时不打该标签。", "不要将其理解为已充分认可专业服务。"],
+    evidence: ["我也觉得可能不只是懒，应该有心理压力。", "是不是我们沟通方式也有问题？", "孩子这样可能跟情绪和学校关系有关。"]
+  }),
+  "认可家庭干预": createTagRuleDefinition({
+    description: "识别家长认可家庭互动、沟通方式和日常陪伴调整对孩子改善有作用的用户。",
+    match: ["家长明确表示愿意从家庭沟通、规则、陪伴方式上做调整。", "家长接受家长课程、家庭作业或亲子互动练习的必要性。", "对话中出现我们家长也要改变、愿意配合老师建议等表达。"],
+    exclude: ["只希望老师单独改变孩子，家长不愿参与，不打该标签。", "只是礼貌性表示可以了解，但没有认可家庭调整，不打标。", "不要等同于已购买长期服务。"],
+    evidence: ["我明白家长这边也需要调整。", "如果需要我们配合家庭练习，我可以做。", "我觉得不能只让孩子变，我们也要改。"]
+  }),
+  "认可专业咨询": createTagRuleDefinition({
+    description: "识别家长认可需要专业老师、咨询师或系统课程介入，而不只是自行处理的用户。",
+    match: ["家长明确表示自己处理不了，需要专业老师评估或指导。", "对咨询、评估、课程陪跑等专业服务表现开放或认可。", "家长询问专业老师怎么介入、服务流程、是否适合孩子。"],
+    exclude: ["只是询问免费建议，不代表认可专业咨询。", "明确担心咨询标签化或抵触心理服务时，应标记对心理咨询抵触。", "不能承诺咨询效果或替代医疗诊疗。"],
+    evidence: ["我们自己确实没办法了，想找专业老师看看。", "这种情况是不是需要专业咨询介入？", "如果老师能评估一下，我们愿意配合。"]
+  }),
+  "对心理咨询抵触": createTagRuleDefinition({
+    description: "识别家长对心理咨询、心理标签、孩子被诊断或隐私暴露存在明显顾虑的用户。",
+    match: ["家长明确表示不想让孩子觉得自己有问题，或抵触心理咨询。", "担心咨询会贴标签、影响孩子自尊、隐私或升学记录。", "销售需要使用教育支持、家庭沟通、成长陪伴等更低敏表达。"],
+    exclude: ["只是正常询问咨询形式和隐私保护，不打抵触标签。", "家长认可咨询但担心价格，应标记价格敏感。", "不要强行用心理诊断话术推进。"],
+    evidence: ["我不想让孩子觉得自己心理有问题。", "心理咨询这个说法他肯定接受不了。", "会不会留下什么记录，影响孩子？"]
+  }),
+  "期待快速见效": createTagRuleDefinition({
+    description: "识别家长期望短期内立刻看到改善，可能对服务周期和效果边界理解不足的用户。",
+    match: ["家长反复询问多久能好、几节课见效、能不能马上改变。", "购买决策高度依赖短期效果承诺。", "需要销售提前澄清教育干预周期和效果边界。"],
+    exclude: ["正常询问课程周期或服务安排，不打该标签。", "家长能接受循序渐进改善时不打该标签。", "不能为了成交承诺确定效果。"],
+    evidence: ["上几次课能马上看到变化吗？", "我希望一个月内就能解决。", "如果不能快点见效，我怕孩子拖不起。"]
+  }),
+  "愿意长期陪伴改善": createTagRuleDefinition({
+    description: "识别家长理解问题改善需要持续陪伴和长期调整，愿意投入时间和配合的用户。",
+    match: ["家长表示愿意持续学习、陪伴孩子、按阶段调整家庭沟通。", "能接受改善不是立刻完成，需要一定周期。", "适合承接长期服务、陪跑类产品或班主任跟进。"],
+    exclude: ["只是说可以试试，但仍要求立刻见效，不打该标签。", "仅有购买意向但不愿配合家庭执行，不打标。", "不能把长期陪伴意愿等同于高客单购买承诺。"],
+    evidence: ["我知道这个不是一两天能改的，我们愿意长期配合。", "只要方向对，我们可以慢慢陪孩子调整。", "后续需要家长做的我们会坚持。"]
+  }),
+  "高意向": createTagRuleDefinition({
+    description: "识别对产品或服务有明确兴趣、购买条件接近成熟、适合销售重点跟进的用户。",
+    match: ["家长主动询问报名方式、价格、名额、老师时间、服务细节或下一步安排。", "已认可问题匹配和服务价值，并表达愿意进一步沟通或支付可能。", "近期互动积极，且没有明显拒绝、强投诉或高风险阻断。"],
+    exclude: ["只是礼貌了解课程，不打高意向。", "主要关注免费内容或明确暂不考虑，不打该标签。", "存在强风险或情绪崩溃时，不应作为销售推进依据。"],
+    evidence: ["这个课怎么报名？今天还能安排吗？", "如果适合我们孩子，我可以先买体验课。", "老师时间怎么约，后面费用也发我看看。"]
+  }),
+  "中意向": createTagRuleDefinition({
+    description: "识别用户认可部分价值但仍在比较、观望或需要更多信息才能决策的状态。",
+    match: ["家长愿意继续了解，但还在询问效果、价格、孩子配合、家人意见等。", "对问题和服务有一定认同，但没有明确报名动作。", "适合继续教育、案例说明、测评或专家沟通。"],
+    exclude: ["已经明确要报名或约时间，应标记高意向。", "明确拒绝或长期不回复，不打中意向。", "仅一次泛泛咨询且无后续互动，不打标。"],
+    evidence: ["我先了解一下，看看孩子适不适合。", "听起来有点帮助，我再和家里人商量。", "能不能先发个案例和课程安排我看看？"]
+  }),
+  "低意向": createTagRuleDefinition({
+    description: "识别用户当前购买或进一步沟通意愿较弱，需要低频培育或暂缓销售推进的状态。",
+    match: ["家长回复冷淡、只泛泛了解、没有持续互动或明确暂时不需要。", "对课程价值、价格、孩子配合或时间安排缺少明显兴趣。", "更适合内容培育，不适合频繁催单。"],
+    exclude: ["用户近期主动问报名、价格或服务细节，不打低意向。", "用户因风险事件暂停购买，不应简单归为低意向。", "沉默客户应结合沉默时长和历史意向判断。"],
+    evidence: ["我先看看吧，暂时不用。", "现在不考虑课程。", "只是随便了解一下。"]
+  }),
+  "明确拒绝": createTagRuleDefinition({
+    description: "识别用户清楚表达不需要、不报名、不想继续沟通或拒绝服务的状态。",
+    match: ["家长明确说不用了、不考虑、不报名、别再联系或已经选择其他方案。", "拒绝表达针对课程、咨询、销售跟进或企微沟通。", "后续应降低触达频率或转为服务型收尾。"],
+    exclude: ["只是暂时没时间或需要商量，不打明确拒绝。", "对某个产品拒绝但愿意了解其他服务时，应标记对应产品不匹配。", "情绪化拒绝后又继续咨询，需要结合最新互动判断。"],
+    evidence: ["不用了，我们不考虑报名。", "先别联系了，谢谢。", "这个课程不适合我们。"]
+  }),
+  "价格敏感": createTagRuleDefinition({
+    description: "识别价格、预算、优惠、分期或性价比成为主要决策阻碍的用户。",
+    match: ["家长多次追问价格、优惠、分期、退款、是否值得或和其他机构比价。", "明确表达预算有限、价格太高、要等优惠或需要性价比证明。", "价格因素影响是否报名或是否继续了解。"],
+    exclude: ["首次正常询价不直接打标。", "主要担心效果或孩子配合，不应只标价格敏感。", "不能用降价承诺或虚假优惠推进。"],
+    evidence: ["价格有点高，能不能优惠？", "我们预算有限，要再比较一下。", "如果效果不确定，这个费用我会犹豫。"]
+  }),
+  "需要家人商量": createTagRuleDefinition({
+    description: "识别购买或服务决策需要配偶、老人或其他家庭成员共同确认的用户。",
+    match: ["家长明确说要和家人、孩子爸爸、孩子妈妈或老人商量后决定。", "家庭成员意见会影响报名、付费、时间安排或服务配合。", "销售后续需要提供便于转述的材料和决策依据。"],
+    exclude: ["只是礼貌性说考虑一下，不明确涉及家人，不打该标签。", "家人分歧明显时应同时考虑父母教育理念不一致。", "纯价格犹豫优先价格敏感。"],
+    evidence: ["我得和孩子爸爸商量一下。", "这个要家里一起决定。", "我先把资料发给家人看看。"]
+  }),
+  "需要专家背书": createTagRuleDefinition({
+    description: "识别用户需要专业老师、专家资质、评估依据或权威解释来建立信任的状态。",
+    match: ["家长询问老师资质、专家背景、评估方法、专业依据或成功经验。", "是否继续沟通取决于能否获得专业背书。", "适合邀约专家连麦、诊断课或发送专业内容。"],
+    exclude: ["只是普通问老师是谁，不一定需要专家背书。", "主要关心价格或案例时，应标记对应标签。", "不能夸大专家资质或承诺诊断。"],
+    evidence: ["有没有专业老师先帮我们判断一下？", "老师是什么背景，专业吗？", "我想听专家怎么分析孩子这个情况。"]
+  }),
+  "需要案例验证": createTagRuleDefinition({
+    description: "识别用户希望通过同类案例、改善过程或真实反馈来判断服务价值的状态。",
+    match: ["家长主动询问有没有类似孩子案例、别人家是否改善、过程如何。", "案例证据会影响继续了解或购买决策。", "适合发送同类场景案例，但需避免承诺同样效果。"],
+    exclude: ["销售主动发案例但家长无反馈，不打标。", "主要需要专家判断而非案例，应标记需要专家背书。", "不能用个案包装成普遍效果保证。"],
+    evidence: ["有没有和我家孩子类似的案例？", "别人这种情况后来有改善吗？", "能不能给我看看真实反馈？"]
+  }),
+  "关注孩子是否配合": createTagRuleDefinition({
+    description: "识别家长担心孩子不愿上课、不愿测评、不接受老师或不配合服务的用户。",
+    match: ["家长反复询问孩子不配合怎么办、是否需要孩子参与、能否先不让孩子知道。", "孩子配合度是购买或服务执行的主要阻碍。", "需要先设计低阻力介入和家长端启动方案。"],
+    exclude: ["只是普通询问上课形式，不打该标签。", "孩子已明确愿意参加时不打标。", "如果孩子拒绝沟通非常明显，应同时标记孩子拒绝沟通。"],
+    evidence: ["我担心孩子根本不愿意上。", "如果他不配合，这个课还能做吗？", "能不能先从家长这边开始？"]
+  }),
+  "关注效果保障": createTagRuleDefinition({
+    description: "识别用户高度关注服务效果、改善概率、退款保障或结果承诺的状态。",
+    match: ["家长追问能不能保证、有没有效果、没效果怎么办、多久改善。", "效果确定性是购买决策关键。", "销售需要清楚说明效果边界、评估方式和服务过程，不做承诺。"],
+    exclude: ["正常了解课程目标不打该标签。", "主要问价格和优惠时优先价格敏感。", "不能给出包好、保证改善等承诺。"],
+    evidence: ["这个能保证有效吗？", "如果没有改善怎么办？", "我最担心花了钱看不到效果。"]
+  }),
+  "关注隐私安全": createTagRuleDefinition({
+    description: "识别用户担心孩子隐私、家庭信息、咨询记录或个人数据被泄露的状态。",
+    match: ["家长询问隐私保护、是否记录、是否会告诉学校、信息谁能看到。", "隐私安全担忧影响是否参与测评、咨询或课程。", "需要明确数据使用边界和保密原则。"],
+    exclude: ["普通询问服务流程不打该标签。", "担心心理标签化时可同时标记对心理咨询抵触。", "不能承诺超出实际系统能力的隐私保护。"],
+    evidence: ["这些内容会不会被别人看到？", "孩子的信息会不会影响学校？", "测评和聊天记录怎么保护？"]
+  })
+};
+
+function isAiGeneratedTag(value) {
+  return aiGeneratedTagValues.has(value);
+}
+
+function getTagDisplayLabel(value) {
+  return isAiGeneratedTag(value) ? `${value}（AI）` : value;
+}
 
 function groupCustomerTagValues(groups, tags = []) {
   return groups.reduce((result, group) => {
@@ -1064,10 +1455,7 @@ function groupCustomerTagValues(groups, tags = []) {
 function createCustomerTagValues(selected) {
   const sourceTags = selected?.tags || [];
   return {
-    customer: {
-      ...groupCustomerTagValues(customerTagGroups, sourceTags),
-      "customer-relation": sourceTags.includes("已删除销售") ? ["已删除销售"] : ["好友正常"]
-    },
+    customer: groupCustomerTagValues(customerTagGroups, sourceTags),
     personal: selected?.intent ? [`${intentLabelMap[selected.intent] || selected.intent}`] : []
   };
 }
@@ -1080,7 +1468,7 @@ const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "massMessage", "humanization", "knowledge", "settings", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -1100,7 +1488,7 @@ const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "massMessage", "humanization", "knowledge", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };
@@ -1141,7 +1529,7 @@ const conversations = [
     wecomId: "room_aisa_trial",
     lifecycle: "提升认知",
     lifecycleStage: 2,
-    tags: ["三年级", "试听课", "自然拼读"],
+    tags: ["直播课用户", "父母成长营意向", "适合邀约直播课"],
     order: "3位学员已预约试听课",
     matchedSkills: ["19元A类课-第一课", "19元A类课-课后"],
     sendMode: "自动发送",
@@ -1178,7 +1566,7 @@ const conversations = [
     phone: "138****7788",
     wecomId: "wm_cust_1024",
     lifecycle: "定义用户",
-    tags: ["三年级", "词汇薄弱", "高意向"],
+    tags: ["学习动力弱", "家长高焦虑", "高意向"],
     order: "自然拼读提升班待报价",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1217,7 +1605,7 @@ const conversations = [
     phone: "139****6621",
     wecomId: "wm_cust_2031",
     lifecycle: "了解阶段",
-    tags: ["四年级", "阅读理解", "待试听"],
+    tags: ["厌学", "开始接受心理因素", "适合推测评"],
     order: "未报名",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1253,7 +1641,7 @@ const conversations = [
     phone: "137****5609",
     wecomId: "wm_cust_3098",
     lifecycle: "催单阶段",
-    tags: ["五年级", "寒假班", "高意向"],
+    tags: ["手机成瘾", "关注孩子是否配合", "高意向"],
     order: "寒假冲刺班报价已发送",
     matchedSkills: ["19元A类课-课前", "通知真人销售"],
     sendMode: "人工确认",
@@ -1290,7 +1678,7 @@ const conversations = [
     wecomId: "wm_cust_4102",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["一年级", "启蒙英语", "待测评"],
+    tags: ["叛逆对抗", "家长高控制", "测评用户"],
     order: "启蒙测评课待预约",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1323,7 +1711,7 @@ const conversations = [
     wecomId: "wm_cust_5109",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["六年级", "小升初", "高意向"],
+    tags: ["休学", "同行者计划意向", "高意向"],
     order: "小升初暑假衔接班待报名",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1357,7 +1745,7 @@ const conversations = [
     wecomId: "wm_cust_6118",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["二年级", "英语启蒙", "新线索"],
+    tags: ["睡眠问题", "尚未意识到问题本质", "新线索"],
     order: "未报名",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1390,7 +1778,7 @@ const conversations = [
     wecomId: "wm_li_demo_001",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["三年级", "试听预约", "高意向"],
+    tags: ["体验课用户", "适合邀约专家连麦", "高意向"],
     order: "自然拼读试听课待确认",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1423,7 +1811,7 @@ const conversations = [
     wecomId: "wm_li_demo_002",
     lifecycle: "定义用户",
     lifecycleStage: 1,
-    tags: ["四年级", "单词记忆", "中意向"],
+    tags: ["学习动力弱", "需要案例验证", "中意向"],
     order: "词汇方法课待推荐",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1456,7 +1844,7 @@ const conversations = [
     wecomId: "wm_li_demo_003",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["五年级", "校内提分", "高意向"],
+    tags: ["厌学", "认可专业咨询", "高意向"],
     order: "校内同步提升班待测评",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1489,7 +1877,7 @@ const conversations = [
     wecomId: "wm_li_demo_004",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["价格异议", "课时方案", "中意向"],
+    tags: ["价格敏感", "适合转人工深聊", "中意向"],
     order: "阅读提升小课包待确认",
     matchedSkills: ["19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1522,7 +1910,7 @@ const conversations = [
     wecomId: "wm_li_demo_005",
     lifecycle: "提升认知",
     lifecycleStage: 2,
-    tags: ["观望", "家庭决策", "低意向"],
+    tags: ["需要家人商量", "暂不强销售", "低意向"],
     order: "未报名",
     matchedSkills: ["19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1555,7 +1943,7 @@ const conversations = [
     wecomId: "wm_li_demo_006",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["报名链接", "周六班", "高意向"],
+    tags: ["父母成长营意向", "关注效果保障", "高意向"],
     order: "周六自然拼读班待付款",
     matchedSkills: ["19元A类课-第一课", "19元A类课-课后"],
     sendMode: "人工确认",
@@ -1588,7 +1976,7 @@ const conversations = [
     wecomId: "wm_li_demo_007",
     lifecycle: "提升认知",
     lifecycleStage: 2,
-    tags: ["课程对比", "四年级", "中意向"],
+    tags: ["需要专家背书", "关注隐私安全", "中意向"],
     order: "课程方案待选择",
     matchedSkills: ["19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1621,7 +2009,7 @@ const conversations = [
     wecomId: "wm_li_demo_008",
     lifecycle: "定义用户",
     lifecycleStage: 1,
-    tags: ["口语表达", "胆怯", "三年级"],
+    tags: ["社交困难", "孩子拒绝沟通", "适合先共情安抚"],
     order: "口语互动试听待预约",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1654,7 +2042,7 @@ const conversations = [
     wecomId: "room_li_trial_schedule",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["试听排课", "家长群", "群运营"],
+    tags: ["直播课用户", "适合邀约直播课", "新线索"],
     order: "本周 18 位家长待试听",
     matchedSkills: ["19元A类课-第四课", "19元A类课-课后"],
     sendMode: "自动发送",
@@ -1687,7 +2075,7 @@ const conversations = [
     wecomId: "wm_li_demo_010",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["考前冲刺", "短期课包", "高意向"],
+    tags: ["家长高焦虑", "适合推测评", "高意向"],
     order: "考前冲刺课待排课",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1720,7 +2108,7 @@ const conversations = [
     wecomId: "wm_cust_7029",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["三年级", "试听完成", "高意向"],
+    tags: ["体验后未报名", "关注效果保障", "高意向"],
     order: "自然拼读班待付款",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1753,7 +2141,7 @@ const conversations = [
     wecomId: "wm_cust_8130",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["渠道线索", "课程形式", "待留资"],
+    tags: ["新线索", "对心理咨询抵触", "低意向"],
     order: "未报名",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1786,7 +2174,7 @@ const conversations = [
     wecomId: "wm_cust_9018",
     lifecycle: "定义用户",
     lifecycleStage: 1,
-    tags: ["五年级", "语法薄弱", "专项课"],
+    tags: ["焦虑倾向", "家长高焦虑", "1V1心理咨询意向"],
     order: "语法专项课待推荐",
     matchedSkills: ["19元A类课-课前", "19元A类课-第一课"],
     sendMode: "自动发送",
@@ -1819,7 +2207,7 @@ const conversations = [
     wecomId: "wm_cust_1006",
     lifecycle: "催单阶段",
     lifecycleStage: 3,
-    tags: ["老学员", "续报", "高意向"],
+    tags: ["老客户复购", "家庭守护计划意向", "高意向"],
     order: "春季续报待确认",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1852,7 +2240,7 @@ const conversations = [
     wecomId: "room_reading_g4",
     lifecycle: "提升认知",
     lifecycleStage: 2,
-    tags: ["四年级", "阅读打卡", "群运营"],
+    tags: ["直播课用户", "愿意长期陪伴改善", "适合案例教育"],
     order: "12位学员参与打卡",
     matchedSkills: ["19元A类课-第一课", "19元A类课-课后"],
     sendMode: "自动发送",
@@ -1885,7 +2273,7 @@ const conversations = [
     wecomId: "wm_cust_1108",
     lifecycle: "提升认知",
     lifecycleStage: 2,
-    tags: ["观望", "资料已发", "低意向"],
+    tags: ["沉默客户", "适合案例教育", "低意向"],
     order: "未报名",
     matchedSkills: ["19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1918,7 +2306,7 @@ const conversations = [
     wecomId: "wm_cust_1201",
     lifecycle: "了解阶段",
     lifecycleStage: 0,
-    tags: ["转介绍", "测评预约", "高意向"],
+    tags: ["高价值客户", "测评解读意向", "高意向"],
     order: "测评课待预约",
     matchedSkills: ["19元A类课-课前", "19元A类课-第四课"],
     sendMode: "自动发送",
@@ -1951,7 +2339,7 @@ const conversations = [
     wecomId: "wm_cust_1308",
     lifecycle: "定义用户",
     lifecycleStage: 1,
-    tags: ["四年级", "周末班", "时间敏感"],
+    tags: ["需要家人商量", "父母教育理念不一致", "中意向"],
     order: "周末阅读班待排课",
     matchedSkills: ["19元A类课-第四课", "19元A类课-第一课"],
     sendMode: "人工确认",
@@ -1984,7 +2372,7 @@ const conversations = [
     wecomId: "room_xsc_summer",
     lifecycle: "完单阶段",
     lifecycleStage: 4,
-    tags: ["小升初", "暑假班", "已报名"],
+    tags: ["已报名未转化高客单", "家庭守护计划意向", "高价值客户"],
     order: "8位学员已报名",
     matchedSkills: ["19元A类课-第四课", "19元A类课-课后"],
     sendMode: "自动发送",
@@ -2009,6 +2397,16 @@ const lifecycleStages = [
   { title: "提升认知", desc: "结合测评或试听反馈，说明课程价值。", skills: ["19元A类课-第一课"] },
   { title: "催单阶段", desc: "处理价格、名额、时间和报名顾虑。", skills: ["19元A类课-第一课", "19元A类课-第四课"] },
   { title: "完单阶段", desc: "家长已完成报名。", skills: ["19元A类课-第四课", "19元A类课-课后"] }
+];
+
+const customerServiceStages = [
+  "A类课前",
+  "A类第一节课",
+  "A类第二节课",
+  "A类第三节课",
+  "A类第四节课",
+  "A类第五节课",
+  "A类课后"
 ];
 
 const pendingMessages = [
@@ -2104,6 +2502,7 @@ const menuItems = [
     label: "用户运营",
     children: [
       { key: "tagLibrary", icon: <TagsOutlined />, label: "标签库管理" },
+      { key: "strategyInsight", icon: <BarChartOutlined />, label: "策略洞察" },
       { key: "massMessage", icon: <SendOutlined />, label: "用户群发" }
     ]
   },
@@ -2645,12 +3044,16 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
   };
 
   const saveStage = (values) => {
+    const knowledgeResourceKeys = values.knowledgeEnabled === false ? [] : (values.knowledgeResourceKeys || []);
     const stage = {
       ...(editingStage.stage || {}),
       ...values,
       key: editingStage.stage?.key || `ia-stage-${Date.now()}`,
       enabled: values.enabled !== false,
-      skills: values.skills || []
+      skills: values.skills || [],
+      knowledgeEnabled: values.knowledgeEnabled !== false,
+      knowledgeResourceKeys,
+      knowledgeBaseKeys: getKnowledgeBaseKeysFromResources(knowledgeResourceKeys)
     };
     syncRow(editingStage.agent.key, (agent) => ({
       ...agent,
@@ -2827,6 +3230,13 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
             }]}
           />
         </Card>
+        <IntelligentAgentStageModal
+          stage={editingStage?.stage}
+          skillOptions={skillOptions}
+          open={Boolean(editingStage)}
+          onClose={() => setEditingStage(null)}
+          onSave={saveStage}
+        />
       </Space>
     );
   }
@@ -2897,30 +3307,101 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
 
 function IntelligentAgentStageModal({ stage, skillOptions, open, onClose, onSave }) {
   const [form] = Form.useForm();
+  const [knowledgePickerOpen, setKnowledgePickerOpen] = useState(false);
+  const [knowledgePickerKeys, setKnowledgePickerKeys] = useState([]);
+  const [selectedKnowledgeKeys, setSelectedKnowledgeKeys] = useState([]);
+  const knowledgeEnabled = Form.useWatch("knowledgeEnabled", form);
+  const selectedKnowledgeRows = buildKnowledgeResourceRows().filter((item) => selectedKnowledgeKeys.includes(item.key));
   useEffect(() => {
     if (open) {
+      const defaultKnowledgeKeys = stage?.knowledgeResourceKeys || (stage?.knowledgeBaseKeys || knowledgeBases.slice(0, 1).map((base) => base.key)).map((key) => `base:${key}`);
+      setSelectedKnowledgeKeys(defaultKnowledgeKeys);
       form.resetFields();
       form.setFieldsValue({
+        stageCode: stage?.stageCode || stage?.key || "",
         name: stage?.name || "",
+        displayName: stage?.displayName || stage?.name || "",
         order: stage?.order || 0,
         description: stage?.description || "",
         skills: stage?.skills || [],
-        enabled: stage?.enabled !== false
+        enabled: stage?.enabled !== false,
+        knowledgeEnabled: stage?.knowledgeEnabled !== false,
+        knowledgeResourceKeys: defaultKnowledgeKeys
       });
     }
   }, [open, stage, form]);
+  const submitStage = (values) => {
+    onSave({
+      ...values,
+      knowledgeResourceKeys: selectedKnowledgeKeys
+    });
+  };
   return (
-    <Modal title={stage?.key ? "编辑阶段" : "新增阶段"} open={open} onCancel={onClose} onOk={() => form.submit()} okText="确认" cancelText="取消" width={760}>
-      <Form form={form} layout="vertical" onFinish={onSave}>
-        <Row gutter={16}>
-          <Col span={14}><Form.Item label="阶段名称" name="name" rules={[{ required: true, message: "请输入阶段名称" }]}><Input placeholder="例如：需求确认阶段" /></Form.Item></Col>
-          <Col span={5}><Form.Item label="排序" name="order"><InputNumber min={0} className="full-input" /></Form.Item></Col>
-          <Col span={5}><Form.Item label="阶段状态" name="enabled" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用" /></Form.Item></Col>
-          <Col span={24}><Form.Item label="绑定智能体" name="skills"><Select mode="multiple" placeholder="请选择智能体" options={skillOptions} /></Form.Item></Col>
-          <Col span={24}><Form.Item label="阶段说明" name="description"><Input.TextArea rows={4} placeholder="说明该阶段的沟通目标、执行边界和转入下一阶段条件。" /></Form.Item></Col>
-        </Row>
+    <>
+      <Modal
+        title={stage?.key ? "编辑流程阶段" : "新增流程阶段"}
+        open={open}
+        onCancel={onClose}
+        onOk={() => form.submit()}
+        okText="确定"
+        cancelText="取消"
+        width={860}
+        className="agent-stage-edit-modal"
+        destroyOnHidden
+      >
+        <Form form={form} layout="vertical" onFinish={submitStage}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="阶段标识" name="stageCode" tooltip="用于研发对接流程阶段编码，原型中默认沿用阶段 key。">
+                <Select
+                  placeholder="请选择阶段标识"
+                  options={[
+                    { value: stage?.key || "stage-contact", label: stage?.name || "了解阶段" },
+                    ...lifecycleStages.map((item) => ({ value: item.title, label: item.title }))
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}><Form.Item label="阶段名称" name="name" rules={[{ required: true, message: "请输入阶段名称" }]}><Input placeholder="例如：了解阶段" /></Form.Item></Col>
+            <Col span={24}><Form.Item label="智能体" name="skills"><Select mode="multiple" placeholder="请选择智能体" options={skillOptions} /></Form.Item></Col>
+            <Col span={24}><Form.Item label="展示名称" name="displayName"><Input.TextArea rows={2} placeholder="例如：A 类体验课-day0" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="排序" name="order"><InputNumber min={0} className="full-input" /></Form.Item></Col>
+            <Col span={12}><Form.Item label="阶段状态" name="enabled" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用" /></Form.Item></Col>
+            <Col span={24}>
+              <Form.Item label="知识库检索" name="knowledgeEnabled" valuePropName="checked" className="agent-stage-knowledge-switch">
+                <Switch checkedChildren="本阶段启用" unCheckedChildren="停用" />
+              </Form.Item>
+              {knowledgeEnabled !== false ? (
+                <div className="agent-stage-knowledge-config">
+                  <div className="agent-stage-knowledge-summary">
+                    <Text>{selectedKnowledgeRows.length ? `已选 ${selectedKnowledgeRows.length} 个知识资源` : "未选择知识库文件"}</Text>
+                    <div className="agent-stage-knowledge-tags">
+                      {selectedKnowledgeRows.length ? selectedKnowledgeRows.map((item) => (
+                        <Tag key={item.key}>{item.name}</Tag>
+                      )) : <Text type="secondary">点击右侧按钮配置本阶段可检索的知识库文件。</Text>}
+                    </div>
+                  </div>
+                  <Button onClick={() => { setKnowledgePickerKeys(selectedKnowledgeKeys); setKnowledgePickerOpen(true); }}>配置知识库</Button>
+                </div>
+              ) : null}
+            </Col>
+            <Col span={24}><Form.Item label="阶段说明" name="description"><Input.TextArea rows={3} placeholder="说明该阶段的沟通目标、执行边界和转入下一阶段条件。" /></Form.Item></Col>
+          </Row>
       </Form>
-    </Modal>
+      </Modal>
+      <KnowledgeResourcePickerModal
+        open={knowledgePickerOpen}
+        selectedKeys={knowledgePickerKeys}
+        onSelectedChange={setKnowledgePickerKeys}
+        onClose={() => setKnowledgePickerOpen(false)}
+        onOk={() => {
+          const nextKeys = Array.from(new Set(knowledgePickerKeys));
+          setSelectedKnowledgeKeys(nextKeys);
+          form.setFieldValue("knowledgeResourceKeys", nextKeys);
+          setKnowledgePickerOpen(false);
+        }}
+      />
+    </>
   );
 }
 
@@ -3131,18 +3612,58 @@ function SkillLogicRichEditor({ defaultValue, onChange }) {
   );
 }
 
+const buildKnowledgeResourceRows = () => knowledgeBases.flatMap((base) => [
+  {
+    key: `base:${base.key}`,
+    name: base.name,
+    path: `${base.category} / ${base.name}`,
+    relationType: "文件夹",
+    contentType: "目录",
+    status: base.status,
+    desc: base.desc,
+    category: base.category,
+    updatedAt: base.updated,
+    entries: base.entries || []
+  },
+  ...(base.entries || []).map((entry) => ({
+    key: `entry:${entry.key}`,
+    name: entry.title,
+    path: `${base.category} / ${base.name} / ${entry.title}`,
+    relationType: "资源",
+    contentType: entry.media === "文本" ? "text/markdown" : entry.media,
+    knowledgeType: entry.type,
+    status: entry.status,
+    desc: entry.content || `${entry.title}：用于 ${base.name} 场景，回答时需以知识库内容为准，不编造未维护的信息。`,
+    category: base.category,
+    updatedAt: base.updated
+  }))
+]);
+
+const getKnowledgeBaseKeysFromResources = (resourceKeys = []) => Array.from(new Set(resourceKeys
+  .map((key) => {
+    if (key.startsWith("base:")) return key.replace("base:", "");
+    if (!key.startsWith("entry:")) return null;
+    const entryKey = key.replace("entry:", "");
+    const base = knowledgeBases.find((item) => (item.entries || []).some((entry) => entry.key === entryKey));
+    return base?.key || null;
+  })
+  .filter(Boolean)));
+
 function AISkillPage() {
   const [rows, setRows] = useState(aiSkills);
   const [configSkill, setConfigSkill] = useState(null);
   const [knowledgePickerOpen, setKnowledgePickerOpen] = useState(false);
-  const [knowledgePickerKey, setKnowledgePickerKey] = useState("");
+  const [knowledgePickerKeys, setKnowledgePickerKeys] = useState([]);
+  const [toolPickerOpen, setToolPickerOpen] = useState(false);
+  const [toolPickerKeys, setToolPickerKeys] = useState([]);
+  const [toolPickerKeyword, setToolPickerKeyword] = useState("");
+  const [toolPickerCategory, setToolPickerCategory] = useState("全部类型");
   const skillAbilityTypes = ["信息总结", "策略判断", "产品匹配", "固定话题回复", "合规检查", "用户标签", "消息生成", "任务触发", "数据同步"];
   const skillTypeOptions = ["全部能力类型", ...skillAbilityTypes].map((value) => ({ value }));
   const statusOptions = ["全部状态", "启用", "停用"].map((value) => ({ value }));
   const skillEditTypeOptions = skillAbilityTypes.map((value) => ({ value }));
   const skillOutputTypeOptions = ["策略判断", "结构化档案", "标签", "建议话术", "任务结果", "合规检查"].map((value) => ({ value }));
   const skillOutputTargetOptions = ["智能体内部", "客户档案", "会话记录", "运营标签", "企微标签", "生成真人销售建议", "触发后续任务"].map((value) => ({ value }));
-  const toolOptions = agentTools.map((item) => ({ value: item.key, label: item.name }));
   const skillDefaultConfig = {
     outputType: "结构化档案",
     outputTargets: ["智能体内部"]
@@ -3213,39 +3734,106 @@ function AISkillPage() {
     }
   ];
   if (configSkill) {
-    const knowledgeResourceRows = knowledgeBases.flatMap((base) => [
-      {
-        key: `base:${base.key}`,
-        name: base.name,
-        path: `${base.category} / ${base.name}`,
-        relationType: "文件夹",
-        contentType: "目录",
-        status: base.status,
-        desc: base.desc,
-        entries: base.entries || []
-      },
-      ...(base.entries || []).map((entry) => ({
-        key: `entry:${entry.key}`,
-        name: entry.title,
-        path: `${base.category} / ${base.name} / ${entry.title}`,
-        relationType: "资源",
-        contentType: entry.media === "文本" ? "text/markdown" : entry.media,
-        knowledgeType: entry.type,
-        status: entry.status,
-        desc: entry.content || `${entry.title}：用于 ${base.name} 场景，回答时需以知识库内容为准，不编造未维护的信息。`
-      }))
-    ]);
+    const knowledgeResourceRows = buildKnowledgeResourceRows();
     const selectedKnowledgeResources = knowledgeResourceRows.filter((item) => (configSkill.knowledgeResourceKeys || []).includes(item.key));
-    const addKnowledgeResource = () => {
-      if (!knowledgePickerKey) return;
-      const nextKeys = Array.from(new Set([...(configSkill.knowledgeResourceKeys || []), knowledgePickerKey]));
+    const skillToolRows = agentTools.map((tool) => ({
+      key: tool.key,
+      name: tool.name,
+      type: tool.enabled ? "可用工具" : "停用工具",
+      description: tool.description,
+      scenario: "外部查询、通知、跳转、托管控制",
+      input: "任务上下文、客户标识、会话阶段、业务参数",
+      output: "调用状态、关键字段、异常信息、结构化摘要",
+      status: tool.enabled ? "启用" : "停用",
+      updatedAt: tool.updatedAt
+    }));
+    const selectedTools = skillToolRows.filter((item) => (configSkill.toolKeys || []).includes(item.key));
+    const saveKnowledgeResources = () => {
+      const nextKeys = Array.from(new Set(knowledgePickerKeys));
       updateConfigSkill({
         knowledgeResourceKeys: nextKeys,
-        knowledgeBaseKeys: nextKeys.filter((key) => key.startsWith("base:")).map((key) => key.replace("base:", ""))
+        knowledgeBaseKeys: getKnowledgeBaseKeysFromResources(nextKeys)
       });
       setKnowledgePickerOpen(false);
     };
-    const selectedTools = agentTools.filter((item) => (configSkill.toolKeys || []).includes(item.key));
+    const openSkillToolPicker = () => {
+      setToolPickerKeys(configSkill.toolKeys || []);
+      setToolPickerKeyword("");
+      setToolPickerCategory("全部类型");
+      setToolPickerOpen(true);
+    };
+    const toggleSkillToolSelection = (key) => {
+      setToolPickerKeys((keys) => (
+        keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]
+      ));
+    };
+    const saveSkillTools = () => {
+      updateConfigSkill({ toolKeys: Array.from(new Set(toolPickerKeys)) });
+      setToolPickerOpen(false);
+    };
+    const removeSkillTool = (key) => {
+      updateConfigSkill({ toolKeys: (configSkill.toolKeys || []).filter((item) => item !== key) });
+    };
+    const renderSkillToolPickerModal = () => {
+      const categories = ["全部类型", ...Array.from(new Set(skillToolRows.map((item) => item.type)))];
+      const keywordText = toolPickerKeyword.trim().toLowerCase();
+      const pickerRows = skillToolRows.filter((item) => {
+        const matchesCategory = toolPickerCategory === "全部类型" || item.type === toolPickerCategory;
+        const matchesKeyword = !keywordText || [item.name, item.type, item.description, item.scenario].some((value) => String(value || "").toLowerCase().includes(keywordText));
+        return matchesCategory && matchesKeyword;
+      });
+      return (
+        <Modal
+          title="选择工具"
+          open={toolPickerOpen}
+          onCancel={() => setToolPickerOpen(false)}
+          footer={<Button type="primary" onClick={saveSkillTools}>确认关联</Button>}
+          width={900}
+          className="agent-relation-picker-modal"
+        >
+          <div className="agent-relation-picker-toolbar">
+            <Input.Search
+              allowClear
+              placeholder="搜索工具名称、类型或说明"
+              value={toolPickerKeyword}
+              onChange={(event) => setToolPickerKeyword(event.target.value)}
+            />
+            <Select
+              value={toolPickerCategory}
+              options={categories.map((value) => ({ value }))}
+              onChange={setToolPickerCategory}
+            />
+          </div>
+          <div className="agent-relation-card-list">
+            {pickerRows.map((item) => {
+              const checked = toolPickerKeys.includes(item.key);
+              return (
+                <div className={checked ? "agent-relation-resource-card selected" : "agent-relation-resource-card"} key={item.key}>
+                  <div className="agent-relation-resource-head">
+                    <Space size={8} wrap>
+                      <span className="agent-relation-resource-icon"><ToolOutlined /></span>
+                      <Text className="agent-relation-resource-name">{item.name}</Text>
+                      <Tag color="blue">{item.type}</Tag>
+                      {statusTag(item.status)}
+                      {checked ? <Tag color="success">已选择</Tag> : null}
+                    </Space>
+                    <Button size="small" type={checked ? "default" : "primary"} onClick={() => toggleSkillToolSelection(item.key)}>
+                      {checked ? "移除" : "选择"}
+                    </Button>
+                  </div>
+                  <Text type="secondary" className="agent-relation-resource-desc">{item.description}</Text>
+                  <div className="agent-relation-resource-meta">
+                    <div><Text type="secondary">适用场景</Text><Text>{item.scenario}</Text></div>
+                    <div><Text type="secondary">输入摘要</Text><Text>{item.input}</Text></div>
+                    <div><Text type="secondary">输出摘要</Text><Text>{item.output}</Text></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Modal>
+      );
+    };
     return (
       <>
         <Space direction="vertical" size={16} className="page-stack ai-skill-page">
@@ -3301,7 +3889,7 @@ function AISkillPage() {
                         <PanelTitle
                           title="已关联知识资源"
                           desc="选择该 Skill 可引用的知识库资源；可关联文件夹或具体资源文件，执行时按资源路径引用内容。"
-                          extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => { setKnowledgePickerKey(knowledgeResourceRows[0]?.key || ""); setKnowledgePickerOpen(true); }}>添加知识资源</Button>}
+                          extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => { setKnowledgePickerKeys(configSkill.knowledgeResourceKeys || []); setKnowledgePickerOpen(true); }}>添加知识资源</Button>}
                         />
                       }
                     >
@@ -3315,7 +3903,7 @@ function AISkillPage() {
                           const nextKeys = (configSkill.knowledgeResourceKeys || []).filter((item) => item !== key);
                           updateConfigSkill({
                             knowledgeResourceKeys: nextKeys,
-                            knowledgeBaseKeys: nextKeys.filter((item) => item.startsWith("base:")).map((item) => item.replace("base:", ""))
+                            knowledgeBaseKeys: getKnowledgeBaseKeysFromResources(nextKeys)
                           });
                         }}>移除</Button> }
                       ]} dataSource={selectedKnowledgeResources} />
@@ -3328,22 +3916,35 @@ function AISkillPage() {
                 label: "关联工具",
                 children: (
                   <Space direction="vertical" size={16} className="full-width skill-relation-tab">
-                    <Form layout="vertical">
-                      <Form.Item label="关联工具">
-                        <Select
-                          mode="multiple"
-                          value={configSkill.toolKeys || []}
-                          placeholder="选择该 Skill 可调用的工具"
-                          options={toolOptions}
-                          onChange={(keys) => updateConfigSkill({ toolKeys: keys })}
+                    <Card
+                      className="agent-relation-config-card"
+                      title={
+                        <PanelTitle
+                          title="已关联工具"
+                          desc="选择该 Skill 可调用的工具；工具用于确定性的外部查询、通知、跳转和托管动作。"
+                          extra={<Button type="primary" icon={<PlusOutlined />} onClick={openSkillToolPicker}>添加工具</Button>}
                         />
-                      </Form.Item>
-                    </Form>
-                    <Table className="admin-table" rowKey="key" pagination={false} columns={[
-                      { title: "工具名称", dataIndex: "name", width: 220 },
-                      { title: "工具说明", dataIndex: "description" },
-                      { title: "状态", dataIndex: "enabled", width: 90, render: statusTag }
-                    ]} dataSource={selectedTools} />
+                      }
+                    >
+                      {selectedTools.length ? (
+                        <Table className="admin-table agent-relation-table" rowKey="key" pagination={false} scroll={{ x: 1180 }} columns={[
+                          { title: "名称", dataIndex: "name", width: 180 },
+                          { title: "类型", dataIndex: "type", width: 110, render: (value) => <Tag color="blue">{value}</Tag> },
+                          { title: "说明", dataIndex: "description", width: 260, render: (value) => <Text type="secondary" className="agent-relation-desc">{value}</Text> },
+                          { title: "适用场景", dataIndex: "scenario", width: 220 },
+                          { title: "状态", dataIndex: "status", width: 80, render: statusTag },
+                          { title: "更新时间", dataIndex: "updatedAt", width: 160 },
+                          { title: "操作", fixed: "right", width: 84, render: (_, record) => <Button type="link" size="small" danger onClick={() => removeSkillTool(record.key)}>移除</Button> }
+                        ]} dataSource={selectedTools} />
+                      ) : (
+                        <button type="button" className="agent-relation-empty" onClick={openSkillToolPicker}>
+                          <span className="agent-relation-empty-icon"><ToolOutlined /></span>
+                          <span className="agent-relation-empty-title">当前 Skill 暂未配置工具</span>
+                          <span className="agent-relation-empty-desc">添加后，Skill 可在提示词允许的场景中调用对应工具。</span>
+                          <span className="agent-relation-empty-action">添加工具</span>
+                        </button>
+                      )}
+                    </Card>
                   </Space>
                 )
               },
@@ -3368,55 +3969,50 @@ function AISkillPage() {
         </Space>
         <KnowledgeResourcePickerModal
           open={knowledgePickerOpen}
-          selectedKey={knowledgePickerKey}
-          onSelect={setKnowledgePickerKey}
+          selectedKeys={knowledgePickerKeys}
+          onSelectedChange={setKnowledgePickerKeys}
           onClose={() => setKnowledgePickerOpen(false)}
-          onOk={addKnowledgeResource}
+          onOk={saveKnowledgeResources}
         />
+        {renderSkillToolPickerModal()}
       </>
     );
   }
   return (
     <Space direction="vertical" size={16} className="page-stack ai-skill-page">
-      <Card title={<PanelTitle title="Skill管理" desc="维护可复用 AI Skill 能力，供智能体按场景组合调用。" extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setConfigSkill(createDraft())}>新增Skill</Button>} />}>
-        <Space className="toolbar" wrap>
-          <Select defaultValue="全部能力类型" options={skillTypeOptions} />
-          <Select defaultValue="全部状态" options={statusOptions} />
-          <Input placeholder="搜索Skill名称或描述" allowClear className="strategy-search-input" />
-          <Button type="primary">搜索</Button>
-          <Button>重置</Button>
-        </Space>
+      <Card>
+        <div className="toolbar compact-card-toolbar">
+          <Space wrap>
+            <Select defaultValue="全部能力类型" options={skillTypeOptions} />
+            <Select defaultValue="全部状态" options={statusOptions} />
+            <Input placeholder="搜索Skill名称或描述" allowClear className="strategy-search-input" />
+            <Button type="primary">搜索</Button>
+            <Button>重置</Button>
+          </Space>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setConfigSkill(createDraft())}>新增Skill</Button>
+        </div>
         <Table className="admin-table ai-skill-table" rowKey="key" columns={columns} dataSource={rows} pagination={false} scroll={{ x: 994 }} />
       </Card>
     </Space>
   );
 }
 
-function KnowledgeResourcePickerModal({ open, selectedKey, onSelect, onClose, onOk }) {
-  const resourceRows = knowledgeBases.flatMap((base) => [
-    {
-      key: `base:${base.key}`,
-      name: base.name,
-      path: `${base.category} / ${base.name}`,
-      relationType: "文件夹",
-      contentType: "目录",
-      status: base.status,
-      desc: base.desc,
-      category: base.category
-    },
-    ...(base.entries || []).map((entry) => ({
-      key: `entry:${entry.key}`,
-      name: entry.title,
-      path: `${base.category} / ${base.name} / ${entry.title}`,
-      relationType: "资源",
-      contentType: entry.media === "文本" ? "text/markdown" : entry.media,
-      knowledgeType: entry.type,
-      status: entry.status,
-      desc: entry.content || `${entry.title}：用于 ${base.name} 场景，回答时需以知识库内容为准，不编造未维护的信息。`,
-      category: base.category
-    }))
-  ]);
-  const currentResource = resourceRows.find((item) => item.key === selectedKey) || resourceRows[0];
+function KnowledgeResourcePickerModal({ open, selectedKeys = [], onSelectedChange, onClose, onOk }) {
+  const resourceRows = buildKnowledgeResourceRows();
+  const [activeKey, setActiveKey] = useState("");
+  useEffect(() => {
+    if (!open) return;
+    setActiveKey(selectedKeys[0] || resourceRows[0]?.key || "");
+  }, [open]);
+  const currentResource = resourceRows.find((item) => item.key === activeKey) || resourceRows[0];
+  const selectedResourceRows = resourceRows.filter((item) => selectedKeys.includes(item.key));
+  const toggleResource = (key) => {
+    onSelectedChange?.(
+      selectedKeys.includes(key)
+        ? selectedKeys.filter((item) => item !== key)
+        : [...selectedKeys, key]
+    );
+  };
   const treeData = Array.from(new Set(knowledgeBases.map((item) => item.category))).map((category) => {
     const bases = knowledgeBases.filter((item) => item.category === category);
     return {
@@ -3424,6 +4020,7 @@ function KnowledgeResourcePickerModal({ open, selectedKey, onSelect, onClose, on
       key: `category:${category}`,
       icon: <FolderOutlined />,
       selectable: false,
+      disableCheckbox: true,
       children: bases.map((base) => ({
         title: <Tooltip title={base.name} placement="topLeft"><span className="resource-tree-label">{base.name}</span></Tooltip>,
         key: `base:${base.key}`,
@@ -3445,22 +4042,33 @@ function KnowledgeResourcePickerModal({ open, selectedKey, onSelect, onClose, on
       onOk={onOk}
       okText="确认关联"
       cancelText="取消"
-      okButtonProps={{ disabled: !currentResource }}
+      okButtonProps={{ disabled: !selectedKeys.length }}
       className="knowledge-resource-picker-modal"
     >
       <div className="knowledge-resource-picker">
         <aside className="knowledge-picker-tree">
-          <Text className="knowledge-picker-title">资源目录</Text>
+          <div className="knowledge-picker-title-row">
+            <Text className="knowledge-picker-title">资源目录</Text>
+            <Tag color="blue">已选 {selectedKeys.length}</Tag>
+          </div>
           <Tree
             showIcon
+            checkable
+            checkStrictly
             blockNode
             defaultExpandAll
             indentSize={4}
             selectedKeys={currentResource ? [currentResource.key] : []}
+            checkedKeys={{ checked: selectedKeys, halfChecked: [] }}
             treeData={treeData}
             onSelect={(keys) => {
               const nextKey = keys[0];
-              if (nextKey) onSelect(nextKey);
+              if (nextKey) setActiveKey(nextKey);
+            }}
+            onCheck={(checkedKeysValue, info) => {
+              const nextCheckedKeys = Array.isArray(checkedKeysValue) ? checkedKeysValue : checkedKeysValue.checked;
+              onSelectedChange?.(nextCheckedKeys.filter((key) => !String(key).startsWith("category:")));
+              if (info?.node?.key && !String(info.node.key).startsWith("category:")) setActiveKey(info.node.key);
             }}
           />
         </aside>
@@ -3470,6 +4078,7 @@ function KnowledgeResourcePickerModal({ open, selectedKey, onSelect, onClose, on
             <Space size={6} wrap>
               {currentResource ? <Tag color={currentResource.relationType === "文件夹" ? "processing" : "blue"}>{currentResource.relationType}</Tag> : null}
               {currentResource ? <Tag>{currentResource.contentType}</Tag> : null}
+              {currentResource && selectedKeys.includes(currentResource.key) ? <Tag color="success">已选</Tag> : null}
             </Space>
           </div>
           <div className="knowledge-picker-content">
@@ -3490,21 +4099,388 @@ function KnowledgeResourcePickerModal({ open, selectedKey, onSelect, onClose, on
             <Text className="knowledge-preview-label">资源规则</Text>
             <Text type="secondary">关联文件夹表示 Skill 可引用目录下全部资源；关联具体资源表示只引用该文件内容。</Text>
           </div>
+          <div className="knowledge-preview-section">
+            <Text className="knowledge-preview-label">当前资源</Text>
+            <Button block size="small" type={currentResource && selectedKeys.includes(currentResource.key) ? "default" : "primary"} disabled={!currentResource} onClick={() => currentResource && toggleResource(currentResource.key)}>
+              {currentResource && selectedKeys.includes(currentResource.key) ? "移出已选" : "加入已选"}
+            </Button>
+          </div>
+          <div className="knowledge-preview-section">
+            <Text className="knowledge-preview-label">已选资源</Text>
+            <div className="knowledge-selected-list">
+              {selectedResourceRows.length ? selectedResourceRows.map((item) => (
+                <Tag key={item.key} closable onClose={(event) => {
+                  event.preventDefault();
+                  toggleResource(item.key);
+                }}>{item.name}</Tag>
+              )) : <Text type="secondary">暂无已选资源</Text>}
+            </div>
+          </div>
         </aside>
       </div>
     </Modal>
   );
 }
 
-function TagLibraryPage() {
+function CommonTagSelectButton({ value = [], placeholder, onClick, onChange, disabled = false }) {
+  const onTagRemove = (event, tagValue) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (disabled) return;
+    onChange?.(value.filter((item) => item !== tagValue));
+  };
+  return (
+    <Button block className="common-tag-select-control mass-tag-select-control" onClick={onClick} disabled={disabled}>
+      {value.length ? (
+        <Space wrap size={[6, 4]}>
+          {value.map((tag) => (
+            <Tag
+              className={isAiGeneratedTag(tag) ? "customer-selected-ai-tag" : "customer-selected-tag"}
+              key={tag}
+              closable={Boolean(onChange) && !disabled}
+              onClose={(event) => onTagRemove(event, tag)}
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              {getTagDisplayLabel(tag)}
+            </Tag>
+          ))}
+        </Space>
+      ) : (
+        <Text type="secondary">{placeholder}</Text>
+      )}
+    </Button>
+  );
+}
+
+function CommonTagPickerModal({
+  open,
+  title,
+  selected = [],
+  keyword = "",
+  rule = "以下标签满足其一",
+  ruleOptions = ["以下标签满足其一", "以下标签同时满足", "无任何标签"],
+  tip = "标签来自统一标签库，AI自动打标的标签会显示（AI）标识。",
+  onKeywordChange,
+  onRuleChange,
+  onSelectedChange,
+  onOk,
+  onCancel
+}) {
+  const disabled = rule === "无任何标签";
+  const toggleTag = (tagValue) => {
+    onSelectedChange?.(
+      selected.includes(tagValue)
+        ? selected.filter((value) => value !== tagValue)
+        : [...selected, tagValue]
+    );
+  };
+  const updateGroup = (groupTags, checked) => {
+    const groupValues = groupTags.map((tag) => tag.value);
+    const nextSelected = checked
+      ? Array.from(new Set([...selected, ...groupValues]))
+      : selected.filter((value) => !groupValues.includes(value));
+    onSelectedChange?.(nextSelected);
+  };
+  return (
+    <Modal
+      title={title}
+      open={open}
+      onCancel={onCancel}
+      onOk={onOk}
+      okText="确定"
+      cancelText="取消"
+      width={760}
+      className="common-tag-picker-modal mass-tag-picker-modal"
+    >
+      <div className="mass-tag-picker-tip"><AlertOutlined />{tip}</div>
+      <Input.Search
+        placeholder="请输入要查找的标签或标签组"
+        allowClear
+        value={keyword}
+        onChange={(event) => onKeywordChange?.(event.target.value)}
+        className="mass-tag-picker-search"
+      />
+      <div className="mass-tag-picker-rule">
+        <Text>筛选：</Text>
+        <Radio.Group
+          value={rule}
+          options={ruleOptions.map((value) => ({ value, label: value }))}
+          onChange={(event) => {
+            const nextRule = event.target.value;
+            onRuleChange?.(nextRule);
+            if (nextRule === "无任何标签") onSelectedChange?.([]);
+          }}
+        />
+      </div>
+      <div className="mass-tag-picker-list">
+        {tagSelectionGroups
+          .map((group) => ({
+            ...group,
+            tags: group.tags.filter((tag) => {
+              const keywordText = keyword.trim();
+              return !keywordText || group.name.includes(keywordText) || tag.label.includes(keywordText) || tag.value.includes(keywordText);
+            })
+          }))
+          .filter((group) => group.tags.length)
+          .map((group) => {
+            const allChecked = group.tags.every((tag) => selected.includes(tag.value));
+            return (
+              <div className="mass-tag-picker-group" key={group.name}>
+                <div className="mass-tag-picker-group-head">
+                  <Text>{group.name} <Text type="secondary">（{group.tags.length}）</Text></Text>
+                  <Checkbox checked={allChecked} disabled={disabled} onChange={(event) => updateGroup(group.tags, event.target.checked)} />
+                </div>
+                <Space wrap size={[10, 10]}>
+                  {group.tags.map((tag) => {
+                    const checked = selected.includes(tag.value);
+                    return (
+                      <Button
+                        key={tag.value}
+                        disabled={disabled}
+                        type={checked ? "primary" : "default"}
+                        ghost={checked}
+                        className="mass-tag-picker-tag"
+                        onClick={() => toggleTag(tag.value)}
+                      >
+                        {tag.label}
+                      </Button>
+                    );
+                  })}
+                </Space>
+              </div>
+            );
+          })}
+      </div>
+      <div className="mass-tag-picker-footer">
+        <Text type="secondary">已选：</Text>
+        <Space wrap size={[8, 6]}>
+          {selected.length ? selected.map((tag) => (
+            <Tag
+              key={tag}
+              className={isAiGeneratedTag(tag) ? "customer-selected-ai-tag" : "customer-selected-tag"}
+              closable
+              onClose={(event) => {
+                event.preventDefault();
+                toggleTag(tag);
+              }}
+            >
+              {getTagDisplayLabel(tag)}
+            </Tag>
+          )) : <Text type="secondary">暂无</Text>}
+        </Space>
+      </div>
+    </Modal>
+  );
+}
+
+function TagLibraryPage({ onViewConversation }) {
   const { message } = AntApp.useApp();
   const [groups, setGroups] = useState(tagGroupsSeed);
   const [roleFilter, setRoleFilter] = useState("全部部门角色");
   const [keyword, setKeyword] = useState("");
   const [editingGroup, setEditingGroup] = useState(null);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [aiTagAgentOpen, setAiTagAgentOpen] = useState(false);
+  const [activeAiTagAgentDataSourceKey, setActiveAiTagAgentDataSourceKey] = useState(null);
+  const [selectedAiTagKnowledgeFiles, setSelectedAiTagKnowledgeFiles] = useState(["entry:ke-1", "entry:ke-4"]);
+  const [selectedAiTagPromptAgents, setSelectedAiTagPromptAgents] = useState(["s1", "s2", "s5"]);
+  const [aiAutoTagConfigOpen, setAiAutoTagConfigOpen] = useState(false);
+  const [aiAutoTagRecordOpen, setAiAutoTagRecordOpen] = useState(false);
+  const [activeAutoTagDataSourceKey, setActiveAutoTagDataSourceKey] = useState(null);
+  const [tagGroupReason, setTagGroupReason] = useState(null);
+  const [tagRuleDetail, setTagRuleDetail] = useState(null);
+  const [manualTagRules, setManualTagRules] = useState({});
+  const [manualTagSources, setManualTagSources] = useState({});
+  const [aiApprovedTagSources, setAiApprovedTagSources] = useState({});
+  const [tagReviewModalOpen, setTagReviewModalOpen] = useState(false);
+  const [aiAutoTagRecordDetail, setAiAutoTagRecordDetail] = useState(null);
+  const [tagReviewDetailBatchKey, setTagReviewDetailBatchKey] = useState(null);
+  const [activeTagReviewBatchKey, setActiveTagReviewBatchKey] = useState("tag-review-batch-20260826");
+  const [tagReviewDecisions, setTagReviewDecisions] = useState({});
+  const [reviewRuleDrafts, setReviewRuleDrafts] = useState({});
+  const [tagRuleDraft, setTagRuleDraft] = useState("");
   const [tagDrafts, setTagDrafts] = useState({});
   const [form] = Form.useForm();
+  const [autoTagConfigForm] = Form.useForm();
+  const [selectedAutoTagVariables, setSelectedAutoTagVariables] = useState({
+    用户沟通数据: ["conversation.recent_messages", "conversation.user_messages", "conversation.sales_messages", "conversation.sensitive_words", "conversation.last_contact_time"],
+    客户档案: ["profile.child_grade", "profile.core_problem", "profile.parent_demand", "profile.current_summary", "profile.risk_note"]
+  });
+  const [autoTagFriendDayRules, setAutoTagFriendDayRules] = useState([3, 5]);
+  const [autoTagMessageCountRules, setAutoTagMessageCountRules] = useState([10, 20]);
+  const aiTagAgentPrompt = `# 角色定位
+
+你是“AI标签库生成管理智能体”，同时具备青少年心理教育行业客户洞察、用户运营标签体系设计、销售转化分析和标签规则治理经验。
+
+你的任务不是直接修改正式标签库，而是基于已授权的数据和业务规则，生成一批可供人工审核的 AI生成标签提案，形成候选标签库变更记录。所有结果必须经过人工审核，通过后才允许写入正式标签库。
+
+# 业务背景
+
+本业务服务对象主要是存在学业适应、亲子沟通、情绪行为或成长支持需求的孩子家庭，沟通对象通常是家长。平台通过企业微信托管、销售跟进、课程服务、客户档案、标签库和策略洞察来支持体验课用户转化为正价课用户。
+
+标签库的目标是帮助运营、销售和 AI 智能体稳定识别用户特征、需求阶段、购买意向、产品兴趣、跟进策略和风险预警。标签必须能被业务人员理解，也必须能被后续 AI 自动打标规则执行。
+
+# 输入数据
+
+你只能使用本次任务已授权的数据来源和已选择的变量字段。常见数据包括但不限于：
+
+1. 企业知识库：产品服务清单、课程类型、价格区间、适用人群、服务边界、业务SOP。
+2. 智能体提示词：会话智能体、策略智能体、Skill 中已经定义的业务规则和服务流程。
+3. 用户沟通数据：家长与销售、班主任、AI托管账号的企微会话记录、最近沟通摘要、敏感词命中信息。
+4. 客户档案：孩子年龄/年级、核心问题、家长诉求、最近跟进摘要、风险备注、人工维护信息。
+5. 用户业务数据：用户状态、用户等级、服务阶段、课程行为、订单状态、运营导入字段。
+6. 现有标签数据：正式标签库、已有标签组、已生效标签、人工标签、AI历史打标记录、标签规则版本。
+
+如果某类数据没有被授权或变量字段没有被选择，禁止基于该类数据做判断，也禁止假设其存在。
+
+# 生成目标
+
+你需要输出结构化的标签库候选变更，变更类型只允许包括：
+
+1. 新增标签：发现现有标签库未覆盖、具备稳定业务价值、满足样本量要求的新标签。
+2. 修改标签规则：现有标签名称仍然合理，但 AI打标依据、判断条件、排除条件或证据要求需要优化。
+3. 建议删除：现有标签长期低频、语义重复、业务不可执行、风险过高或不适合继续自动打标。
+
+当前阶段不主动新增标签组。你只能在已选择的已有标签组下生成标签提案或规则变更，也就是只在已选择的已有标签组下生成候选标签。如果发现现有标签组无法承载某类高价值特征，只输出“标签组优化建议”，不得直接生成新标签组。
+
+# 与现有标签和人工标签的关系
+
+1. 现有正式标签库优先：生成任何新增标签前，必须与现有标签逐一去重。
+2. 人工标签优先：人工创建、人工修改、人工确认过的标签和规则优先级高于 AI 生成结果，不得覆盖人工维护标签。
+3. AI历史标签仅作参考：可以用于发现趋势和冲突，但不能作为新增标签的唯一依据。
+4. 语义相似度≥70%时，不允许新增标签，应输出“修改标签规则”或“合并建议”。
+5. 如果新发现的标签与已有标签语义接近但业务口径不同，必须解释差异，例如适用人群、判断依据、跟进策略或风险等级不同。
+6. 如果标签之间存在互斥或冲突，必须在输出中说明冲突关系和建议保留口径。
+7. 已经由人工明确驳回过的标签，不得再次以相同名称或同义表达重复提出，除非新增数据能证明业务情况发生明显变化。
+
+# 标签生成标准
+
+每个新增标签必须同时满足以下条件：
+
+1. 业务价值明确：能服务用户分层、销售跟进、课程推荐、风险识别、运营触达或智能体沟通策略。
+2. 标签含义单一：一个标签只能表达一个清晰特征，不能把多个判断混在一起。
+3. 可被业务人员理解：命名使用业务语言，避免技术词、模型词、过度抽象词。
+4. 可被 AI 自动判断：必须能写出明确的 AI打标依据，包括触发条件、排除条件和证据要求。
+5. 最小样本量：同一类特征至少需要≥10个独立用户稳定出现，少于10个用户只记录观察，不生成标签提案。
+6. 跨用户稳定：不能因为单个用户、单条极端对话或一次偶发提及生成标签。
+7. 与现有标签不重复：与现有标签语义相似度≥70%时不新增。
+8. 不替代状态字段：订单状态、课程阶段、用户等级、托管状态等客观系统状态，优先作为状态字段，不建议生成画像标签。
+
+# 标签规则生成要求
+
+每个新增标签或修改标签规则都必须给出可执行的 AI打标依据。规则必须包含：
+
+1. 正向判断条件：哪些表达、行为、档案字段或业务数据共同出现时可以打标。
+2. 关键词或语义特征：列出3-5个核心关键词、典型表达或语义模式。
+3. 证据要求：说明至少需要几类证据、几次出现、是否需要历史数据印证。
+4. 排除条件：哪些情况不能打标，例如偶然提及、引用他人观点、销售主动引导、用户明确否认。
+5. 置信度建议：高/中/低置信度如何区分。
+6. 人工审核条件：哪些情况下必须进入人工审核，不能自动生效。
+7. 规则版本说明：如果是修改规则，需要说明旧规则的问题和新规则的变化。
+
+规则必须是“可执行判断”，不能只写概念解释。例如不要只写“用户有焦虑”，而要写“用户或客户档案中多次出现担心孩子状态、睡眠/上学/沟通问题，并伴随求助或解决方案询问，且不是单次情绪宣泄”。
+
+# 分析步骤
+
+请严格按以下流程完成分析：
+
+步骤1：数据准备
+- 读取已授权数据和已选择变量字段。
+- 按用户维度聚合沟通记录、客户档案、课程行为、订单状态和已有标签。
+- 区分用户主动表达、销售引导表达、AI托管消息、人工档案和系统状态。
+
+步骤2：高频特征扫描
+- 统计高频出现的痛点、诉求、行为、情绪词、产品兴趣、购买顾虑和风险信号。
+- 每个候选特征都要统计独立用户数，不能只统计消息条数。
+- 对极端词、敏感词和风险词单独标记，不进入普通标签生成。
+
+步骤3：聚类归因
+- 将相似诉求或行为聚合为候选特征簇。
+- 每个特征簇至少需要≥10个独立用户支持。
+- 提炼该特征簇的业务含义、适用场景和可能所属标签组。
+
+步骤4：现有标签比对
+- 与现有标签库、人工标签、AI历史标签逐一比对。
+- 如果语义相似度≥70%，不要新增标签，改为输出修改标签规则或合并建议。
+- 如果已有标签由人工维护，必须尊重人工口径，不得覆盖，只能提出优化建议。
+
+步骤5：风险与合规检查
+- 检查是否涉及医疗诊断、隐私侵犯、负面定性、歧视性表述或过度推断。
+- 检查是否会误导销售做出不恰当承诺。
+- 检查是否适合 AI 自动打标，敏感或高风险标签必须建议人工审核。
+
+步骤6：生成候选变更
+- 按“新增标签 / 修改标签规则 / 建议删除”输出。
+- 每条变更必须包含 AI判断原因和 AI打标依据。
+- 每条变更必须说明所属标签组、样本量、证据来源、建议审核方式。
+- 所有结果都只是候选提案，不得直接写入正式标签库。
+
+# 禁止行为
+
+1. 禁止生成明确医疗诊断标签，例如“抑郁症”“ADHD”“焦虑症”等；可替换为行为或状态描述，例如“情绪低落表达”“注意力分散表现”“焦虑表达明显”。
+2. 禁止生成隐私侵犯标签，例如真实姓名、学校名称、具体住址、联系方式、身份证明等。
+3. 禁止生成负面定性标签，例如“差生”“问题家长”“不配合家长”“难搞客户”等。
+4. 禁止基于单条对话、单个用户、销售主观判断或AI托管消息单独生成标签。
+5. 禁止为了覆盖更多人群而生成含义宽泛、无法执行的标签。
+6. 禁止把纯系统状态包装成标签，例如“已支付”“已退款”“已上课”，除非它承载明确运营策略且无法用状态字段表达。
+7. 禁止直接修改、删除或覆盖正式标签库，必须生成待审核提案。
+8. 禁止输出没有打标规则的标签。
+
+# 敏感风险处理
+
+如果数据中出现自杀、自残、伤人、极端崩溃、严重失控、疑似医疗风险等内容：
+
+1. 不纳入普通标签分析。
+2. 单独输出风险预警。
+3. 不生成医疗诊断。
+4. 建议转人工或专业人员介入。
+5. 如果确实需要标签表达，只能使用行为描述和风险级别，例如“高危风险需人工介入”，并标记必须人工审核。
+
+# 输出格式
+
+请严格输出结构化结果，字段如下：
+
+## 一、生成摘要
+- 本次分析数据范围：
+- 覆盖用户数：
+- 有效样本用户数：
+- 发现候选特征数：
+- 输出新增标签数：
+- 输出修改标签规则数：
+- 输出建议删除数：
+- 需要人工重点审核的问题：
+
+## 二、候选变更列表
+每条变更按以下字段输出：
+
+- 变更类型：新增标签 / 修改标签规则 / 建议删除
+- 所属标签组：
+- 标签名称：
+- AI判断原因：
+- 独立用户样本量：
+- 主要证据来源：
+- 与现有标签关系：新增 / 与某标签相似 / 建议合并 / 人工标签冲突 / 无冲突
+- AI打标依据：
+  - 正向判断条件：
+  - 关键词或语义特征：
+  - 证据要求：
+  - 排除条件：
+  - 置信度建议：
+  - 必须人工审核条件：
+- 建议操作：通过 / 修改后通过 / 驳回 / 合并到已有标签 / 保留观察
+
+## 三、标签组优化建议
+如果发现已有标签组无法承载某类业务特征，只输出建议，不直接创建标签组。
+
+## 四、风险预警
+列出不进入普通标签库的高风险内容、原因和建议处理方式。
+
+## 五、不生成说明
+列出因为样本量不足、与现有标签重复、风险过高、含义不清或不适合作为标签而未生成的候选项。
+
+# 最终原则
+
+你生成的是候选标签库变更，不是正式标签库。审核通过后才允许写入正式标签库；人工标签、人工修改规则和人工审核结论永远优先于 AI 生成结果。`;
   const totalTags = groups.reduce((sum, group) => sum + group.tags.length, 0);
   const roleFilterOptions = [{ label: "全部部门角色", value: "全部部门角色" }, ...tagRoleOptions];
   const filteredGroups = groups.filter((group) => {
@@ -3513,6 +4489,315 @@ function TagLibraryPage() {
     const matchesKeyword = !keywordText || [group.name, ...group.tags].some((item) => String(item).toLowerCase().includes(keywordText));
     return matchesRole && matchesKeyword;
   });
+  const aiTagAgentDataSourceConfigs = [
+    {
+      key: "企业知识库",
+      name: "企业知识库",
+      desc: "选择现有知识库中的文件，作为生成标签组、标签内容和规则的业务背景。",
+      configTitle: "选择知识库文件"
+    },
+    {
+      key: "智能体提示词",
+      name: "智能体提示词",
+      desc: "选择现有智能体，代表读取该智能体的角色逻辑、业务边界和提示词规则。",
+      configTitle: "选择智能体提示词"
+    },
+    {
+      key: "用户沟通数据",
+      name: "用户沟通数据",
+      desc: "配置用于分析的代表性用户对话样本，也支持上传导入企业提供的用户对话数据文件。",
+      configTitle: "用户沟通数据配置"
+    }
+  ];
+  const activeAiTagAgentDataSource = aiTagAgentDataSourceConfigs.find((item) => item.key === activeAiTagAgentDataSourceKey);
+  const aiTagKnowledgeFileRows = buildKnowledgeResourceRows().filter((item) => item.relationType === "资源");
+  const aiTagPromptAgentRows = strategies.map((item) => ({
+    key: item.key,
+    name: item.name,
+    category: item.agentCategory || "会话智能体",
+    type: item.type,
+    input: item.input,
+    output: item.output,
+    status: item.status
+  }));
+  const aiAutoTagDataSourceConfigs = [
+    {
+      key: "用户沟通数据",
+      name: "用户沟通数据",
+      source: "企微会话记录、AI托管消息记录",
+      fields: ["客户ID", "发送人类型", "消息内容", "消息类型", "发送时间", "是否AI消息", "敏感词命中"],
+      variables: [
+        { key: "conversation.recent_messages", variable: "{{conversation.recent_messages}}", meaning: "最近沟通记录", defaultValue: "最近7天，最多100条，包含用户消息和销售消息" },
+        { key: "conversation.user_messages", variable: "{{conversation.user_messages}}", meaning: "用户发送的消息", defaultValue: "排除销售消息和AI托管消息，仅保留用户表达" },
+        { key: "conversation.sales_messages", variable: "{{conversation.sales_messages}}", meaning: "销售发送的消息", defaultValue: "人工销售消息，用于判断跟进承诺和服务上下文" },
+        { key: "conversation.ai_messages", variable: "{{conversation.ai_messages}}", meaning: "AI托管消息", defaultValue: "AI自动回复内容，用于避免重复沟通和识别托管边界" },
+        { key: "conversation.sensitive_words", variable: "{{conversation.sensitive_words}}", meaning: "敏感词命中", defaultValue: "仅输出命中词和上下文片段，不进入普通标签判断" },
+        { key: "conversation.last_contact_time", variable: "{{conversation.last_contact_time}}", meaning: "最近沟通时间", defaultValue: "当前客户最近一条有效消息时间" }
+      ],
+      params: ["数据范围：要打标签用户的全部对话数据", "消息角色：用户消息、销售消息、AI托管消息", "消息类型：文本、语音转写", "脱敏：开启"],
+      usage: "默认读取要打标签用户的全部对话数据，用于识别用户核心表达、痛点、购买意向、风险词和反复出现的诉求；单条偶发内容不能直接作为打标依据。"
+    },
+    {
+      key: "客户档案",
+      name: "客户档案",
+      source: "客户资料、销售维护档案、AI摘要档案",
+      fields: ["客户ID", "孩子年龄/年级", "核心问题", "家长诉求", "负责销售", "最近跟进摘要", "风险备注"],
+      variables: [
+        { key: "profile.child_grade", variable: "{{profile.child_grade}}", meaning: "孩子年龄/年级", defaultValue: "客户档案中最新有效年龄或年级字段" },
+        { key: "profile.core_problem", variable: "{{profile.core_problem}}", meaning: "核心问题", defaultValue: "人工档案和AI档案摘要中的稳定问题描述" },
+        { key: "profile.parent_demand", variable: "{{profile.parent_demand}}", meaning: "家长诉求", defaultValue: "销售维护或AI总结出的主要求助目标" },
+        { key: "profile.current_summary", variable: "{{profile.current_summary}}", meaning: "最近跟进摘要", defaultValue: "最近一次有效跟进摘要，人工维护优先" },
+        { key: "profile.risk_note", variable: "{{profile.risk_note}}", meaning: "风险备注", defaultValue: "客户档案中已确认的风险备注" }
+      ],
+      params: ["数据范围：企业给到的客户档案数据", "读取范围：当前客户最新档案", "历史摘要：最近一次有效摘要", "脱敏：开启"],
+      usage: "默认读取企业给到的客户档案数据，用于校验会话判断是否与客户长期背景一致，避免只凭最近一次对话误打标签。"
+    },
+    {
+      key: "课程行为",
+      name: "课程行为",
+      source: "课程进度、听课记录、课节行为数据",
+      fields: ["课程ID", "课程名称", "完课率", "看课时长", "最近上课时间", "缺课次数", "课后反馈"],
+      variables: [
+        { key: "course.current_stage", variable: "{{course.current_stage}}", meaning: "当前课程阶段", defaultValue: "体验课、正价课或课后服务阶段" },
+        { key: "course.completion_rate", variable: "{{course.completion_rate}}", meaning: "完课率", defaultValue: "当前课程已完成课节占比" },
+        { key: "course.watch_duration", variable: "{{course.watch_duration}}", meaning: "看课时长", defaultValue: "最近30天累计有效观看时长" },
+        { key: "course.absence_count", variable: "{{course.absence_count}}", meaning: "缺课次数", defaultValue: "最近30天未按计划完成课节次数" },
+        { key: "course.feedback", variable: "{{course.feedback}}", meaning: "课后反馈", defaultValue: "最近一次课后反馈或班主任记录" }
+      ],
+      params: ["课程范围：体验课与正价课", "时间范围：最近30天", "异常行为：缺课、低完课率、重复观看"],
+      usage: "用于判断体验后未报名、课程参与度、复盘触达价值等运营标签。"
+    },
+    {
+      key: "订单状态",
+      name: "订单状态",
+      source: "订单系统、支付系统、退款记录",
+      fields: ["订单ID", "课程商品", "支付状态", "支付金额", "下单时间", "退款状态", "优惠使用"],
+      variables: [
+        { key: "order.paid_status", variable: "{{order.paid_status}}", meaning: "支付状态", defaultValue: "当前客户最新有效订单支付状态" },
+        { key: "order.product_name", variable: "{{order.product_name}}", meaning: "课程商品", defaultValue: "体验课、正价课或其他已购商品名称" },
+        { key: "order.paid_amount", variable: "{{order.paid_amount}}", meaning: "支付金额", defaultValue: "按权限脱敏后的订单金额区间" },
+        { key: "order.refund_status", variable: "{{order.refund_status}}", meaning: "退款状态", defaultValue: "是否存在退款申请、退款中或已退款" },
+        { key: "order.last_paid_time", variable: "{{order.last_paid_time}}", meaning: "最近下单时间", defaultValue: "最近一笔有效订单时间" }
+      ],
+      params: ["订单范围：当前客户全部有效订单", "退款订单：仅读状态不进入销售推断", "金额字段：按权限脱敏"],
+      usage: "用于确认客户购买阶段、是否已报名、是否存在退款或价格敏感相关判断。"
+    },
+    {
+      key: "已有标签",
+      name: "已有标签",
+      source: "当前已生效用户标签、人工标签、AI历史打标记录",
+      fields: ["标签名", "标签组", "来源", "生效状态", "更新时间", "人工修改标记"],
+      variables: [
+        { key: "tag.current_tags", variable: "{{tag.current_tags}}", meaning: "当前已生效标签", defaultValue: "当前客户全部生效标签，按标签组聚合" },
+        { key: "tag.manual_tags", variable: "{{tag.manual_tags}}", meaning: "人工标签", defaultValue: "销售或运营人工维护的标签" },
+        { key: "tag.ai_tags", variable: "{{tag.ai_tags}}", meaning: "AI历史打标", defaultValue: "AI自动打标历史结果及置信度" },
+        { key: "tag.rule_versions", variable: "{{tag.rule_versions}}", meaning: "规则版本", defaultValue: "当前生效标签对应的打标规则版本" },
+        { key: "tag.conflicts", variable: "{{tag.conflicts}}", meaning: "标签冲突", defaultValue: "语义冲突或互斥标签的当前状态" }
+      ],
+      params: ["读取范围：当前客户全部已生效标签", "来源区分：AI、人工", "冲突处理：人工标签优先"],
+      usage: "用于避免重复打标、识别标签冲突，并在规则冲突时优先保留人工维护结果。"
+    },
+    {
+      key: "用户业务数据",
+      name: "用户业务数据",
+      source: "业务系统扩展字段、运营导入数据",
+      fields: ["用户状态", "用户等级", "服务阶段", "业务分层", "运营备注", "外部导入字段"],
+      variables: [
+        { key: "business.user_status", variable: "{{business.user_status}}", meaning: "用户状态", defaultValue: "纯新用户、体验课用户、正价课用户等业务状态" },
+        { key: "business.user_level", variable: "{{business.user_level}}", meaning: "用户等级", defaultValue: "S/A/B/C等客户分层" },
+        { key: "business.service_stage", variable: "{{business.service_stage}}", meaning: "服务阶段", defaultValue: "当前角色流程或业务服务阶段" },
+        { key: "business.latest_followup_stage", variable: "{{business.latest_followup_stage}}", meaning: "最近跟进阶段", defaultValue: "销售或班主任最近一次跟进后的阶段结果" },
+        { key: "business.operation_note", variable: "{{business.operation_note}}", meaning: "运营备注", defaultValue: "已授权运营导入字段或备注信息" }
+      ],
+      params: ["字段范围：仅读取已授权业务字段", "缺失处理：不参与对应标签判断", "脱敏：按字段权限执行"],
+      usage: "用于补充系统化业务状态，避免 AI 把稳定状态类字段误当成普通语义标签。"
+    }
+  ];
+  const autoTagVisibleDataSourceConfigs = aiAutoTagDataSourceConfigs.filter((item) => ["用户沟通数据", "客户档案"].includes(item.key));
+  const activeAutoTagDataSource = autoTagVisibleDataSourceConfigs.find((item) => item.key === activeAutoTagDataSourceKey);
+  const aiTagReviewBatches = [
+    {
+      key: "tag-review-batch-20260826",
+      name: "2026-08-26 09:00 AI生成批次",
+      generatedAt: "2026-08-26 09:00",
+      trigger: "定时生成",
+      status: "待审核",
+      dataScope: "企业知识库、智能体提示词、用户沟通数据、客户档案、用户业务数据、现有标签数据",
+      summary: { newTags: 3, modified: 2, deleted: 1 },
+      changes: [
+        {
+          key: "new-tag-return-school",
+          type: "新增标签",
+          groupKey: "tag-group-child-problem",
+          groupName: "孩子问题画像",
+          tagName: "返校困难",
+          aiSuggestion: "近30天沟通中有较多家长反复提到孩子请假、拒绝上学、担心返校后再次冲突，独立用户数超过10人。",
+          ruleText: "AI打标依据：家长明确描述孩子存在不愿返校、返校后情绪明显波动、因学校场景持续逃避上学等情况，并且该问题是当前沟通核心诉求。排除条件：仅短期请假、偶发不想上学，或主要问题已由其他标签覆盖。"
+        },
+        {
+          key: "new-tag-parent-cooperation",
+          type: "新增标签",
+          groupKey: "tag-group-parent-awareness",
+          groupName: "家长认知阶段",
+          tagName: "愿意配合家庭作业",
+          aiSuggestion: "多名家长明确表示愿意按老师建议完成家庭沟通练习，适合后续班主任服务跟进。",
+          currentValue: "家长认知阶段中暂无该标签",
+          proposedValue: "新增标签：愿意配合家庭作业",
+          ruleText: "AI打标依据：家长明确表示愿意按建议完成家庭沟通练习、课后记录或亲子互动任务，并在后续对话中持续配合。排除条件：仅礼貌性回复“可以”但没有具体配合动作。"
+        },
+        {
+          key: "new-tag-case-sensitive",
+          type: "新增标签",
+          groupKey: "tag-group-purchase-intent",
+          groupName: "购买意向",
+          tagName: "重视同类案例",
+          aiSuggestion: "咨询转化中反复出现“有没有类似孩子案例”“别人家改善了吗”等决策信号。",
+          currentValue: "购买意向中暂无该标签",
+          proposedValue: "新增标签：重视同类案例",
+          ruleText: "AI打标依据：家长主动询问相似孩子、相似家庭或同类问题的服务案例，并把案例结果作为继续了解或购买决策依据。排除条件：销售单方面发送案例但家长没有表达关注。"
+        },
+        {
+          key: "modify-rule-price-sensitive",
+          type: "修改标签规则",
+          groupKey: "tag-group-purchase-intent",
+          groupName: "购买意向",
+          tagName: "价格敏感",
+          aiSuggestion: "原规则只关注价格提问，容易误判正常询价；建议增加预算压力、反复比较、优惠依赖等判定条件。",
+          currentValue: "当前生效：用户询问价格即可打标。",
+          proposedValue: "AI建议：需出现预算压力、反复比较或明确优惠诉求之一，且不是单次正常询价。",
+          ruleText: "AI打标依据：用户多次追问价格、分期、优惠、退款保障，或明确表达预算有限、需要比较其他机构。排除条件：仅首次了解价格、没有表现出预算压力或成交阻碍。"
+        },
+        {
+          key: "delete-tag-psychiatry",
+          type: "建议删除",
+          groupKey: "tag-group-product-interest",
+          groupName: "产品兴趣",
+          tagName: "精神科问诊意向",
+          aiSuggestion: "该标签容易与医疗诊断服务边界混淆，不适合作为销售运营标签直接启用。",
+          ruleText: "AI打标依据：该标签容易引导销售进入医疗诊断或问诊承诺边界，建议从标签库删除，相关内容只作为风险提醒或人工备注处理。"
+        }
+      ]
+    },
+    {
+      key: "tag-review-batch-20260819",
+      name: "2026-08-19 09:00 AI生成批次",
+      generatedAt: "2026-08-19 09:00",
+      trigger: "手动生成",
+      status: "已通过",
+      dataScope: "用户沟通数据、客户档案、现有标签数据",
+      summary: { newTags: 2, modified: 1, deleted: 0 },
+      changes: []
+    }
+  ];
+  const activeTagReviewBatch = aiTagReviewBatches.find((item) => item.key === activeTagReviewBatchKey) || aiTagReviewBatches[0];
+  const tagReviewDetailBatch = aiTagReviewBatches.find((item) => item.key === tagReviewDetailBatchKey);
+  const pendingReviewCount = aiTagReviewBatches.filter((item) => item.status === "待审核").length;
+  const tagReviewBatchColumns = [
+    { title: "AI生成批次", dataIndex: "name", width: 190 },
+    { title: "生成方式", dataIndex: "trigger", width: 86 },
+    {
+      title: "待审核变更",
+      dataIndex: "summary",
+      width: 190,
+      render: (summary) => `新增${summary.newTags} / 修改${summary.modified} / 删除${summary.deleted}`
+    },
+    { title: "状态", dataIndex: "status", width: 86, render: (status) => <Tag color={status === "待审核" ? "processing" : "success"}>{status}</Tag> },
+    { title: "操作", width: 90, render: (_, record) => <Button type="link" size="small" onClick={() => openTagReviewDetail(record)}>查看详情</Button> }
+  ];
+  const aiAutoTagRecords = [
+    {
+      key: "auto-tag-record-20260826-0900",
+      name: "2026-08-26 09:00 自动打标批次",
+      executedAt: "2026-08-26 09:00",
+      trigger: "定时执行",
+      scannedUsers: 286,
+      addedTags: 43,
+      removedTags: 8,
+      modifiedTags: 16,
+      details: [
+        { key: "auto-tag-detail-1", customerKey: "c1", customerName: "张妈妈", role: "销售", operation: "新增", tag: "高意向", reason: "最近完整对话中主动询问班型、课时安排和报名路径，客户档案显示已完成体验课但未确认正价课，符合高意向规则。" },
+        { key: "auto-tag-detail-2", customerKey: "c2", customerName: "王妈妈", role: "销售", operation: "修改", tag: "适合推测评", reason: "原标签依据为单次咨询，本次结合多轮用户主动表达阅读理解困难和希望先了解孩子水平，规则依据更新为测评承接。" },
+        { key: "auto-tag-detail-3", customerKey: "c3", customerName: "赵妈妈", role: "班主任", operation: "删除", tag: "低意向", reason: "用户后续主动补充希望了解正价课服务和老师安排，低意向标签与最新沟通证据冲突，建议移除。" }
+      ]
+    },
+    {
+      key: "auto-tag-record-20260825-0900",
+      name: "2026-08-25 09:00 自动打标批次",
+      executedAt: "2026-08-25 09:00",
+      trigger: "定时执行",
+      scannedUsers: 251,
+      addedTags: 36,
+      removedTags: 5,
+      modifiedTags: 11,
+      details: [
+        { key: "auto-tag-detail-4", customerKey: "c4", customerName: "陈妈妈", role: "销售", operation: "新增", tag: "需要案例验证", reason: "用户多次询问是否有类似孩子改善案例，且未继续追问价格，符合案例验证型决策规则。" },
+        { key: "auto-tag-detail-5", customerKey: "c5", customerName: "许妈妈", role: "班主任", operation: "新增", tag: "家长高焦虑", reason: "对话中反复出现担心孩子状态、怕错过干预时间等表达，客户档案中也记录家长焦虑明显。" }
+      ]
+    }
+  ];
+  const openAiAutoTagRecordDetail = (record) => {
+    setAiAutoTagRecordDetail(record);
+  };
+  const viewAiAutoTagCustomerTags = (record) => {
+    onViewConversation?.({ key: record.customerKey, name: record.customerName });
+    setAiAutoTagRecordDetail(null);
+    setAiAutoTagRecordOpen(false);
+  };
+  const aiAutoTagRecordColumns = [
+    { title: "打标批次", dataIndex: "name", width: 220 },
+    { title: "执行方式", dataIndex: "trigger", width: 90 },
+    { title: "扫描用户", dataIndex: "scannedUsers", width: 90, align: "right" },
+    { title: "新增标签", dataIndex: "addedTags", width: 90, align: "right" },
+    { title: "移除标签", dataIndex: "removedTags", width: 90, align: "right" },
+    { title: "修改标签", dataIndex: "modifiedTags", width: 90, align: "right" },
+    { title: "操作", width: 92, render: (_, record) => <Button type="link" size="small" onClick={() => openAiAutoTagRecordDetail(record)}>查看详情</Button> }
+  ];
+  const aiAutoTagRecordDetailColumns = [
+    { title: "打标对象", dataIndex: "customerName", width: 100, render: (value, record) => <Button type="link" size="small" onClick={() => viewAiAutoTagCustomerTags(record)}>{value}</Button> },
+    { title: "角色", dataIndex: "role", width: 80, render: (value) => <Tag color={value === "班主任" ? "cyan" : "blue"}>{value}</Tag> },
+    { title: "操作类型", dataIndex: "operation", width: 92, render: (value) => <Tag color={value === "新增" ? "success" : value === "删除" ? "error" : "processing"}>{value}</Tag> },
+    { title: "标签", dataIndex: "tag", width: 120 },
+    { title: "打标原因", dataIndex: "reason", render: (value) => <Text type="secondary">{value}</Text> },
+    { title: "操作", width: 118, render: (_, record) => <Button type="link" size="small" onClick={() => viewAiAutoTagCustomerTags(record)}>查看用户标签</Button> }
+  ];
+  const toggleAutoTagVariable = (sourceKey, variableKey) => {
+    setSelectedAutoTagVariables((current) => {
+      const selectedKeys = current[sourceKey] || [];
+      const nextKeys = selectedKeys.includes(variableKey)
+        ? selectedKeys.filter((key) => key !== variableKey)
+        : [...selectedKeys, variableKey];
+      return { ...current, [sourceKey]: nextKeys };
+    });
+  };
+  const addAutoTagTriggerRule = (type) => {
+    if (type === "friendDay") {
+      setAutoTagFriendDayRules((items) => [...items, (items[items.length - 1] || 0) + 2]);
+      return;
+    }
+    setAutoTagMessageCountRules((items) => [...items, (items[items.length - 1] || 0) + 10]);
+  };
+  const removeAutoTagTriggerRule = (type, index) => {
+    if (type === "friendDay") {
+      setAutoTagFriendDayRules((items) => items.filter((_, itemIndex) => itemIndex !== index));
+      return;
+    }
+    setAutoTagMessageCountRules((items) => items.filter((_, itemIndex) => itemIndex !== index));
+  };
+  const autoTagVariableColumns = [
+    {
+      title: "选择",
+      width: 62,
+      render: (_, record) => (
+        <Checkbox
+          checked={(selectedAutoTagVariables[activeAutoTagDataSource?.key] || []).includes(record.key)}
+          onChange={() => toggleAutoTagVariable(activeAutoTagDataSource.key, record.key)}
+        />
+      )
+    },
+    { title: "变量字段", dataIndex: "meaning", width: 150 },
+    { title: "变量标识", dataIndex: "variable", width: 220, render: (value) => <Text code>{value}</Text> },
+    { title: "默认取数", dataIndex: "defaultValue" }
+  ];
 
   const openGroupModal = (group = null) => {
     setEditingGroup(group);
@@ -3547,6 +4832,7 @@ function TagLibraryPage() {
       if (group.key !== groupKey || group.tags.includes(tagName)) return group;
       return { ...group, tags: [...group.tags, tagName] };
     }));
+    setManualTagSources((items) => ({ ...items, [`${groupKey}:${tagName}`]: true }));
     setTagDrafts((items) => ({ ...items, [groupKey]: "" }));
   };
   const removeTag = (groupKey, tagName) => {
@@ -3564,17 +4850,250 @@ function TagLibraryPage() {
       onOk: () => setGroups((items) => items.filter((item) => item.key !== group.key))
     });
   };
-  const syncWecomTags = () => {
-    message.success("已同步企微标签，新增 3 个标签组、18 个标签（原型模拟）");
+  const moveGroup = (groupKey, direction) => {
+    setGroups((items) => {
+      const currentIndex = items.findIndex((item) => item.key === groupKey);
+      const nextIndex = currentIndex + direction;
+      if (currentIndex < 0 || nextIndex < 0 || nextIndex >= items.length) return items;
+      const nextItems = [...items];
+      [nextItems[currentIndex], nextItems[nextIndex]] = [nextItems[nextIndex], nextItems[currentIndex]];
+      return nextItems;
+    });
   };
+  const generateAiTagSuggestion = () => {
+    setAiTagAgentOpen(false);
+    setTagReviewModalOpen(true);
+    setActiveTagReviewBatchKey("tag-review-batch-20260826");
+    message.success("已生成标签体系建议，请在AI生成标签库记录中审核后生效");
+  };
+  function openTagReviewDetail(record) {
+    setActiveTagReviewBatchKey(record.key);
+    setTagReviewDetailBatchKey(record.key);
+    setTagReviewModalOpen(false);
+  }
+  const getTagRuleKey = (group, tag) => `${group.key}:${tag}`;
+  const getReviewChangeKey = (batch, change) => `${batch.key}:${change.key}`;
+  const updateAiSourceForTags = (groupKey, tags) => {
+    setAiApprovedTagSources((items) => {
+      const next = { ...items };
+      tags.forEach((tag) => {
+        next[`${groupKey}:${tag}`] = true;
+      });
+      return next;
+    });
+  };
+  const applyTagReviewChange = (batch, change, options = {}) => {
+    if (change.type === "新增标签") {
+      setGroups((items) => items.map((group) => {
+        if (group.key !== change.groupKey || group.tags.includes(change.tagName)) return group;
+        return { ...group, tags: [...group.tags, change.tagName] };
+      }));
+      updateAiSourceForTags(change.groupKey, [change.tagName]);
+      if (options.ruleText) {
+        setManualTagRules((items) => ({ ...items, [`${change.groupKey}:${change.tagName}`]: options.ruleText }));
+      }
+      return;
+    }
+    if (change.type === "修改标签规则") {
+      setManualTagRules((items) => ({ ...items, [`${change.groupKey}:${change.tagName}`]: options.ruleText || change.ruleText }));
+      return;
+    }
+    if (change.type === "建议删除") {
+      setGroups((items) => items.map((group) => (
+        group.key === change.groupKey ? { ...group, tags: group.tags.filter((tag) => tag !== change.tagName) } : group
+      )));
+    }
+  };
+  const reviewChangeDecision = (batch, change, decision) => {
+    const key = getReviewChangeKey(batch, change);
+    const ruleText = reviewRuleDrafts[key] || change.ruleText;
+    setTagReviewDecisions((items) => ({ ...items, [key]: decision }));
+    if (decision === "通过") {
+      applyTagReviewChange(batch, change, { ruleText });
+      message.success(`${change.type}已${decision}，已同步到当前标签库`);
+    } else {
+      message.info(`${change.type}已驳回`);
+    }
+  };
+  const getTagMeta = (group, tag) => {
+    const key = getTagRuleKey(group, tag);
+    const isManual = Boolean(manualTagSources[key]) || (!aiGeneratedTagValues.has(tag) && !aiApprovedTagSources[key]);
+    const isRuleEdited = Boolean(manualTagRules[key]);
+    return {
+      source: isManual ? "人工新增" : "AI生成",
+      ruleStatus: isRuleEdited ? "人工已改" : "AI规则",
+      status: group.status === "停用" ? "已停用" : "已生效",
+      sourceIcon: isManual ? <UserOutlined /> : <RobotOutlined />,
+      ruleIcon: isRuleEdited ? <EditOutlined /> : null
+    };
+  };
+  const tagSourceIcon = (meta) => (
+    <Tooltip title={meta.source}>
+      <span className={`tag-source-icon ${meta.source === "AI生成" ? "is-ai" : "is-manual"}`} aria-label={meta.source}>
+        {meta.sourceIcon}
+      </span>
+    </Tooltip>
+  );
+  const tagRuleEditedIcon = (meta) => meta.ruleIcon ? (
+    <Tooltip title="人工已改，优先使用人工规则">
+      <span className="tag-rule-edited-icon" aria-label="人工已改">
+        {meta.ruleIcon}
+      </span>
+    </Tooltip>
+  ) : null;
+  const openTagRuleDetail = (group, tag) => {
+    const detail = { group, tag };
+    const rule = getTagRuleDetail(detail);
+    setTagRuleDetail(detail);
+    setTagRuleDraft(manualTagRules[getTagRuleKey(group, tag)] || rule.ruleText);
+  };
+  const getTagGroupReason = (group) => ({
+    title: `${group.name} · AI生成逻辑`,
+    reason: `AI 根据企业知识库、用户沟通数据、客户档案、用户业务数据和现有标签数据，将高频且具备销售跟进价值的用户特征聚类为「${group.name}」。`,
+    data: ["近30天家长沟通记录", "体验课与课程行为", "客户档案中的核心诉求", "现有标签库去重结果"],
+    logic: ["按用户维度聚合核心诉求", "过滤少于10个独立用户提及的偶发样本", "排除医疗诊断、隐私和负面定性标签", "保留可被销售、班主任或市场用于服务跟进的标签"]
+  });
+  const getTagRuleDetail = (detail) => {
+    if (!detail) return null;
+    const { group, tag } = detail;
+    return {
+      title: `${tag} · 标签AI打标规则`,
+      description: `用于识别「${group.name}」下的「${tag}」用户特征，辅助销售和班主任判断后续沟通策略。`,
+      ruleText: `AI打标依据：
+1. 用户在沟通中明确表达与「${tag}」相关的核心问题或决策顾虑。
+2. 该特征在最近多轮会话中反复出现，或与课程行为、客户档案信息相互印证。
+3. 表达强度达到核心痛点，不是偶尔提及或泛泛抱怨。
+
+排除条件：
+1. 只在单条消息中偶然出现，缺少上下文支撑。
+2. 语义更接近已有标签，应优先合并到已有标签。
+3. 涉及医疗诊断、隐私信息或负面定性，不直接生成标签。
+
+证据样例：
+1. “孩子现在主要问题就是${tag}，我们不知道怎么处理。”
+2. “老师反馈也提到${tag}这块比较明显。”
+3. “如果后面课程能解决${tag}，我们愿意继续了解。”`
+    };
+  };
+  const saveTagRuleDetail = () => {
+    if (!tagRuleDetail) return;
+    setManualTagRules((items) => ({
+      ...items,
+      [getTagRuleKey(tagRuleDetail.group, tagRuleDetail.tag)]: tagRuleDraft
+    }));
+    setTagRuleDetail(null);
+    message.success("标签打标规则已保存，人工修改后优先于AI生成规则");
+  };
+  const getReviewChangeContent = (change) => `${change.groupName}${change.tagName ? ` / ${change.tagName}` : ""}`;
+  const tagReviewDetailColumns = [
+    {
+      title: "变更类型",
+      dataIndex: "type",
+      width: 116,
+      render: (type) => <Tag color={type === "建议删除" ? "error" : type === "修改标签规则" ? "warning" : "blue"}>{type}</Tag>
+    },
+    {
+      title: "变更内容",
+      width: 180,
+      render: (_, record) => <Text>{getReviewChangeContent(record)}</Text>
+    },
+    {
+      title: "AI判断原因",
+      dataIndex: "aiSuggestion",
+      width: 260,
+      render: (value) => <Text className="tag-review-wrap-text">{value}</Text>
+    },
+    {
+      title: "AI打标依据",
+      dataIndex: "ruleText",
+      width: 360,
+      render: (value, record) => {
+        const decisionKey = getReviewChangeKey(tagReviewDetailBatch, record);
+        return (
+          <Input.TextArea
+            rows={4}
+            value={reviewRuleDrafts[decisionKey] ?? value ?? ""}
+            onChange={(event) => setReviewRuleDrafts((items) => ({ ...items, [decisionKey]: event.target.value }))}
+          />
+        );
+      }
+    },
+    {
+      title: "操作",
+      width: 120,
+      fixed: "right",
+      render: (_, record) => {
+        const decision = tagReviewDecisions[getReviewChangeKey(tagReviewDetailBatch, record)];
+        return decision ? (
+          <Tag color={decision === "驳回" ? "default" : "success"}>{decision}</Tag>
+        ) : (
+          <Space size={4}>
+            <Button type="link" size="small" onClick={() => reviewChangeDecision(tagReviewDetailBatch, record, "驳回")}>驳回</Button>
+            <Button type="link" size="small" onClick={() => reviewChangeDecision(tagReviewDetailBatch, record, "通过")}>通过</Button>
+          </Space>
+        );
+      }
+    }
+  ];
+  const renderTagReviewDetailPage = () => {
+    if (!tagReviewDetailBatch) return null;
+    return (
+      <Space direction="vertical" size={16} className="page-stack tag-review-page">
+        <Card>
+          <div className="tag-review-page-head">
+            <Space size={10}>
+              <Button icon={<ArrowLeftOutlined />} onClick={() => setTagReviewDetailBatchKey(null)}>返回标签库</Button>
+              <div>
+                <Text className="tag-review-page-title">{tagReviewDetailBatch.name}</Text>
+                <Text type="secondary">AI生成记录审核详情</Text>
+              </div>
+            </Space>
+            <Tag color={tagReviewDetailBatch.status === "待审核" ? "processing" : "success"}>{tagReviewDetailBatch.status}</Tag>
+          </div>
+        </Card>
+        <Card className="tag-review-summary-card">
+          <Text className="tag-review-title">批次摘要</Text>
+          <Descriptions size="small" column={4}>
+            <Descriptions.Item label="生成时间">{tagReviewDetailBatch.generatedAt}</Descriptions.Item>
+            <Descriptions.Item label="生成方式">{tagReviewDetailBatch.trigger}</Descriptions.Item>
+            <Descriptions.Item label="新增标签">{tagReviewDetailBatch.summary.newTags}</Descriptions.Item>
+            <Descriptions.Item label="修改规则">{tagReviewDetailBatch.summary.modified}</Descriptions.Item>
+            <Descriptions.Item label="建议删除">{tagReviewDetailBatch.summary.deleted}</Descriptions.Item>
+            <Descriptions.Item label="数据范围" span={2}>{tagReviewDetailBatch.dataScope}</Descriptions.Item>
+          </Descriptions>
+        </Card>
+        <Card className="tag-review-table-card">
+          <Table
+            size="small"
+            rowKey="key"
+            columns={tagReviewDetailColumns}
+            dataSource={tagReviewDetailBatch.changes}
+            pagination={false}
+            scroll={{ x: 1120 }}
+            className="tag-review-detail-table"
+          />
+        </Card>
+      </Space>
+    );
+  };
+
+  if (tagReviewDetailBatchKey) {
+    return renderTagReviewDetailPage();
+  }
 
   return (
     <Space direction="vertical" size={16} className="page-stack tag-library-page">
-      <Card
-        title={<PanelTitle title="标签库管理" desc="维护受控标签体系，标签组可按部门角色使用，并控制 AI 是否允许自动给客户打标签。" extra={<><Button type="primary" icon={<PlusOutlined />} onClick={() => openGroupModal()}>添加标签组</Button><Button icon={<CloudSyncOutlined />} onClick={syncWecomTags}>同步企微标签</Button></>} />}
-      >
+      <Card>
         <div className="tag-filter-panel">
-          <Space wrap size={16}>
+          <Space className="tag-filter-actions">
+            <Button icon={<RobotOutlined />} onClick={() => setAiTagAgentOpen(true)}>AI智能生成标签</Button>
+            <Badge count={pendingReviewCount} size="small">
+              <Button icon={<FileSearchOutlined />} onClick={() => setTagReviewModalOpen(true)}>AI生成标签库记录</Button>
+            </Badge>
+            <Button icon={<ClockCircleOutlined />} onClick={() => setAiAutoTagConfigOpen(true)}>AI自动打标配置</Button>
+            <Button icon={<TagsOutlined />} onClick={() => setAiAutoTagRecordOpen(true)}>AI打标记录</Button>
+          </Space>
+          <Space wrap size={16} className="tag-filter-fields">
             <Space>
               <Text>部门角色：</Text>
               <Select value={roleFilter} options={roleFilterOptions} onChange={setRoleFilter} className="tag-role-select" />
@@ -3583,52 +5102,88 @@ function TagLibraryPage() {
               <Text>搜索：</Text>
               <Input.Search value={keyword} placeholder="请输入标签组或标签" allowClear onChange={(event) => setKeyword(event.target.value)} className="tag-search-input" />
             </Space>
+            <Button onClick={() => { setRoleFilter("全部部门角色"); setKeyword(""); }}>重置</Button>
           </Space>
-          <Button onClick={() => { setRoleFilter("全部部门角色"); setKeyword(""); }}>重置</Button>
         </div>
-        <div className="tag-library-summary">共{totalTags}个标签</div>
+        <div className="tag-library-summary">
+          <Text className="tag-library-summary-text">共{totalTags}个标签</Text>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => openGroupModal()}>新增标签组</Button>
+        </div>
         <div className="tag-group-list">
-          {filteredGroups.map((group) => (
-            <Card
-              key={group.key}
-              className="tag-group-card"
-              title={
+          {filteredGroups.map((group) => {
+            const groupIndex = groups.findIndex((item) => item.key === group.key);
+            return (
+              <Card
+                key={group.key}
+                className="tag-group-card"
+              >
                 <div className="tag-group-head">
-                  <Space wrap size={8}>
-                    <span className="tag-group-accent" />
-                    <Title level={4}>{group.name}</Title>
-                    <Text type="secondary">（共{group.tags.length}个标签）</Text>
-                  </Space>
-                  <Space size={10}>
-                    <Text type="secondary">允许AI自动打标</Text>
-                    <Switch size="small" checked={group.aiWritable} onChange={(checked) => setGroups((items) => items.map((item) => item.key === group.key ? { ...item, aiWritable: checked } : item))} />
-                    <Button type="link" size="small" onClick={() => openGroupModal(group)}>编辑</Button>
-                    <Button type="link" size="small" danger onClick={() => deleteGroup(group)}>删除</Button>
-                  </Space>
+                  <div className="tag-group-main">
+                    <Space wrap size={8} className="tag-group-title">
+                      <span className="tag-group-accent" />
+                      <Title level={4}>{group.name}</Title>
+                      <Tooltip title="查看AI生成逻辑">
+                        <Button
+                          type="link"
+                          size="small"
+                          className="tag-group-ai-reason"
+                          onClick={() => setTagGroupReason(getTagGroupReason(group))}
+                        >
+                          AI
+                        </Button>
+                      </Tooltip>
+                      <Text type="secondary">（共{group.tags.length}个标签）</Text>
+                    </Space>
+                    <Space size={6} className="tag-group-actions">
+                      <Text type="secondary">允许AI自动打标</Text>
+                      <Switch size="small" checked={group.aiWritable} onChange={(checked) => setGroups((items) => items.map((item) => item.key === group.key ? { ...item, aiWritable: checked } : item))} />
+                      <Button type="link" size="small" disabled={groupIndex <= 0} onClick={() => moveGroup(group.key, -1)}>上移</Button>
+                      <Button type="link" size="small" disabled={groupIndex === groups.length - 1} onClick={() => moveGroup(group.key, 1)}>下移</Button>
+                      <Button type="link" size="small" onClick={() => openGroupModal(group)}>编辑</Button>
+                      <Button type="link" size="small" danger onClick={() => deleteGroup(group)}>删除</Button>
+                    </Space>
+                  </div>
                 </div>
-              }
-            >
-              <div className="tag-group-meta">
-                <Text type="secondary">适用部门角色：</Text>
-                <Space wrap size={[6, 6]}>{group.roles.map((role) => <Tag color="blue" key={role}>{role}</Tag>)}</Space>
-                <Tag color={group.aiWritable ? "success" : "default"}>{group.aiWritable ? "允许AI自动打标" : "禁止AI自动打标"}</Tag>
-              </div>
-              <div className="tag-chip-row">
-                {group.tags.map((tag) => (
-                  <Tag closable key={tag} onClose={(event) => { event.preventDefault(); removeTag(group.key, tag); }}>{tag}</Tag>
-                ))}
-              </div>
-              <div className="tag-add-row">
-                <Button icon={<PlusOutlined />} onClick={() => addTag(group.key)}>添加</Button>
-                <Input
-                  value={tagDrafts[group.key] || ""}
-                  placeholder="输入后回车"
-                  onChange={(event) => setTagDrafts((items) => ({ ...items, [group.key]: event.target.value }))}
-                  onPressEnter={() => addTag(group.key)}
-                />
-              </div>
-            </Card>
-          ))}
+                <div className="tag-group-content">
+                  <div className="tag-group-meta">
+                    <Text type="secondary">适用部门角色：</Text>
+                    <Space wrap size={[6, 6]}>{group.roles.map((role) => <Tag color="blue" key={role}>{role}</Tag>)}</Space>
+                    <Tag color={group.aiWritable ? "success" : "default"}>{group.aiWritable ? "允许AI自动打标" : "禁止AI自动打标"}</Tag>
+                  </div>
+                  <div className="tag-chip-row">
+                    {group.tags.map((tag) => {
+                      const meta = getTagMeta(group, tag);
+                      return (
+                        <Tooltip title="点击标签查看AI打标规则" key={tag}>
+                          <Tag
+                            closable
+                            className="tag-rule-chip"
+                            onClick={() => openTagRuleDetail(group, tag)}
+                            onClose={(event) => { event.preventDefault(); event.stopPropagation(); removeTag(group.key, tag); }}
+                          >
+                            <span className="tag-rule-chip-content">
+                              <span>{tag}</span>
+                              {tagSourceIcon(meta)}
+                              {tagRuleEditedIcon(meta)}
+                            </span>
+                          </Tag>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                  <div className="tag-add-row">
+                    <Button icon={<PlusOutlined />} onClick={() => addTag(group.key)}>添加</Button>
+                    <Input
+                      value={tagDrafts[group.key] || ""}
+                      placeholder="输入后回车"
+                      onChange={(event) => setTagDrafts((items) => ({ ...items, [group.key]: event.target.value }))}
+                      onPressEnter={() => addTag(group.key)}
+                    />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </Card>
       <Modal
@@ -3658,25 +5213,865 @@ function TagLibraryPage() {
           </Form.Item>
         </Form>
       </Modal>
+      <Drawer
+        title="AI标签生成管理智能体"
+        open={aiTagAgentOpen}
+        onClose={() => setAiTagAgentOpen(false)}
+        width={860}
+        className="ai-tag-agent-drawer"
+        extra={<Space><Button onClick={() => setAiTagAgentOpen(false)}>关闭</Button><Button type="primary" icon={<RobotOutlined />} onClick={generateAiTagSuggestion}>生成标签体系</Button></Space>}
+      >
+        <Space direction="vertical" size={16} className="full-width">
+          <Card size="small" title="生成配置" className="ai-tag-agent-card">
+            <Form layout="vertical" initialValues={{
+              dataScope: ["企业知识库", "智能体提示词", "用户沟通数据"],
+              roles: ["市场", "销售", "班主任"],
+              goals: ["生成标签组", "生成标签内容", "生成AI打标规则"],
+              conversationFriendMonths: 3,
+              conversationMessageMinCount: 20
+            }}>
+              <Form.Item label="输入数据范围" name="dataScope">
+                <Checkbox.Group className="ai-tag-agent-data-source-list">
+                  {aiTagAgentDataSourceConfigs.map((item) => (
+                    <div className="ai-tag-agent-data-source-row" key={item.key}>
+                      <Checkbox value={item.key}>{item.name}</Checkbox>
+                      <Text type="secondary">{item.desc}</Text>
+                      <Button type="link" size="small" onClick={() => setActiveAiTagAgentDataSourceKey(item.key)}>配置</Button>
+                    </div>
+                  ))}
+                </Checkbox.Group>
+              </Form.Item>
+              <Form.Item label="适用部门角色" name="roles">
+                <Select mode="multiple" options={tagRoleOptions} />
+              </Form.Item>
+              <Form.Item label="生成目标" name="goals">
+                <Select mode="multiple" options={["生成标签组", "生成标签内容", "生成AI打标规则"].map((value) => ({ value }))} />
+              </Form.Item>
+              <Form.Item label="提示词配置">
+                <Input.TextArea
+                  rows={24}
+                  defaultValue={aiTagAgentPrompt}
+                />
+              </Form.Item>
+            </Form>
+          </Card>
+        </Space>
+      </Drawer>
+      <Modal
+        title={activeAiTagAgentDataSource?.configTitle || "输入数据配置"}
+        open={Boolean(activeAiTagAgentDataSource)}
+        onCancel={() => setActiveAiTagAgentDataSourceKey(null)}
+        footer={<Button type="primary" onClick={() => setActiveAiTagAgentDataSourceKey(null)}>确定</Button>}
+        width={820}
+        className="ai-tag-agent-data-source-modal"
+      >
+        {activeAiTagAgentDataSourceKey === "企业知识库" ? (
+          <div className="ai-tag-agent-source-config">
+            <div className="ai-tag-agent-config-tip">选择现有知识库里的文件作为标签生成依据。文件内容会进入 AI 标签生成的业务背景，不直接作为最终标签结果。</div>
+            <Checkbox.Group value={selectedAiTagKnowledgeFiles} onChange={setSelectedAiTagKnowledgeFiles} className="ai-tag-agent-resource-list">
+              {aiTagKnowledgeFileRows.map((item) => (
+                <div className="ai-tag-agent-resource-row" key={item.key}>
+                  <Checkbox value={item.key}>{item.name}</Checkbox>
+                  <Text type="secondary">{item.path}</Text>
+                  <Tag>{item.contentType}</Tag>
+                </div>
+              ))}
+            </Checkbox.Group>
+          </div>
+        ) : null}
+        {activeAiTagAgentDataSourceKey === "智能体提示词" ? (
+          <div className="ai-tag-agent-source-config">
+            <Checkbox.Group value={selectedAiTagPromptAgents} onChange={setSelectedAiTagPromptAgents} className="ai-tag-agent-prompt-list">
+              {aiTagPromptAgentRows.map((item) => (
+                <div className="ai-tag-agent-prompt-row" key={item.key}>
+                  <Checkbox value={item.key}>{item.name}</Checkbox>
+                  <Tag color={item.category === "策略智能体" ? "purple" : "blue"}>{item.category}</Tag>
+                </div>
+              ))}
+            </Checkbox.Group>
+          </div>
+        ) : null}
+        {activeAiTagAgentDataSourceKey === "用户沟通数据" ? (
+          <div className="ai-tag-agent-source-config">
+            <div className="ai-tag-agent-config-tip">配置用于 AI 分析的真实用户对话样本。系统会筛选最近 x 个月加好友、且用户发出的对话条数超过 x 条的用户，并提供这些人群与 AI 的完整对话内容。</div>
+            <Form layout="vertical" className="ai-tag-agent-conversation-form">
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="最近 x 个月加的好友">
+                    <InputNumber min={1} max={24} defaultValue={3} addonAfter="个月" className="full-width" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="用户发出的对话条数超过 x 条">
+                    <InputNumber min={1} max={500} defaultValue={20} addonAfter="条" className="full-width" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Descriptions size="small" column={1} bordered>
+                <Descriptions.Item label="数据口径">用户发出的消息用于筛选样本；给 AI 的数据输入为筛选后用户与 AI 的完整对话内容。</Descriptions.Item>
+                <Descriptions.Item label="适用场景">用于发现真实沟通中的高频痛点、需求表达、产品兴趣、购买顾虑和风险信号。</Descriptions.Item>
+              </Descriptions>
+              <div className="ai-tag-agent-upload-block">
+                <Text className="ai-tag-agent-upload-title">上传导入用户对话数据文件</Text>
+                <Upload.Dragger multiple beforeUpload={() => false} accept=".csv,.xlsx,.xls,.txt,.json,.doc,.docx">
+                  <p className="ant-upload-drag-icon"><UploadOutlined /></p>
+                  <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+                  <p className="ant-upload-hint">支持企业提供的代表性用户对话数据，原型阶段仅展示导入入口。</p>
+                </Upload.Dragger>
+              </div>
+            </Form>
+          </div>
+        ) : null}
+      </Modal>
+      <Modal
+        title="AI生成标签库记录"
+        open={tagReviewModalOpen}
+        onCancel={() => setTagReviewModalOpen(false)}
+        footer={<Button onClick={() => setTagReviewModalOpen(false)}>关闭</Button>}
+        width={860}
+        className="tag-review-record-modal"
+      >
+        <Table
+          size="small"
+          rowKey="key"
+          columns={tagReviewBatchColumns}
+          dataSource={aiTagReviewBatches}
+          pagination={false}
+          rowClassName={(record) => record.key === activeTagReviewBatch.key ? "tag-review-batch-row active" : "tag-review-batch-row"}
+          onRow={(record) => ({ onClick: () => setActiveTagReviewBatchKey(record.key) })}
+        />
+      </Modal>
+      <Drawer
+        title="AI自动打标配置"
+        open={aiAutoTagConfigOpen}
+        onClose={() => setAiAutoTagConfigOpen(false)}
+        width={760}
+        className="ai-auto-tagging-drawer"
+        extra={<Space><Button onClick={() => setAiAutoTagConfigOpen(false)}>关闭</Button><Button type="primary" onClick={() => { setAiAutoTagConfigOpen(false); message.success("AI自动打标配置已保存"); }}>保存配置</Button></Space>}
+      >
+        <Form form={autoTagConfigForm} layout="vertical" initialValues={{
+          enabled: true,
+          roleScope: ["销售", "班主任"],
+          executeDelayDays: "后 1 天",
+          executeTime: "00:00",
+          dataScope: ["用户沟通数据", "客户档案"],
+          logic: `请基于已生效标签库和每个标签的AI打标规则，对符合执行范围的用户进行自动打标判断。
+
+执行原则：
+1. 仅允许对已开启“允许AI自动打标”的标签组执行自动打标。
+2. 每个标签必须依据该标签当前生效的打标规则判断，人工修改过的规则优先于AI生成规则。
+3. 判断依据必须来自用户沟通数据或客户档案，不得凭空推断。
+   用户沟通数据默认读取要打标签用户的全部对话数据；客户档案默认读取企业给到的客户档案数据。
+4. 用户只在单条消息中偶然提及，不应直接打标，除非与历史沟通或客户档案相互印证。
+5. 新增标签、移除标签、保持不变都需要输出判断原因。
+6. 对低置信度、敏感风险、可能涉及医疗诊断或负面定性的结果，不自动写入敏感结论，仅记录为待关注原因。
+7. 如果多个标签语义冲突，优先保留证据更充分、业务含义更明确的标签。
+8. 输出结果必须包含：用户、角色、标签、变更类型、判断依据、置信度、触发规则和执行时间。`
+        }}>
+          <Card size="small" title="执行配置" className="ai-auto-tagging-card">
+            <Row gutter={16}>
+              <Col span={12}><Form.Item label="启用自动打标" name="enabled" valuePropName="checked"><Switch checkedChildren="启用" unCheckedChildren="停用" /></Form.Item></Col>
+              <Col span={12}><Form.Item label="角色选择" name="roleScope"><Select mode="multiple" options={["销售", "班主任"].map((value) => ({ value }))} /></Form.Item></Col>
+              <Col span={24}>
+                <Form.Item label="执行对象规则">
+                  <div className="ai-auto-tag-trigger-panel">
+                    <div className="ai-auto-tag-trigger-tip">满足任一条件即执行：加好友天数规则和用户发出消息条数规则是或的关系。</div>
+                    <div className="ai-auto-tag-trigger-grid">
+                      <div className="ai-auto-tag-trigger-card">
+                        <div className="ai-auto-tag-trigger-card-head">
+                          <Text className="ai-auto-tag-trigger-title">加好友第 X 天</Text>
+                          <Button type="link" size="small" icon={<PlusOutlined />} onClick={() => addAutoTagTriggerRule("friendDay")}>添加</Button>
+                        </div>
+                        <div className="ai-auto-tag-trigger-list">
+                          {autoTagFriendDayRules.map((value, index) => (
+                            <div className="ai-auto-tag-trigger-row" key={`friend-day-${index}`}>
+                              <Text className="ai-auto-tag-trigger-prefix">加好友第</Text>
+                              <InputNumber min={1} max={365} value={value} onChange={(nextValue) => setAutoTagFriendDayRules((items) => items.map((item, itemIndex) => itemIndex === index ? nextValue || 1 : item))} />
+                              <Text className="ai-auto-tag-trigger-suffix">天打一次标签</Text>
+                              <Button type="link" size="small" danger onClick={() => removeAutoTagTriggerRule("friendDay", index)}>删除</Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="ai-auto-tag-trigger-card">
+                        <div className="ai-auto-tag-trigger-card-head">
+                          <Text className="ai-auto-tag-trigger-title">用户发出的会话信息条数超过 X 条</Text>
+                          <Button type="link" size="small" icon={<PlusOutlined />} onClick={() => addAutoTagTriggerRule("messageCount")}>添加</Button>
+                        </div>
+                        <div className="ai-auto-tag-trigger-list">
+                          {autoTagMessageCountRules.map((value, index) => (
+                            <div className="ai-auto-tag-trigger-row" key={`message-count-${index}`}>
+                              <Text className="ai-auto-tag-trigger-prefix">用户发出消息超过</Text>
+                              <InputNumber min={1} max={1000} value={value} onChange={(nextValue) => setAutoTagMessageCountRules((items) => items.map((item, itemIndex) => itemIndex === index ? nextValue || 1 : item))} />
+                              <Text className="ai-auto-tag-trigger-suffix">条打一次标签</Text>
+                              <Button type="link" size="small" danger onClick={() => removeAutoTagTriggerRule("messageCount", index)}>删除</Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="满足以上条件自然日后" name="executeDelayDays">
+                  <Select options={["后 1 天", "后 2 天", "后 3 天"].map((value) => ({ value }))} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="执行时间" name="executeTime">
+                  <Input placeholder="例如：00:00" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+          <Card size="small" title="标签与数据范围" className="ai-auto-tagging-card">
+            <div className="ai-auto-tagging-tip">自动打标仅作用于已开启“允许AI自动打标”的标签组；标签组开关在外部标签组列表中维护。</div>
+            <Form.Item label="数据来源授权" name="dataScope">
+              <Checkbox.Group className="ai-auto-tag-data-source-list">
+                {autoTagVisibleDataSourceConfigs.map((item) => (
+                  <div className="ai-auto-tag-data-source-row" key={item.key}>
+                    <Checkbox value={item.key}>{item.name}</Checkbox>
+                    <Text type="secondary">{item.usage}</Text>
+                  </div>
+                ))}
+              </Checkbox.Group>
+            </Form.Item>
+            <Form.Item
+              label="自动打标逻辑说明"
+              name="logic"
+              extra="这里填写业务判断逻辑；AI执行时会自动读取已授权数据来源下勾选的变量字段。"
+            >
+              <Input.TextArea rows={12} />
+            </Form.Item>
+          </Card>
+        </Form>
+      </Drawer>
+      <Modal
+        title={activeAutoTagDataSource ? `${activeAutoTagDataSource.name}配置` : "输入数据项配置"}
+        open={Boolean(activeAutoTagDataSource)}
+        onCancel={() => setActiveAutoTagDataSourceKey(null)}
+        footer={<Button type="primary" onClick={() => setActiveAutoTagDataSourceKey(null)}>确定</Button>}
+        width={760}
+        className="ai-auto-tag-data-source-modal"
+      >
+        {activeAutoTagDataSource ? (
+          <div className="ai-auto-tag-data-source-config">
+            <Descriptions size="small" column={1} bordered>
+              <Descriptions.Item label="数据来源">{activeAutoTagDataSource.source}</Descriptions.Item>
+              <Descriptions.Item label="AI使用方式">{activeAutoTagDataSource.usage}</Descriptions.Item>
+            </Descriptions>
+            <div className="ai-auto-tag-data-section">
+              <Text className="ai-auto-tag-data-title">可用字段</Text>
+              <Space wrap size={[6, 6]}>{activeAutoTagDataSource.fields.map((field) => <Tag key={field}>{field}</Tag>)}</Space>
+            </div>
+            <div className="ai-auto-tag-data-section">
+              <div className="ai-auto-tag-data-title-row">
+                <Text className="ai-auto-tag-data-title">选择变量字段</Text>
+                <Tag color="blue">已选择 {(selectedAutoTagVariables[activeAutoTagDataSource.key] || []).length} 项</Tag>
+              </div>
+              <Table
+                size="small"
+                rowKey="key"
+                columns={autoTagVariableColumns}
+                dataSource={activeAutoTagDataSource.variables || []}
+                pagination={false}
+                className="ai-auto-tag-variable-table"
+              />
+            </div>
+            <div className="ai-auto-tag-data-section">
+              <Text className="ai-auto-tag-data-title">取数参数</Text>
+              <Form layout="vertical" className="ai-auto-tag-data-param-form">
+                {activeAutoTagDataSource.params.map((param) => {
+                  const [label, value] = param.split("：");
+                  return (
+                    <Form.Item label={label} key={param}>
+                      <Input defaultValue={value || param} />
+                    </Form.Item>
+                  );
+                })}
+              </Form>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+      <Modal
+        title="AI打标记录"
+        open={aiAutoTagRecordOpen}
+        onCancel={() => setAiAutoTagRecordOpen(false)}
+        footer={<Button onClick={() => setAiAutoTagRecordOpen(false)}>关闭</Button>}
+        width={980}
+        className="ai-auto-tag-record-modal"
+      >
+        <Table
+          size="small"
+          rowKey="key"
+          columns={aiAutoTagRecordColumns}
+          dataSource={aiAutoTagRecords}
+          pagination={false}
+          scroll={{ x: 850 }}
+        />
+      </Modal>
+      <Modal
+        title={aiAutoTagRecordDetail ? `${aiAutoTagRecordDetail.name}详情` : "AI打标详情"}
+        open={Boolean(aiAutoTagRecordDetail)}
+        onCancel={() => setAiAutoTagRecordDetail(null)}
+        footer={<Button onClick={() => setAiAutoTagRecordDetail(null)}>关闭</Button>}
+        width={1080}
+        className="ai-auto-tag-record-detail-modal"
+      >
+        <Table
+          size="small"
+          rowKey="key"
+          columns={aiAutoTagRecordDetailColumns}
+          dataSource={aiAutoTagRecordDetail?.details || []}
+          pagination={false}
+          scroll={{ x: 980 }}
+        />
+      </Modal>
+      <Modal
+        title={tagGroupReason?.title}
+        open={Boolean(tagGroupReason)}
+        onCancel={() => setTagGroupReason(null)}
+        footer={<Button type="primary" onClick={() => setTagGroupReason(null)}>知道了</Button>}
+        width={680}
+      >
+        {tagGroupReason ? (
+          <div className="tag-ai-detail">
+            <Paragraph>{tagGroupReason.reason}</Paragraph>
+            <div className="tag-ai-detail-section">
+              <Text className="tag-ai-detail-title">数据依据</Text>
+              <ul>{tagGroupReason.data.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+            <div className="tag-ai-detail-section">
+              <Text className="tag-ai-detail-title">生成逻辑</Text>
+              <ul>{tagGroupReason.logic.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
+      <Modal
+        title={getTagRuleDetail(tagRuleDetail)?.title}
+        open={Boolean(tagRuleDetail)}
+        onCancel={() => setTagRuleDetail(null)}
+        okText="保存规则"
+        cancelText="取消"
+        onOk={saveTagRuleDetail}
+        width={720}
+      >
+        {getTagRuleDetail(tagRuleDetail) ? (
+          <div className="tag-ai-detail">
+            <Paragraph>{getTagRuleDetail(tagRuleDetail).description}</Paragraph>
+            <div className="tag-meta-line">
+              {(() => {
+                const meta = getTagMeta(tagRuleDetail.group, tagRuleDetail.tag);
+                return (
+                  <>
+                    <Tag icon={meta.sourceIcon} color={meta.source === "AI生成" ? "blue" : "default"}>{meta.source}</Tag>
+                    <Tag color={meta.ruleStatus === "人工已改" ? "processing" : "default"}>{meta.ruleStatus}</Tag>
+                    <Tag color={meta.status === "已生效" ? "success" : "default"}>{meta.status}</Tag>
+                  </>
+                );
+              })()}
+              <Text type="secondary">手动新增的标签默认进入人工来源，人工修改后的规则优先级高于 AI 生成规则。</Text>
+            </div>
+            <Input.TextArea
+              className="tag-rule-editor"
+              rows={16}
+              value={tagRuleDraft}
+              onChange={(event) => setTagRuleDraft(event.target.value)}
+            />
+            <Text type="secondary">人工修改后优先于AI生成规则，后续 AI 自动打标签时按人工保存的规则执行。</Text>
+          </div>
+        ) : null}
+      </Modal>
     </Space>
+  );
+}
+
+function StrategyInsightPage({ onViewConversation }) {
+  const { message } = AntApp.useApp();
+  const insightRows = [
+    {
+      key: "insight-1",
+      name: "2026-08-21 用户洞察日报",
+      task: "用户洞察日报",
+      audience: "当前服务用户 / 体验课转化阶段",
+      total: 50,
+      focus: 12,
+      type: "用户洞察日报",
+      generatedAt: "2026-08-21 09:30",
+      status: "待处理",
+      conclusion: "本次共分析 50 名体验课用户，其中 12 名用户表现出较强转化意愿，主要集中在“完整看课超过30分钟”“主动咨询正价课”“表达孩子问题紧迫”三类行为。建议销售在 24 小时内优先人工跟进高意向用户，AI 继续对观望用户做价值引导。",
+      metrics: [
+        { label: "覆盖用户", value: 50, suffix: "人" },
+        { label: "高意向用户", value: 12, suffix: "人" },
+        { label: "风险关注用户", value: 5, suffix: "人" },
+        { label: "建议人工跟进", value: 14, suffix: "人" },
+        { label: "建议AI继续培育", value: 26, suffix: "人" },
+        { label: "已生成定时任务", value: 31, suffix: "条" }
+      ],
+      segments: [
+        { name: "高意向用户", count: 12, percent: "24%", feature: "看课超过30分钟，主动咨询价格、名额或后续方案", basis: "会话命中“怎么报名”“价格多少”“还有名额吗”；标签命中高意向、体验后未报名、关注效果保障。", action: "销售优先人工跟进，围绕体验课反馈确认班型和报名顾虑。", handoff: "分配给销售人工跟进，写入用户侧边栏销售策略，并生成明早二次触达任务。", color: "red" },
+        { name: "观望培育用户", count: 26, percent: "52%", feature: "完成部分课程，有孩子问题描述，但尚未明确购买意愿", basis: "看课时长 10-30 分钟，表达孩子问题但没有咨询价格或报名路径。", action: "由AI继续发送案例、课程价值和家长课片段，降低决策压力。", handoff: "加入观望培育人群，可后续进入用户群发任务。", color: "orange" },
+        { name: "风险关注用户", count: 5, percent: "10%", feature: "亲子冲突高、孩子状态风险、家长情绪波动明显", basis: "标签命中亲子冲突高、孩子状态风险、家长高焦虑，且会话中出现明显无助表达。", action: "提醒人工谨慎介入，先共情和收集事实，不直接推动成交。", handoff: "进入人工重点关注清单，限制AI自动强触达。", color: "purple" }
+      ],
+      actionResults: [
+        { key: "result-1", item: "AI标签", count: "38个", target: "客户标签", review: "部分需要" },
+        { key: "result-2", item: "个人销售策略", count: "12条", target: "客户档案-销售策略", review: "不需要" },
+        { key: "result-3", item: "个性化提示词", count: "12条", target: "会话智能体上下文", review: "需要审核" },
+        { key: "result-4", item: "定时任务", count: "31条", target: "流程阶段定时任务", review: "需要确认" }
+      ],
+      customers: [
+        { key: "c1", name: "张妈妈", level: "A", tags: ["高意向（AI）", "体验后未报名", "关注效果保障"], reason: "看课52分钟，主动询问班型，已购买398但未确认正价课", action: "今晚发送体验课复盘，明早人工确认班型", status: "待跟进" },
+        { key: "li-demo-6", name: "周女士", level: "S", tags: ["高意向（AI）", "待付款", "需要家人商量"], reason: "看课74分钟，已进入待付款状态，但最近一次回复提到需要和家人确认", action: "销售今天 18:00 前人工跟进，重点处理决策人异议", status: "处理中" },
+        { key: "li-demo-5", name: "郑妈妈", level: "C", tags: ["风险关注（AI）", "亲子冲突高", "已删除企微"], reason: "看课不足10分钟且已删除企微，亲子冲突高，不适合继续自动触达", action: "停止AI触达，转人工评估是否通过其他渠道温和联系", status: "待处理" }
+      ]
+    },
+    {
+      key: "insight-2",
+      name: "2026-08-20 用户洞察日报",
+      task: "用户洞察日报",
+      audience: "当前服务用户 / 亲子冲突关注人群",
+      total: 38,
+      focus: 9,
+      type: "用户洞察日报",
+      generatedAt: "2026-08-20 18:00",
+      status: "已处理",
+      conclusion: "本周高冲突用户主要集中在休学、手机成瘾和拒绝沟通场景。9 名用户需要人工重点关注，其中 3 名用户不建议继续使用强转化话术，应先进入家长情绪承接和问题澄清流程。",
+      metrics: [
+        { label: "覆盖用户", value: 38, suffix: "人" },
+        { label: "需要人工介入", value: 9, suffix: "人" },
+        { label: "适合课程培育", value: 18, suffix: "人" },
+        { label: "低响应用户", value: 11, suffix: "人" },
+        { label: "高风险提醒", value: 3, suffix: "条" },
+        { label: "已写入策略", value: 9, suffix: "条" }
+      ],
+      segments: [
+        { name: "需要人工介入", count: 9, percent: "24%", feature: "家长情绪强烈，孩子问题描述复杂，AI 不宜独立推进", basis: "多轮会话出现冲突升级、失控、无助等表达，且标签组允许AI写入风险预警标签。", action: "主管分配销售人工跟进，先做风险确认和服务边界说明。", handoff: "生成会话中心提醒，暂停自动催单类话术。", color: "red" },
+        { name: "适合课程培育", count: 18, percent: "47%", feature: "家长认可问题存在，但仍在观望课程价值", basis: "家长开始接受心理因素，但对服务周期、孩子配合度仍有疑虑。", action: "推送家长课片段和同类案例，避免高频催单。", handoff: "进入AI培育流程，定期更新个人销售策略。", color: "blue" },
+        { name: "低响应用户", count: 11, percent: "29%", feature: "近7天仅少量互动，未形成明确诉求", basis: "会话响应低、未完整看课、没有明确表达报名或咨询动作。", action: "降低触达频率，等待课程节点或直播活动再唤醒。", handoff: "加入低响应观察人群。", color: "default" }
+      ],
+      actionResults: [
+        { key: "result-1", item: "AI标签", count: "21个", target: "客户标签", review: "高风险需确认" },
+        { key: "result-2", item: "个人销售策略", count: "9条", target: "客户档案-销售策略", review: "不需要" },
+        { key: "result-3", item: "人工提醒", count: "9条", target: "会话中心提醒", review: "需要处理" },
+        { key: "result-4", item: "触达限制", count: "3条", target: "会话智能体上下文", review: "需要审核" }
+      ],
+      customers: [
+        { key: "risk-1", name: "李女士", level: "B", tags: ["亲子冲突高（AI）", "孩子拒绝沟通", "家长高焦虑"], reason: "连续三次提到孩子不沟通和家庭冲突升级", action: "人工先确认安全边界，再邀请参加家长沟通课", status: "待处理" },
+        { key: "risk-2", name: "陈爸爸", level: "B", tags: ["手机成瘾（AI）", "父母教育理念不一致"], reason: "父母对处理方式分歧明显，孩子手机使用问题反复出现", action: "发送父母共识建立内容，不直接推正价课", status: "已跟进" }
+      ]
+    },
+    {
+      key: "insight-3",
+      name: "2026-08-19 用户洞察日报",
+      task: "用户洞察日报",
+      audience: "当前服务用户 / 体验后未报名人群",
+      total: 86,
+      focus: 21,
+      type: "用户洞察日报",
+      generatedAt: "2026-08-19 20:10",
+      status: "待处理",
+      conclusion: "体验后未报名用户主要分为价格顾虑、等待家人决策、未理解课程价值三类。21 名用户仍有转化机会，其中已完整看课且表达认可的用户应优先进入人工跟进。",
+      metrics: [
+        { label: "覆盖用户", value: 86, suffix: "人" },
+        { label: "仍有机会", value: 21, suffix: "人" },
+        { label: "价格顾虑", value: 18, suffix: "人" },
+        { label: "等待决策", value: 21, suffix: "人" },
+        { label: "价值未建立", value: 31, suffix: "人" },
+        { label: "建议群发", value: 39, suffix: "人" }
+      ],
+      segments: [
+        { name: "价格顾虑用户", count: 18, percent: "21%", feature: "认可课程但反复询价或询问优惠", basis: "会话中多次出现价格、优惠、少报课时等表达。", action: "销售用课程规划和服务价值解释价格，不直接降价。", handoff: "生成价值解释话术和人工跟进任务。", color: "orange" },
+        { name: "等待决策用户", count: 21, percent: "24%", feature: "需要和家人商量，或等待孩子反馈", basis: "会话表达“商量一下”“问问孩子”“晚点决定”，未明确拒绝。", action: "生成二次跟进任务，补充孩子课堂反馈和家长决策材料。", handoff: "归入等待决策人群，后续可发送体验课复盘材料。", color: "blue" },
+        { name: "价值未建立用户", count: 31, percent: "36%", feature: "看课少、问题描述浅、对服务理解不足", basis: "看课时长不足10分钟或会话缺少明确痛点。", action: "AI继续培育，不进入高频人工销售跟进。", handoff: "进入长期培育池，等待直播或课程节点唤醒。", color: "default" }
+      ],
+      actionResults: [
+        { key: "result-1", item: "AI标签", count: "64个", target: "客户标签", review: "部分需要" },
+        { key: "result-2", item: "销售策略", count: "21条", target: "客户档案-销售策略", review: "不需要" },
+        { key: "result-3", item: "群发人群", count: "39人", target: "用户群发草稿", review: "需要确认" },
+        { key: "result-4", item: "定时任务", count: "46条", target: "流程阶段定时任务", review: "需要确认" }
+      ],
+      customers: [
+        { key: "review-1", name: "王妈妈", level: "A", tags: ["体验后未报名", "关注效果保障", "需要案例验证"], reason: "体验课后认可老师，但担心孩子是否能坚持", action: "发送同类孩子变化案例，约人工复盘", status: "待跟进" },
+        { key: "review-2", name: "赵女士", level: "B", tags: ["价格敏感", "需要家人商量"], reason: "反复询问优惠和课时组合，尚未明确拒绝", action: "销售解释服务内容和分阶段方案", status: "待处理" }
+      ]
+    }
+  ];
+  const [selectedInsight, setSelectedInsight] = useState(null);
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+  const [insightUserList, setInsightUserList] = useState(null);
+  const [insightGenerateModalOpen, setInsightGenerateModalOpen] = useState(false);
+  const [insightTagPickerOpen, setInsightTagPickerOpen] = useState(false);
+  const [insightTagKeyword, setInsightTagKeyword] = useState("");
+  const [insightGenerateForm] = Form.useForm();
+  const [insightAudienceTags, setInsightAudienceTags] = useState(["体验课用户", "体验后未报名"]);
+  const statusColorMap = { 待处理: "warning", 处理中: "processing", 已处理: "success", 已跟进: "success", 待跟进: "warning" };
+  const insightConversationPool = conversations.filter((item) => item.type === "single");
+  const insightGenerateInitialValues = {
+    insightType: "用户洞察日报",
+    audienceType: "当前服务用户",
+    stageAudience: ["体验课转化阶段"],
+    dataScope: ["用户沟通数据", "客户档案", "课程行为", "标签数据"],
+    generateMode: "立即生成",
+    outputContent: ["人群整体结论", "分层洞察", "重点用户清单", "销售建议"],
+    insightGeneratePrompt: `你是一位资深青少年心理教育行业客户洞察专家。
+
+请基于所选用户沟通数据、客户档案、课程行为和标签数据，生成用户洞察日报。
+
+请完成以下分析：
+1. 汇总当前人群的整体状态和主要变化
+2. 识别需要重点关注的用户及原因
+3. 将用户按相似问题、购买意向、风险状态进行分层
+4. 给出每类人群的销售跟进建议
+5. 输出重点用户清单，包括命中原因和建议动作
+
+判断要求：
+1. 不要基于单条对话做过度判断
+2. 涉及风险、医疗边界、极端情绪时，只做风险提醒，不做诊断
+3. 销售建议要可执行，避免空泛描述
+4. 重点用户必须说明判断依据`,
+    reviewMode: "生成后直接进入洞察列表"
+  };
+  const openInsightDetail = (record) => {
+    setSelectedInsight(record);
+    setDetailDrawerOpen(true);
+  };
+  const openInsightGenerateModal = () => {
+    insightGenerateForm.setFieldsValue({
+      ...insightGenerateInitialValues,
+      audienceTags: insightAudienceTags
+    });
+    setInsightGenerateModalOpen(true);
+  };
+  const submitInsightGenerate = async () => {
+    await insightGenerateForm.validateFields();
+    setInsightGenerateModalOpen(false);
+    message.success("已提交AI生成洞察任务，生成后进入洞察列表");
+  };
+  const buildInsightUserRows = (insight, source) => {
+    const seedCustomers = insight.customers || [];
+    const targetCount = source.count || seedCustomers.length || insight.focus || 0;
+    return Array.from({ length: targetCount }, (_, index) => {
+      const sourceCustomer = seedCustomers[index % Math.max(seedCustomers.length, 1)] || {};
+      const conversation = insightConversationPool.find((item) => item.key === sourceCustomer.key || item.name === sourceCustomer.name) || insightConversationPool[index % insightConversationPool.length];
+      return {
+        key: `${source.key}-${index}`,
+        name: sourceCustomer.name || conversation?.name || `客户${index + 1}`,
+        level: sourceCustomer.level || (index % 5 === 0 ? "S" : index % 3 === 0 ? "A" : "B"),
+        lifecycle: conversation?.lifecycle || "体验课跟进",
+        tags: sourceCustomer.tags || ["高意向（AI）", "体验后未报名"],
+        reason: sourceCustomer.reason || source.reason || "命中该指标对应的人群条件",
+        action: sourceCustomer.action || source.action || "按策略洞察建议继续跟进",
+        owner: conversation?.owner || "李销售",
+        status: sourceCustomer.status || "待跟进",
+        accountKey: conversation?.accountKey,
+        conversationKey: conversation?.key
+      };
+    });
+  };
+  const openInsightUserList = (source) => {
+    if (!selectedInsight) return;
+    setInsightUserList({
+      title: source.title,
+      count: source.count,
+      rows: buildInsightUserRows(selectedInsight, source)
+    });
+  };
+  const openInsightCustomerChat = (record) => {
+    setInsightUserList(null);
+    setDetailDrawerOpen(false);
+    if (record.conversationKey) {
+      onViewConversation?.({ key: record.conversationKey, accountKey: record.accountKey });
+    } else {
+      message.info("该演示用户暂无同步会话");
+    }
+  };
+  const columns = [
+    { title: "洞察名称", dataIndex: "name", width: 210 },
+    { title: "策略任务", dataIndex: "task", width: 160 },
+    { title: "分析人群", dataIndex: "audience", width: 240 },
+    { title: "覆盖人数", dataIndex: "total", width: 86, align: "center", render: (value) => `${value} 人` },
+    { title: "重点人数", dataIndex: "focus", width: 86, align: "center", render: (value) => <Text type="danger">{value} 人</Text> },
+    { title: "日报类型", dataIndex: "type", width: 120 },
+    { title: "生成时间", dataIndex: "generatedAt", width: 140 },
+    { title: "处理状态", dataIndex: "status", width: 90, render: (value) => <Tag color={statusColorMap[value] || "default"}>{value}</Tag> },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 150,
+      render: (_, record) => (
+        <Space size={4} className="table-action-group">
+          <Button type="link" size="small" onClick={() => openInsightDetail(record)}>查看详情</Button>
+          <Button type="link" size="small" onClick={() => message.success("已按重点用户生成跟进任务")}>创建跟进任务</Button>
+        </Space>
+      )
+    }
+  ];
+  const customerColumns = [
+    { title: "用户", dataIndex: "name", width: 86, render: (value, record) => <Button type="link" size="small" className="insight-user-name-link" onClick={() => openInsightCustomerChat(record)}>{value}</Button> },
+    { title: "等级", dataIndex: "level", width: 62, render: (value) => <span className={`customer-level-pill level-${value}`}>{value}</span> },
+    { title: "当前阶段", dataIndex: "lifecycle", width: 112 },
+    { title: "关键标签", dataIndex: "tags", width: 220, render: (tags) => <Space wrap size={[4, 4]}>{tags.map((tag) => <Tag className={tag.includes("AI") ? "customer-selected-ai-tag" : "customer-selected-tag"} key={tag}>{tag}</Tag>)}</Space> },
+    { title: "命中原因", dataIndex: "reason", width: 260 },
+    { title: "建议动作", dataIndex: "action", width: 260 },
+    { title: "负责人", dataIndex: "owner", width: 82 },
+    { title: "处理状态", dataIndex: "status", width: 90, render: (value) => <Tag color={statusColorMap[value] || "default"}>{value}</Tag> },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 88,
+      render: (_, record) => (
+        <Space size={4} className="table-action-group">
+          <Button type="link" size="small" onClick={() => openInsightCustomerChat(record)}>查看会话</Button>
+        </Space>
+      )
+    }
+  ];
+  const userListColumns = [
+    { title: "用户", dataIndex: "name", width: 86, render: (value, record) => <Button type="link" size="small" className="insight-user-name-link" onClick={() => openInsightCustomerChat(record)}>{value}</Button> },
+    { title: "等级", dataIndex: "level", width: 56, render: (value) => <span className={`customer-level-pill level-${value}`}>{value}</span> },
+    {
+      title: "关键标签",
+      dataIndex: "tags",
+      width: 210,
+      render: (tags) => (
+        <Space wrap size={[4, 4]} className="insight-user-tag-cell">
+          {tags.map((tag) => <Tag className={tag.includes("AI") ? "customer-selected-ai-tag" : "customer-selected-tag"} key={tag}>{tag}</Tag>)}
+        </Space>
+      )
+    },
+    { title: "命中原因", dataIndex: "reason", width: 260, render: (value) => <div className="insight-wrap-cell">{value}</div> },
+    { title: "建议动作", dataIndex: "action", width: 260, render: (value) => <div className="insight-wrap-cell">{value}</div> },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 86,
+      render: (_, record) => <Button type="link" size="small" onClick={() => openInsightCustomerChat(record)}>查看会话</Button>
+    }
+  ];
+  const renderClickableCount = (source) => (
+    <Button type="link" className="insight-clickable-count" onClick={() => openInsightUserList(source)}>
+      {source.count}{source.suffix || "人"}
+    </Button>
+  );
+  return (
+    <>
+      <Space direction="vertical" size={16} className="page-stack strategy-insight-page">
+        <Row gutter={[16, 16]}>
+          <Col xs={12} lg={6}><Card><Statistic title="今日洞察" value={3} /></Card></Col>
+          <Col xs={12} lg={6}><Card><Statistic title="覆盖用户" value={174} suffix="人" /></Card></Col>
+          <Col xs={12} lg={6}><Card><Statistic title="重点用户" value={42} suffix="人" /></Card></Col>
+          <Col xs={12} lg={6}><Card><Statistic title="待处理" value={2} /></Card></Col>
+        </Row>
+        <Card title={<PanelTitle title="洞察列表" desc="展示策略智能体每天面向当前服务用户生成的用户洞察日报。" extra={<Button type="primary" icon={<RobotOutlined />} onClick={openInsightGenerateModal}>AI生成洞察</Button>} />}>
+          <Space className="toolbar" wrap>
+            <Input.Search placeholder="搜索日报名称或分析人群" allowClear className="strategy-search-input" />
+            <Select defaultValue="全部状态" options={["全部状态", "待处理", "处理中", "已处理"].map((value) => ({ value }))} />
+            <Button type="primary">搜索</Button>
+            <Button>重置</Button>
+          </Space>
+          <Table className="admin-table strategy-insight-table" rowKey="key" columns={columns} dataSource={insightRows} pagination={false} scroll={{ x: 1180 }} />
+        </Card>
+      </Space>
+      <Modal
+        title="AI生成用户洞察日报"
+        open={insightGenerateModalOpen}
+        onCancel={() => setInsightGenerateModalOpen(false)}
+        onOk={submitInsightGenerate}
+        okText="生成洞察"
+        cancelText="取消"
+        width={760}
+        className="insight-generate-modal"
+      >
+        <Form form={insightGenerateForm} layout="vertical" initialValues={insightGenerateInitialValues}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="洞察类型" name="insightType" rules={[{ required: true, message: "请选择洞察类型" }]}>
+                <Select options={["用户洞察日报"].map((value) => ({ value }))} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="分析人群" name="audienceType" rules={[{ required: true, message: "请选择分析人群" }]}>
+                <Select options={["当前服务用户", "指定标签人群", "指定阶段人群"].map((value) => ({ value }))} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="指定标签人群" name="audienceTags">
+                <CommonTagSelectButton
+                  value={insightAudienceTags}
+                  placeholder="选择用于生成洞察的客户标签"
+                  onClick={() => setInsightTagPickerOpen(true)}
+                  onChange={(value) => {
+                    setInsightAudienceTags(value);
+                    insightGenerateForm.setFieldsValue({ audienceTags: value });
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="指定阶段人群" name="stageAudience">
+                <Select mode="multiple" options={["体验课转化阶段", "课前待激活", "课后未报名", "长期培育"].map((value) => ({ value }))} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="数据范围" name="dataScope">
+            <Checkbox.Group options={["用户沟通数据", "客户档案", "课程行为", "标签数据"].map((value) => ({ label: value, value }))} />
+          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="生成时间" name="generateMode">
+                <Radio.Group options={["立即生成", "定时生成"].map((value) => ({ label: value, value }))} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="定时生成时间" name="generateAt">
+                <DatePicker showTime format="YYYY-MM-DD HH:mm" placeholder="选择生成时间" className="full-width" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="输出内容" name="outputContent">
+            <Checkbox.Group options={["人群整体结论", "分层洞察", "重点用户清单", "销售建议"].map((value) => ({ label: value, value }))} />
+          </Form.Item>
+          <div className="insight-generate-logic">
+            <Text className="insight-generate-logic-title">生成逻辑</Text>
+            <Form.Item label="任务提示词" name="insightGeneratePrompt" rules={[{ required: true, message: "请输入任务提示词" }]}>
+              <Input.TextArea rows={12} />
+            </Form.Item>
+          </div>
+          <Form.Item label="审核方式" name="reviewMode">
+            <Select options={["生成后直接进入洞察列表", "需人工确认后入库"].map((value) => ({ value }))} />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <CommonTagPickerModal
+        open={insightTagPickerOpen}
+        title="选择指定标签人群"
+        selected={insightAudienceTags}
+        keyword={insightTagKeyword}
+        onKeywordChange={setInsightTagKeyword}
+        onSelectedChange={(value) => {
+          setInsightAudienceTags(value);
+          insightGenerateForm.setFieldsValue({ audienceTags: value });
+        }}
+        onOk={() => setInsightTagPickerOpen(false)}
+        onCancel={() => setInsightTagPickerOpen(false)}
+      />
+      <Drawer
+        title={selectedInsight?.name || "策略洞察详情"}
+        open={detailDrawerOpen}
+        onClose={() => setDetailDrawerOpen(false)}
+        width={1080}
+        className="strategy-insight-detail-drawer"
+        extra={selectedInsight ? (
+          <Space>
+            <Tag color={statusColorMap[selectedInsight.status] || "default"}>{selectedInsight.status}</Tag>
+            <Button onClick={() => message.success("已导出用户洞察日报")}>导出</Button>
+          </Space>
+        ) : null}
+      >
+        {selectedInsight ? (
+          <div className="insight-detail-grid">
+            <section className="insight-detail-section">
+              <div className="insight-section-title">洞察摘要</div>
+              <div className="insight-summary-grid">
+                {[
+                  { label: "策略任务", value: selectedInsight.task },
+                  { label: "分析人群", value: selectedInsight.audience },
+                  { label: "覆盖人数", source: { key: "summary-total", title: "覆盖用户", count: selectedInsight.total } },
+                  { label: "重点人数", source: { key: "summary-focus", title: "重点用户", count: selectedInsight.focus } },
+                  { label: "生成时间", value: selectedInsight.generatedAt },
+                  { label: "输出来源", value: "策略洞察 / AI生成洞察" }
+                ].map((item) => (
+                  <div className="insight-summary-item" key={item.label}>
+                    <Text type="secondary">{item.label}</Text>
+                    {item.source ? renderClickableCount(item.source) : <Text>{item.value}</Text>}
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section className="insight-detail-section insight-conclusion">
+              <div className="insight-section-title">人群整体结论</div>
+              <Paragraph>{selectedInsight.conclusion}</Paragraph>
+            </section>
+            <section className="insight-detail-section">
+              <div className="insight-section-title">人群分层</div>
+              <div className="insight-segment-list">
+                {selectedInsight.segments.map((segment) => (
+                  <div className="insight-segment-card" key={segment.name}>
+                    <div className="insight-segment-head">
+                      <Tag color={segment.color}>{segment.name}</Tag>
+                      <Space size={4}>
+                        {renderClickableCount({ key: `segment-${segment.name}`, title: segment.name, count: segment.count, reason: segment.basis, action: segment.action })}
+                        <Text type="secondary">/ {segment.percent}</Text>
+                      </Space>
+                    </div>
+                    <Paragraph type="secondary">主要特征：{segment.feature}</Paragraph>
+                    <Paragraph type="secondary">AI判断依据：{segment.basis}</Paragraph>
+                    <Paragraph>建议动作：{segment.action}</Paragraph>
+                    <Paragraph>建议承接方式：{segment.handoff}</Paragraph>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section className="insight-detail-section insight-customer-section">
+              <div className="insight-section-title">重点用户清单</div>
+              <Table size="small" className="admin-table" rowKey="key" columns={customerColumns} dataSource={buildInsightUserRows(selectedInsight, { key: "focus-table", title: "重点用户", count: selectedInsight.customers.length })} pagination={false} scroll={{ x: 1420 }} />
+            </section>
+          </div>
+        ) : null}
+      </Drawer>
+      <Modal
+        title={insightUserList ? `${insightUserList.title}名单` : "用户清单"}
+        open={Boolean(insightUserList)}
+        onCancel={() => setInsightUserList(null)}
+        footer={null}
+        width={1060}
+        className="insight-user-list-modal"
+      >
+        {insightUserList ? (
+          <div className="insight-user-list-content">
+            <div className="insight-user-list-head">
+              <Text type="secondary">对应用户数</Text>
+              <Text>{insightUserList.count} 人</Text>
+            </div>
+            <Table
+              size="small"
+              className="admin-table insight-user-list-table"
+              rowKey="key"
+              columns={userListColumns}
+              dataSource={insightUserList.rows}
+              pagination={{ pageSize: 8, showSizeChanger: false }}
+            />
+          </div>
+        ) : null}
+      </Modal>
+    </>
   );
 }
 
 function MassMessagePage() {
   const { message } = AntApp.useApp();
   const [form] = Form.useForm();
-  const tagOptions = customerTagGroups.map((group) => ({
-    label: group.name,
-    options: group.tags.map((tag) => ({ value: tag.value, label: tag.source === "AI打标" ? `${tag.value}（AI）` : tag.value }))
-  }));
-  const courseStatusOptions = ["全部课程状态", "已预约体验课", "已上体验课", "体验课未报名", "已报名", "未预约"].map((value) => ({ value }));
+  const audienceStatusFields = [
+    { name: "hostingStatus", label: "托管状态", all: "全部托管状态", options: ["已托管", "未托管"] },
+    { name: "lifecycle", label: "所处阶段", all: "全部阶段", options: lifecycleStages.map((item) => item.title) }
+  ];
+  const getDefaultAudienceStatuses = () => audienceStatusFields.reduce((result, item) => ({ ...result, [item.name]: item.all }), {});
+  const getAudienceStatusSummary = (statuses = {}) => audienceStatusFields
+    .map((item) => statuses[item.name])
+    .filter((value, index) => value && value !== audienceStatusFields[index].all);
   const initialRows = [
     {
       key: "mass-1",
-      name: "A类课课后未报名客户回访",
+      name: "体验后未报名家长回访",
       audienceMode: "筛选客户",
-      audienceTags: ["高意向", "体验课未报名", "好友正常"],
-      excludeTags: ["已报名", "已删除销售"],
+      audienceStatuses: { ...getDefaultAudienceStatuses(), hostingStatus: "已托管", lifecycle: "催单阶段" },
+      audienceTags: ["高意向", "体验后未报名", "关注效果保障"],
+      excludeTags: ["明确拒绝", "删除企微风险"],
       estimatedCount: 128,
       sendTime: "2026-08-20 09:30",
       sendAccountMode: "按客户所属销售发送",
@@ -3686,10 +6081,11 @@ function MassMessagePage() {
     },
     {
       key: "mass-2",
-      name: "今晚课程提醒",
+      name: "今晚家长直播课提醒",
       audienceMode: "筛选客户",
-      audienceTags: ["已预约体验课", "好友正常"],
-      excludeTags: ["已删除销售"],
+      audienceStatuses: { ...getDefaultAudienceStatuses(), hostingStatus: "已托管", lifecycle: "提升认知" },
+      audienceTags: ["直播课用户", "适合邀约直播课"],
+      excludeTags: ["删除企微风险"],
       estimatedCount: 86,
       sendTime: "2026-08-19 18:30",
       sendAccountMode: "按客户所属销售发送",
@@ -3701,8 +6097,9 @@ function MassMessagePage() {
       key: "mass-3",
       name: "周末家庭教育直播邀约",
       audienceMode: "筛选客户",
-      audienceTags: ["家长焦虑", "亲子冲突", "好友正常"],
-      excludeTags: ["已报名", "投诉"],
+      audienceStatuses: { ...getDefaultAudienceStatuses(), lifecycle: "定义用户" },
+      audienceTags: ["家长高焦虑", "亲子冲突高", "父母成长营意向"],
+      excludeTags: ["投诉风险", "不适合AI继续沟通"],
       estimatedCount: 214,
       sendTime: "立即发送",
       sendAccountMode: "指定企微账号发送",
@@ -3713,53 +6110,116 @@ function MassMessagePage() {
   ];
   const [rows, setRows] = useState(initialRows);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState("create");
+  const [activeTask, setActiveTask] = useState(null);
+  const [tagPicker, setTagPicker] = useState({ open: false, field: "audienceTags", title: "选择标签", selected: [], keyword: "", rule: "以下标签满足其一" });
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("全部状态");
+  const isViewMode = drawerMode === "view";
+  const getDefaultMassContent = () => "早上好家长～\n\n昨天课程结束后，老师这边已经整理出孩子当前学习里的几个关键点。您方便的话，我晚点把孩子的课堂表现和下一步建议发您，我们一起看看后面怎么安排更合适。";
+  const getTaskFormValues = (record = {}) => {
+    const sendMode = record.sendTime === "立即发送" ? "立即发送" : "定时发送";
+    const sendAt = sendMode === "定时发送" && record.sendTime && record.sendTime !== "未设置" ? dayjs(record.sendTime) : null;
+    return {
+      name: record.name || "",
+      description: record.description || "",
+      audienceMode: record.audienceMode || "全部客户",
+      audienceTags: record.audienceTags || [],
+      excludeTags: record.excludeTags || [],
+      audienceTagRule: record.audienceTagRule || "以下标签满足其一",
+      excludeTagRule: record.excludeTagRule || "以下标签满足其一",
+      ...getDefaultAudienceStatuses(),
+      ...(record.audienceStatuses || {}),
+      sendMode,
+      sendAt,
+      sendAccountMode: record.sendAccountMode || "按客户所属销售发送",
+      sendAccounts: record.sendAccounts || [],
+      content: record.content || getDefaultMassContent(),
+      materialType: record.materialType || "文本"
+    };
+  };
   const estimateCount = () => {
     const values = form.getFieldsValue();
     if (values.audienceMode === "全部客户") return 1268;
     const tagCount = (values.audienceTags || []).length;
     const excludeCount = (values.excludeTags || []).length;
-    return Math.max(18, 64 + tagCount * 38 - excludeCount * 16);
+    const statusCount = audienceStatusFields.filter((item) => values[item.name] && values[item.name] !== item.all).length;
+    return Math.max(18, 96 + tagCount * 32 - excludeCount * 14 - statusCount * 11);
   };
   const openCreate = () => {
     form.resetFields();
-    form.setFieldsValue({
-      name: "",
-      description: "",
-      audienceMode: "筛选客户",
-      audienceTags: ["高意向", "好友正常"],
-      excludeTags: ["已报名", "已删除销售"],
-      courseStatus: "全部课程状态",
-      sendMode: "定时发送",
-      sendAccountMode: "按客户所属销售发送",
-      content: "早上好家长～\n\n昨天课程结束后，老师这边已经整理出孩子当前学习里的几个关键点。您方便的话，我晚点把孩子的课堂表现和下一步建议发您，我们一起看看后面怎么安排更合适。",
-      materialType: "文本"
-    });
+    setDrawerMode("create");
+    setActiveTask(null);
+    form.setFieldsValue(getTaskFormValues());
     setDrawerOpen(true);
   };
-  const createTask = () => {
+  const openTaskDrawer = (mode, record) => {
+    form.resetFields();
+    setDrawerMode(mode);
+    setActiveTask(record);
+    form.setFieldsValue(getTaskFormValues(record));
+    setDrawerOpen(true);
+  };
+  const closeTaskDrawer = () => {
+    setDrawerOpen(false);
+    setActiveTask(null);
+    setDrawerMode("create");
+  };
+  const openTagPicker = (field) => {
+    const values = form.getFieldsValue();
+    setTagPicker({
+      open: true,
+      field,
+      title: field === "audienceTags" ? "选择标签" : "选择排除标签",
+      selected: values[field] || [],
+      keyword: "",
+      rule: values[field === "audienceTags" ? "audienceTagRule" : "excludeTagRule"] || "以下标签满足其一"
+    });
+  };
+  const saveTagPicker = () => {
+    const ruleField = tagPicker.field === "audienceTags" ? "audienceTagRule" : "excludeTagRule";
+    form.setFieldsValue({ [tagPicker.field]: tagPicker.selected, [ruleField]: tagPicker.rule });
+    setTagPicker((item) => ({ ...item, open: false }));
+  };
+  const saveTask = () => {
     form.validateFields().then((values) => {
       const now = new Date().toISOString().slice(0, 16).replace("T", " ");
-      const sendTime = values.sendMode === "立即发送" ? "立即发送" : values.sendAt ? values.sendAt.format("YYYY-MM-DD HH:mm") : "未设置";
-      setRows((items) => [
-        {
-          key: `mass-${Date.now()}`,
-          name: values.name,
-          audienceMode: values.audienceMode,
-          audienceTags: values.audienceTags || [],
-          excludeTags: values.excludeTags || [],
-          estimatedCount: estimateCount(),
-          sendTime,
-          sendAccountMode: values.sendAccountMode,
-          status: values.sendMode === "立即发送" ? "发送中" : "待发送",
-          creator: "平台管理员",
-          updatedAt: now
-        },
-        ...items
-      ]);
-      setDrawerOpen(false);
-      message.success("群发任务已创建");
+      const previousSendTime = drawerMode === "edit" ? activeTask?.sendTime : null;
+      const sendTime = values.sendMode === "立即发送" ? "立即发送" : values.sendAt ? values.sendAt.format("YYYY-MM-DD HH:mm") : previousSendTime || "未设置";
+      const taskPayload = {
+        name: values.name,
+        description: values.description || "",
+        audienceMode: values.audienceMode,
+        audienceStatuses: values.audienceMode === "全部客户" ? getDefaultAudienceStatuses() : audienceStatusFields.reduce((result, item) => ({ ...result, [item.name]: values[item.name] || item.all }), {}),
+        audienceTags: values.audienceMode === "全部客户" ? [] : values.audienceTags || [],
+        excludeTags: values.audienceMode === "全部客户" ? [] : values.excludeTags || [],
+        audienceTagRule: values.audienceTagRule,
+        excludeTagRule: values.excludeTagRule,
+        estimatedCount: estimateCount(),
+        sendTime,
+        sendMode: values.sendMode,
+        sendAccountMode: values.sendAccountMode,
+        sendAccounts: values.sendAccounts || [],
+        content: values.content,
+        materialType: values.materialType || "文本",
+        status: values.sendMode === "立即发送" ? "发送中" : activeTask?.status || "待发送",
+        updatedAt: now
+      };
+      if (drawerMode === "edit" && activeTask) {
+        setRows((items) => items.map((item) => item.key === activeTask.key ? { ...item, ...taskPayload } : item));
+        message.success("群发任务已更新");
+      } else {
+        setRows((items) => [
+          {
+            key: `mass-${Date.now()}`,
+            ...taskPayload,
+            creator: "平台管理员"
+          },
+          ...items
+        ]);
+        message.success("群发任务已创建");
+      }
+      closeTaskDrawer();
     });
   };
   const filteredRows = rows.filter((item) => {
@@ -3768,32 +6228,37 @@ function MassMessagePage() {
     return matchesKeyword && matchesStatus;
   });
   const columns = [
-    { title: "群发名称", dataIndex: "name", width: 220 },
+    { title: "群发名称", dataIndex: "name", width: 180 },
     {
       title: "目标人群",
       dataIndex: "audienceTags",
-      width: 260,
+      width: 280,
       render: (items = [], record) => (
-        <Space direction="vertical" size={4}>
+        <Space direction="vertical" size={4} className="mass-audience-tags">
           <Text>{record.audienceMode}</Text>
-          <Space wrap size={[4, 4]}>{items.slice(0, 3).map((item) => <Tag key={item}>{item}</Tag>)}{items.length > 3 ? <Tag>+{items.length - 3}</Tag> : null}</Space>
+          {record.audienceMode === "筛选客户" ? (
+            <Text type="secondary" className="mass-audience-status-summary">
+              {getAudienceStatusSummary(record.audienceStatuses).length ? getAudienceStatusSummary(record.audienceStatuses).join(" / ") : "未限制状态条件"}
+            </Text>
+          ) : null}
+          <Space wrap size={[4, 4]}>{items.slice(0, 2).map((item) => <Tag className={isAiGeneratedTag(item) ? "customer-selected-ai-tag" : "customer-selected-tag"} key={item}>{getTagDisplayLabel(item)}</Tag>)}{items.length > 2 ? <Tag>+{items.length - 2}</Tag> : null}</Space>
         </Space>
       )
     },
-    { title: "预计发送人数", dataIndex: "estimatedCount", width: 120, render: (value) => `${value} 人` },
-    { title: "发送时间", dataIndex: "sendTime", width: 150 },
-    { title: "发送账号", dataIndex: "sendAccountMode", width: 170 },
-    { title: "发送状态", dataIndex: "status", width: 100, render: (value) => <Tag color={value === "已完成" ? "success" : value === "发送中" ? "processing" : value === "待发送" ? "blue" : "default"}>{value}</Tag> },
-    { title: "创建人", dataIndex: "creator", width: 120 },
-    { title: "更新时间", dataIndex: "updatedAt", width: 150 },
+    { title: "预计发送人数", dataIndex: "estimatedCount", width: 112, align: "center", render: (value) => <span className="mass-estimate-count-cell">{value} 人</span> },
+    { title: "发送时间", dataIndex: "sendTime", width: 128 },
+    { title: "发送账号", dataIndex: "sendAccountMode", width: 150 },
+    { title: "发送状态", dataIndex: "status", width: 96, render: (value) => <Tag color={value === "已完成" ? "success" : value === "发送中" ? "processing" : value === "待发送" ? "blue" : "default"}>{value}</Tag> },
+    { title: "创建人", dataIndex: "creator", width: 104 },
+    { title: "更新时间", dataIndex: "updatedAt", width: 132 },
     {
       title: "操作",
       fixed: "right",
-      width: 190,
+      width: 146,
       render: (_, record) => (
         <Space size={4} className="table-action-group">
-          <Button type="link" size="small" onClick={() => message.info(`查看 ${record.name}`)}>查看</Button>
-          <Button type="link" size="small" onClick={() => message.info("原型中编辑会复用创建表单")}>编辑</Button>
+          <Button type="link" size="small" onClick={() => openTaskDrawer("view", record)}>查看</Button>
+          <Button type="link" size="small" onClick={() => openTaskDrawer("edit", record)}>编辑</Button>
           <Button type="link" size="small" onClick={() => setRows((items) => [{ ...record, key: `mass-copy-${Date.now()}`, name: `${record.name} 副本`, status: "草稿" }, ...items])}>复制</Button>
           <Button type="link" size="small" danger onClick={() => setRows((items) => items.filter((item) => item.key !== record.key))}>删除</Button>
         </Space>
@@ -3813,50 +6278,98 @@ function MassMessagePage() {
             <Col xs={12} lg={6} key={label}><Card><Statistic title={label} value={value} /></Card></Col>
           ))}
         </Row>
-        <Card title={<PanelTitle title="用户群发" desc="人工创建群发任务，按标签和基础条件筛选客户，支持立即发送或定时发送。" extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>创建群发任务</Button>} />}>
-          <Space className="toolbar" wrap>
-            <Input.Search placeholder="搜索群发名称" allowClear value={keyword} onChange={(event) => setKeyword(event.target.value)} className="strategy-search-input" />
-            <Select value={statusFilter} options={["全部状态", "草稿", "待发送", "发送中", "已完成", "已暂停"].map((value) => ({ value }))} onChange={setStatusFilter} />
-            <Button type="primary">搜索</Button>
-            <Button onClick={() => { setKeyword(""); setStatusFilter("全部状态"); }}>重置</Button>
-          </Space>
-          <Table className="admin-table mass-message-table" rowKey="key" columns={columns} dataSource={filteredRows} pagination={false} scroll={{ x: 1500 }} />
+        <Card>
+          <div className="toolbar compact-card-toolbar">
+            <Space wrap>
+              <Input.Search placeholder="搜索群发名称" allowClear value={keyword} onChange={(event) => setKeyword(event.target.value)} className="strategy-search-input" />
+              <Select value={statusFilter} options={["全部状态", "草稿", "待发送", "发送中", "已完成", "已暂停"].map((value) => ({ value }))} onChange={setStatusFilter} />
+              <Button type="primary">搜索</Button>
+              <Button onClick={() => { setKeyword(""); setStatusFilter("全部状态"); }}>重置</Button>
+            </Space>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>创建群发任务</Button>
+          </div>
+          <Table className="admin-table mass-message-table" rowKey="key" columns={columns} dataSource={filteredRows} pagination={false} scroll={{ x: 1180 }} />
         </Card>
       </Space>
       <Drawer
-        title="创建群发任务"
+        title={drawerMode === "view" ? "查看群发任务" : drawerMode === "edit" ? "编辑群发任务" : "创建群发任务"}
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeTaskDrawer}
         width={920}
-        extra={<Space><Button onClick={() => setDrawerOpen(false)}>取消</Button><Button type="primary" onClick={createTask}>保存任务</Button></Space>}
+        extra={<Space><Button onClick={closeTaskDrawer}>{isViewMode ? "关闭" : "取消"}</Button>{!isViewMode ? <Button type="primary" onClick={saveTask}>保存任务</Button> : null}</Space>}
         className="mass-message-drawer"
       >
-        <Form form={form} layout="vertical" className="mass-message-form">
-          <Card size="small" title="基础信息">
+        <Form form={form} layout="vertical" className="mass-message-form" disabled={isViewMode}>
+          <Card size="small">
             <Row gutter={16}>
               <Col span={14}><Form.Item label="群发名称" name="name" rules={[{ required: true, message: "请输入群发名称" }]}><Input placeholder="群发名称仅内部可见" /></Form.Item></Col>
               <Col span={10}><Form.Item label="群发说明" name="description"><Input placeholder="例如：A类课课后未报名回访" /></Form.Item></Col>
             </Row>
           </Card>
-          <Card size="small" title="选择客户">
+          <Card size="small">
             <Form.Item label="选择客户" name="audienceMode" rules={[{ required: true }]}>
-              <Radio.Group options={["全部客户", "筛选客户"].map((value) => ({ value, label: value }))} />
+              <Radio.Group
+                options={["全部客户", "筛选客户"].map((value) => ({ value, label: value }))}
+                onChange={(event) => {
+                  if (event.target.value === "全部客户") {
+                    form.setFieldsValue({ audienceTags: [], excludeTags: [], ...getDefaultAudienceStatuses() });
+                  }
+                }}
+              />
             </Form.Item>
-            <div className="mass-audience-box">
-              <Row gutter={16}>
-                <Col span={24}><Form.Item label="标签" name="audienceTags"><Select mode="multiple" options={tagOptions} placeholder="选择标签确定群发人群" /></Form.Item></Col>
-                <Col span={24}><Form.Item label="排除客户" name="excludeTags" extra="选择排除标签后，群发时不会发送给这些标签内的客户。"><Select mode="multiple" options={tagOptions} placeholder="选择需要排除的客户标签" /></Form.Item></Col>
-                <Col span={12}><Form.Item label="课程状态" name="courseStatus"><Select options={courseStatusOptions} /></Form.Item></Col>
-              </Row>
-              <div className="mass-estimate-box">
-                <Text type="secondary">预计发送人数</Text>
-                <Form.Item noStyle shouldUpdate>
-                  {() => <Text className="mass-estimate-count">{estimateCount()} 人</Text>}
-                </Form.Item>
-              </div>
-            </div>
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldValue }) => {
+                const audienceMode = getFieldValue("audienceMode");
+                const audienceTags = getFieldValue("audienceTags") || [];
+                const excludeTags = getFieldValue("excludeTags") || [];
+                if (audienceMode !== "筛选客户") {
+                  return (
+                    <div className="mass-all-audience-box">
+                      <Text type="secondary">将发送给当前可触达的全部客户。</Text>
+                      <div className="mass-estimate-box">
+                        <Text type="secondary">预计发送人数</Text>
+                        <Text className="mass-estimate-count">{estimateCount()} 人</Text>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mass-audience-box">
+                    <div className="mass-audience-section">
+                      <Row gutter={[12, 10]}>
+                        {audienceStatusFields.map((item) => (
+                          <Col span={12} key={item.name}>
+                            <Form.Item label={item.label} name={item.name}>
+                              <Select options={[item.all, ...item.options].map((value) => ({ value }))} />
+                            </Form.Item>
+                          </Col>
+                        ))}
+                      </Row>
+                    </div>
+                    <div className="mass-audience-section">
+                      <Row gutter={16}>
+                        <Col span={24}>
+                          <Form.Item label="标签">
+                            <CommonTagSelectButton disabled={isViewMode} value={audienceTags} placeholder="选择标签确定群发人群" onClick={() => openTagPicker("audienceTags")} onChange={(value) => form.setFieldsValue({ audienceTags: value })} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                          <Form.Item label="排除客户" extra="选择排除标签后，群发时不会发送给这些标签内的客户。">
+                            <CommonTagSelectButton disabled={isViewMode} value={excludeTags} placeholder="选择需要排除的客户标签" onClick={() => openTagPicker("excludeTags")} onChange={(value) => form.setFieldsValue({ excludeTags: value })} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </div>
+                    <div className="mass-estimate-box">
+                      <Text type="secondary">预计发送人数</Text>
+                      <Text className="mass-estimate-count">{estimateCount()} 人</Text>
+                    </div>
+                  </div>
+                );
+              }}
+            </Form.Item>
           </Card>
-          <Card size="small" title="群发内容">
+          <Card size="small">
             <Space wrap className="mass-material-actions">
               <Upload showUploadList={false}><Button icon={<PictureOutlined />}>本地上传图片</Button></Upload>
               <Upload showUploadList={false}><Button icon={<VideoCameraOutlined />}>本地上传视频</Button></Upload>
@@ -3868,16 +6381,44 @@ function MassMessagePage() {
               <Input.TextArea rows={9} showCount maxLength={5000} placeholder="输入要群发给客户的内容，可搭配图片、视频、文件或素材库资源。" />
             </Form.Item>
           </Card>
-          <Card size="small" title="发送设置">
+          <Card size="small">
             <Row gutter={16}>
-              <Col span={12}><Form.Item label="发送方式" name="sendMode"><Radio.Group options={["立即发送", "定时发送"].map((value) => ({ value, label: value }))} /></Form.Item></Col>
-              <Col span={12}><Form.Item label="定时发送时间" name="sendAt"><DatePicker showTime className="full-width" /></Form.Item></Col>
+              <Col span={12}>
+                <Form.Item label="发送方式" name="sendMode">
+                  <Radio.Group
+                    options={["立即发送", "定时发送"].map((value) => ({ value, label: value }))}
+                    onChange={(event) => {
+                      if (event.target.value === "立即发送") {
+                        form.setFieldsValue({ sendAt: null });
+                      }
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+              <Form.Item noStyle shouldUpdate>
+                {({ getFieldValue }) => getFieldValue("sendMode") === "定时发送" ? (
+                  <Col span={12}><Form.Item label="定时发送时间" name="sendAt"><DatePicker showTime className="full-width" /></Form.Item></Col>
+                ) : null}
+              </Form.Item>
               <Col span={12}><Form.Item label="发送账号" name="sendAccountMode"><Radio.Group options={["按客户所属销售发送", "指定企微账号发送"].map((value) => ({ value, label: value }))} /></Form.Item></Col>
               <Col span={12}><Form.Item label="指定企微账号" name="sendAccounts"><Select mode="multiple" options={managedWecomAccounts.map((item) => ({ value: item.key, label: item.label }))} placeholder="发送账号为指定时选择" /></Form.Item></Col>
             </Row>
           </Card>
         </Form>
       </Drawer>
+      <CommonTagPickerModal
+        title={tagPicker.title}
+        open={tagPicker.open}
+        onCancel={() => setTagPicker((item) => ({ ...item, open: false }))}
+        onOk={saveTagPicker}
+        selected={tagPicker.selected}
+        keyword={tagPicker.keyword}
+        rule={tagPicker.rule}
+        tip="标签来自统一标签库，用于圈定群发人群；带（AI）的标签表示后续可由策略智能体自动判断写入。"
+        onKeywordChange={(keyword) => setTagPicker((item) => ({ ...item, keyword }))}
+        onRuleChange={(rule) => setTagPicker((item) => ({ ...item, rule }))}
+        onSelectedChange={(selected) => setTagPicker((item) => ({ ...item, selected }))}
+      />
     </>
   );
 }
@@ -4055,15 +6596,13 @@ function StrategyEditor({ skill, onBack }) {
     baseUrl: "https://dashscope.aliyuncs.com"
   };
   const userTagOptions = [
-    "已付费",
     "高意向",
-    "720期次",
-    "已预约体验课",
-    "第一节体验课完成",
-    "第二节体验课完成",
     "中意向",
     "低意向",
-    "需人工介入",
+    "亲子冲突高",
+    "家长高焦虑",
+    "体验后未报名",
+    "适合转人工深聊",
     ...lifecycleOptions.map((item) => item.value)
   ].map((value) => ({ value }));
   const tagAttributeOptions = ["时间标签", "状态标签"].map((value) => ({ value }));
@@ -4107,120 +6646,172 @@ function StrategyEditor({ skill, onBack }) {
 - 如果输出会写入客户档案，必须标记更新时间和来源任务。`;
   const strategyTaskConfigs = [
     {
-      key: "daily-report",
-      name: "客户销售策略日报",
-      type: "销售策略总结",
-      status: "启用",
-      scope: "标签人群",
-      audienceTags: ["高意向", "已上体验课", "体验课未报名", "需人工跟进"],
-      scheduleTime: "20:00",
-      scheduleCycle: "每天一次",
-      inputScope: ["客户档案", "最近24小时会话", "课程信息", "用户标签", "听课数据"],
-      outputResults: ["销售策略", "人工提醒"],
-      writeTargets: ["客户档案-销售策略", "人工工作台"],
-      reviewMode: "无需审核，直接写入",
-      logic: "每天晚上汇总客户最近 24 小时的企微会话、课程状态、听课时长和标签变化，判断当前主要矛盾、购买意向、亲子冲突强度和下一步销售建议。对高意向但未报名客户生成跟进提醒；对情绪敏感或冲突高的客户提示销售先共情和收集信息，不直接强推产品。输出写入客户档案“销售策略”tab，并在人工工作台生成今日重点跟进列表。"
-    },
-    {
-      key: "auto-tagging",
-      name: "周期性AI打标",
-      type: "周期性AI打标",
-      status: "启用",
-      scope: "标签人群",
-      audienceTags: ["好友正常", "高意向", "中意向", "待试听", "试听完成"],
-      scheduleTime: "09:00",
-      scheduleCycle: "6小时1次",
-      inputScope: ["最近7天会话", "客户档案", "课程信息", "已有标签", "订单状态"],
-      outputResults: ["客户标签", "打标理由"],
-      writeTargets: ["客户标签", "打标记录"],
-      reviewMode: "仅高风险结果需审核",
-      logic: "扫描最近 7 天有互动的客户，根据标签库中允许 AI 自动打标的标签组判断是否新增、移除或保持标签。比如用户主动问价格、服务形式、报名方式，且已完成体验课，可建议“高意向（AI）”；如果多次表达犹豫或价格压力，可建议“价格敏感”。客户状态、企微关系、已报名等重要标签不允许直接写入，只能生成建议并等待人工确认。每次打标必须输出依据片段和置信度。"
-    },
-    {
       key: "personalized-prompt",
       name: "生成个性化策略提示词",
       type: "生成个性化策略提示词",
       status: "启用",
-      scope: "单个客户",
-      audienceTags: ["好友正常", "需人工跟进", "亲子冲突"],
+      scope: "标签人群",
+      audienceTags: ["亲子冲突高", "家长高焦虑", "适合先共情安抚"],
       scheduleTime: "08:00",
       scheduleCycle: "1小时1次",
-      inputScope: ["客户档案", "流程阶段", "最近10轮会话", "用户标签", "销售策略"],
-      outputResults: ["策略提示词", "会话智能体上下文"],
-      writeTargets: ["会话智能体上下文", "客户档案-策略记录"],
-      reviewMode: "无需审核，直接写入",
+      friendDayRules: [3, 5],
+      messageCountRules: [10, 20],
+      executeDelayDays: "后 1 天",
+      inputScope: ["用户沟通数据", "客户档案"],
+      outputResults: ["策略提示词"],
+      writeTargets: ["系统提示词", "客户档案"],
       logic: "当客户进入新的角色流程阶段时，生成一段面向当前会话智能体的个性化策略提示词。内容包括客户关键背景、当前最适合的沟通角度、禁止触碰的话题、是否适合推品、下一轮建议动作。比如亲子冲突高、家长焦虑明显的客户，应提示会话智能体先稳定情绪和确认事实，不要过早介绍课程价格；已完成体验课且认可老师判断的客户，可提示智能体适度引导人工确认方案。"
-    },
-    {
-      key: "follow-up-task",
-      name: "自动生成跟进任务",
-      type: "生成定时任务",
-      status: "启用",
-      scope: "标签人群",
-      audienceTags: ["已预约体验课", "已上体验课", "体验课未报名", "高意向"],
-      scheduleTime: "09:00",
-      scheduleCycle: "每天一次",
-      inputScope: ["课程计划", "听课状态", "最近会话", "用户标签", "销售负责人"],
-      outputResults: ["定时任务", "人工提醒"],
-      writeTargets: ["聊天计划", "人工工作台", "会话中心提醒"],
-      reviewMode: "敏感触达需确认",
-      logic: "根据客户课程计划、听课状态和最近互动自动生成后续触达任务。比如体验课前 30 分钟生成课前提醒；课后 20 分钟生成反馈收集；课后 24 小时仍未报名且标签为高意向时生成销售人工跟进提醒。若客户刚表达反感、投诉或明确拒绝，不自动生成营销触达，只生成人工复盘提醒。生成任务时要包含触达目标、建议时间、触达方式和风险提示。"
     }
   ];
-  const strategyTaskTypeOptions = ["销售策略总结", "周期性AI打标", "生成个性化策略提示词", "生成定时任务"].map((value) => ({ value }));
-  const strategyScopeOptions = ["单个客户", "标签人群", "全部客户"].map((value) => ({ value }));
+  const strategyTaskTypeOptions = ["生成个性化策略提示词"].map((value) => ({ value }));
+  const strategyScopeOptions = ["标签人群", "全部客户"].map((value) => ({ value }));
   const strategyCycleOptions = ["1小时1次", "6小时1次", "12小时1次", "每天一次", "2天一次", "1周一次"].map((value) => ({ value }));
   const strategyInputScopeOptions = ["客户档案", "最近24小时会话", "最近7天会话", "最近10轮会话", "历史会话摘要", "课程信息", "课程计划", "听课数据", "用户标签", "已有标签", "订单状态", "销售策略", "销售负责人", "流程阶段"].map((value) => ({ value }));
-  const strategyOutputResultOptions = ["销售策略", "客户标签", "打标理由", "策略提示词", "会话智能体上下文", "定时任务", "人工提醒"].map((value) => ({ value }));
-  const strategyWriteTargetOptions = ["客户档案-销售策略", "客户档案-策略记录", "客户标签", "打标记录", "会话智能体上下文", "聊天计划", "人工工作台", "会话中心提醒"].map((value) => ({ value }));
-  const strategyReviewModeOptions = ["无需审核，直接写入", "写入前需人工审核", "仅高风险结果需审核", "只生成建议，不自动写入", "敏感触达需确认"].map((value) => ({ value }));
+  const strategyOutputResultOptions = ["策略提示词"].map((value) => ({ value }));
+  const strategyWriteTargetOptions = ["系统提示词", "客户档案"].map((value) => ({ value }));
+  const strategyPromptDataSourceConfigs = [
+    {
+      key: "用户沟通数据",
+      name: "用户沟通数据",
+      usage: "默认读取要生成提示词用户的全部对话数据，用于识别用户核心表达、当前情绪、阻碍点、购买顾虑和反复出现的诉求。"
+    },
+    {
+      key: "客户档案",
+      name: "客户档案",
+      usage: "默认读取企业给到的客户档案数据，用于校验会话判断是否与客户长期背景一致，避免只凭最近一次对话生成错误提示词。"
+    }
+  ];
   const strategyAudienceTagOptions = customerTagGroups.map((group) => ({
     label: group.name,
-    options: group.tags.map((tag) => ({ value: tag.value, label: tag.source === "AI打标" ? `${tag.value}（AI）` : tag.value }))
+    options: group.tags.map((tag) => ({ value: tag.value, label: getTagDisplayLabel(tag.value) }))
   }));
   const createStrategyTaskDraft = (index = 0) => ({
     key: `strategy-task-${Date.now()}`,
-    name: index === 0 ? "客户销售策略日报" : "新增策略任务",
-    type: "销售策略总结",
+    name: "生成个性化策略提示词",
+    type: "生成个性化策略提示词",
     status: "启用",
     scope: "标签人群",
-    audienceTags: ["高意向"],
-    scheduleTime: "20:00",
-    scheduleCycle: "每天一次",
-    inputScope: ["客户档案", "最近24小时会话", "用户标签"],
-    outputResults: ["销售策略"],
-    writeTargets: ["客户档案-销售策略"],
-    reviewMode: "无需审核，直接写入",
-    logic: "描述该策略任务的判断条件、执行步骤、输出格式和异常处理方式。"
+    audienceTags: ["亲子冲突高", "家长高焦虑", "适合先共情安抚"],
+    scheduleTime: "08:00",
+    scheduleCycle: "1小时1次",
+    friendDayRules: [3, 5],
+    messageCountRules: [10, 20],
+    executeDelayDays: "后 1 天",
+    inputScope: ["用户沟通数据", "客户档案"],
+    outputResults: ["策略提示词"],
+    writeTargets: ["系统提示词", "客户档案"],
+    logic: "描述个性化策略提示词的生成条件、引用数据、输出结构和禁止事项。"
   });
   const [strategyTasks, setStrategyTasks] = useState(strategyTaskConfigs);
   const [strategyTaskEditor, setStrategyTaskEditor] = useState(null);
   const [strategyTaskDraft, setStrategyTaskDraft] = useState(createStrategyTaskDraft(0));
+  const [strategyTaskTagPicker, setStrategyTaskTagPicker] = useState({ open: false, selected: [], keyword: "", rule: "以下标签满足其一" });
   const openStrategyTaskEditor = (index = null) => {
     setStrategyTaskEditor({ index });
     setStrategyTaskDraft(index == null ? createStrategyTaskDraft(strategyTasks.length) : { ...strategyTasks[index] });
+  };
+  const openStrategyTaskTagPicker = () => {
+    setStrategyTaskTagPicker({
+      open: true,
+      selected: strategyTaskDraft.audienceTags || [],
+      keyword: "",
+      rule: "以下标签满足其一"
+    });
+  };
+  const saveStrategyTaskTagPicker = () => {
+    setStrategyTaskDraft((item) => ({ ...item, audienceTags: strategyTaskTagPicker.selected }));
+    setStrategyTaskTagPicker((item) => ({ ...item, open: false }));
+  };
+  const addStrategyPromptTriggerRule = (type) => {
+    setStrategyTaskDraft((item) => {
+      const field = type === "friendDay" ? "friendDayRules" : "messageCountRules";
+      const nextValue = type === "friendDay" ? 7 : 30;
+      return { ...item, [field]: [...(item[field] || []), nextValue] };
+    });
+  };
+  const updateStrategyPromptTriggerRule = (type, index, value) => {
+    setStrategyTaskDraft((item) => {
+      const field = type === "friendDay" ? "friendDayRules" : "messageCountRules";
+      return { ...item, [field]: (item[field] || []).map((currentValue, itemIndex) => itemIndex === index ? value || 1 : currentValue) };
+    });
+  };
+  const removeStrategyPromptTriggerRule = (type, index) => {
+    setStrategyTaskDraft((item) => {
+      const field = type === "friendDay" ? "friendDayRules" : "messageCountRules";
+      const currentRules = item[field] || [];
+      return { ...item, [field]: currentRules.length > 1 ? currentRules.filter((_, itemIndex) => itemIndex !== index) : currentRules };
+    });
   };
   const saveStrategyTaskDraft = () => {
     if (!strategyTaskDraft.name?.trim()) {
       message.warning("请输入任务名称");
       return;
     }
+    const normalizedTaskDraft = {
+      ...strategyTaskDraft,
+      audienceTags: strategyTaskDraft.scope === "全部客户" ? [] : strategyTaskDraft.audienceTags
+    };
     if (strategyTaskEditor.index == null) {
-      setStrategyTasks((items) => [...items, { ...strategyTaskDraft, key: `strategy-task-${Date.now()}` }]);
+      setStrategyTasks((items) => [...items, { ...normalizedTaskDraft, key: `strategy-task-${Date.now()}` }]);
     } else {
-      setStrategyTasks((items) => items.map((item, index) => (index === strategyTaskEditor.index ? strategyTaskDraft : item)));
+      setStrategyTasks((items) => items.map((item, index) => (index === strategyTaskEditor.index ? normalizedTaskDraft : item)));
     }
     setStrategyTaskEditor(null);
   };
   const createScheduleRule = (index = 0) => ({
     taskName: index === 0 ? "自我介绍" : index === 1 ? "追问客户需求" : "阶段结果同步",
     taskDescription: index === 0 ? "打招呼，说明服务身份，并承接客户当前咨询场景。" : index === 1 ? "围绕年级、英语基础、学习目标和时间安排进行需求确认。" : "同步当前阶段结果，更新客户状态并准备后续跟进。",
+    targetAudienceMode: "全部用户",
+    targetTags: [],
     taskType: index === 0 ? "ADD_FRIEND" : "AGENT_START",
     delayType: index === 0 ? "IMMEDIATE" : "DELAY",
     delayValue: index === 0 ? 0 : index === 1 ? 1 : 30,
     delayUnit: "分钟",
     enabled: true
   });
+  const createAgentVersionRows = () => [
+    {
+      key: "v3",
+      version: "v3",
+      status: "当前发布版本",
+      model: "qwen3.5-omni-flash",
+      modelConfig,
+      toolKeys: defaultToolKeys,
+      aiSkillKeys: fallbackAiSkillKeys,
+      knowledgeBaseKeys: defaultKnowledgeBaseKeys,
+      taskCount: 6,
+      updatedAt: "2026-08-03 17:40:34"
+    },
+    {
+      key: "v2",
+      version: "v2",
+      status: "历史版本",
+      model: "qwen3.5-omni-flash",
+      modelConfig: { ...modelConfig, temperature: 0.6 },
+      toolKeys: defaultToolKeys.slice(0, 2),
+      aiSkillKeys: fallbackAiSkillKeys,
+      knowledgeBaseKeys: defaultKnowledgeBaseKeys.slice(0, 1),
+      taskCount: 5,
+      updatedAt: "2026-07-21 11:29:22"
+    },
+    {
+      key: "v1",
+      version: "v1",
+      status: "历史版本",
+      model: "qwen3.5-omni-flash",
+      modelConfig: { ...modelConfig, model: "qwen3.5-omni-flash", temperature: 0.8 },
+      toolKeys: defaultToolKeys.slice(0, 1),
+      aiSkillKeys: fallbackAiSkillKeys.slice(0, 1),
+      knowledgeBaseKeys: defaultKnowledgeBaseKeys.slice(0, 1),
+      taskCount: 4,
+      updatedAt: "2026-07-24 13:00:05"
+    }
+  ];
+  const [versionRows, setVersionRows] = useState(createAgentVersionRows);
+  const [selectedVersionKey, setSelectedVersionKey] = useState("v3");
+  const [activeAgentTab, setActiveAgentTab] = useState("model");
+  const selectedVersion = versionRows.find((item) => item.key === selectedVersionKey) || versionRows[0];
+  const currentVersionModelConfig = selectedVersion.modelConfig || modelConfig;
   const taskTypeOptions = [
     { value: "ADD_FRIEND", label: "加好友" },
     { value: "ADD_FRIEND_NATURAL_DAY", label: "加好友自然日" },
@@ -4260,15 +6851,49 @@ function StrategyEditor({ skill, onBack }) {
   };
   const [taskEditor, setTaskEditor] = useState(null);
   const [taskDraft, setTaskDraft] = useState(createScheduleRule(0));
+  const [taskTagPicker, setTaskTagPicker] = useState({ open: false, selected: [], keyword: "", rule: "以下标签满足其一" });
   const openTaskEditor = (index = null) => {
     const rules = form.getFieldValue("scheduleRules") || [];
     setTaskEditor({ index });
     setTaskDraft(index == null ? createScheduleRule(rules.length) : { ...createScheduleRule(index), ...(rules[index] || {}) });
   };
-  const [selectedKnowledgeBaseKeys, setSelectedKnowledgeBaseKeys] = useState(skill.knowledgeBaseKeys || defaultKnowledgeBaseKeys);
-  const [selectedToolKeys, setSelectedToolKeys] = useState(skill.toolKeys || defaultToolKeys);
-  const [selectedAiSkillKeys, setSelectedAiSkillKeys] = useState(skill.aiSkillKeys || fallbackAiSkillKeys);
-  const selectedKnowledgeBases = knowledgeBases.filter((item) => selectedKnowledgeBaseKeys.includes(item.key));
+  const openTaskTagPicker = () => {
+    setTaskTagPicker({
+      open: true,
+      selected: taskDraft.targetTags || [],
+      keyword: "",
+      rule: "以下标签满足其一"
+    });
+  };
+  const saveTaskTagPicker = () => {
+    setTaskDraft((item) => ({ ...item, targetTags: taskTagPicker.selected }));
+    setTaskTagPicker((item) => ({ ...item, open: false }));
+  };
+  const getDelayHours = () => Math.floor((taskDraft.delayValue || 0) / 60);
+  const getDelayMinutes = () => (taskDraft.delayValue || 0) % 60;
+  const updateTaskDelayPart = (part, value) => {
+    const nextValue = Math.max(0, value || 0);
+    const hours = part === "hours" ? nextValue : getDelayHours();
+    const minutes = part === "minutes" ? nextValue : getDelayMinutes();
+    setTaskDraft((item) => ({ ...item, delayValue: hours * 60 + minutes, delayUnit: "分钟" }));
+  };
+  const [selectedKnowledgeResourceKeys, setSelectedKnowledgeResourceKeys] = useState(
+    selectedVersion.knowledgeResourceKeys || (selectedVersion.knowledgeBaseKeys || defaultKnowledgeBaseKeys).map((key) => `base:${key}`)
+  );
+  const [agentKnowledgePickerOpen, setAgentKnowledgePickerOpen] = useState(false);
+  const [agentKnowledgePickerKeys, setAgentKnowledgePickerKeys] = useState([]);
+  const [selectedToolKeys, setSelectedToolKeys] = useState(selectedVersion.toolKeys || defaultToolKeys);
+  const [selectedAiSkillKeys, setSelectedAiSkillKeys] = useState(selectedVersion.aiSkillKeys || fallbackAiSkillKeys);
+  const [relationPicker, setRelationPicker] = useState({ open: false, type: "tools", keyword: "", category: "全部类型" });
+  useEffect(() => {
+    if (!selectedVersion) return;
+    setSelectedKnowledgeResourceKeys(selectedVersion.knowledgeResourceKeys || (selectedVersion.knowledgeBaseKeys || defaultKnowledgeBaseKeys).map((key) => `base:${key}`));
+    setSelectedToolKeys(selectedVersion.toolKeys || defaultToolKeys);
+    setSelectedAiSkillKeys(selectedVersion.aiSkillKeys || fallbackAiSkillKeys);
+    form.setFieldsValue(selectedVersion.modelConfig || modelConfig);
+  }, [selectedVersionKey]);
+  const knowledgeResourceRows = buildKnowledgeResourceRows();
+  const selectedKnowledgeResources = knowledgeResourceRows.filter((item) => selectedKnowledgeResourceKeys.includes(item.key));
   const selectedTools = agentTools.filter((item) => selectedToolKeys.includes(item.key));
   const skillOutputTypeDefaults = {
     "信息总结": "结构化档案",
@@ -4297,6 +6922,199 @@ function StrategyEditor({ skill, onBack }) {
       return item ? buildAgentSkillUsage(item) : null;
     })
     .filter(Boolean);
+  const relationCatalogs = {
+    tools: {
+      title: "已关联工具",
+      desc: "配置该版本智能体可调用的工具，用于外部查询、通知、跳转和托管动作。",
+      emptyTitle: "当前版本暂未配置工具",
+      emptyDesc: "添加后，智能体可在编排和提示词允许的场景中调用对应工具。",
+      addText: "添加工具",
+      pickerTitle: "选择工具",
+      icon: <ToolOutlined />,
+      selectedKeys: selectedToolKeys,
+      setSelectedKeys: setSelectedToolKeys,
+      rows: agentTools.map((tool) => ({
+        key: tool.key,
+        name: tool.name,
+        type: tool.enabled ? "可用工具" : "停用工具",
+        description: tool.description,
+        scenario: "外部查询、通知、跳转、托管控制",
+        input: "任务上下文、客户标识、会话阶段、业务参数",
+        output: "调用状态、关键字段、异常信息、结构化摘要",
+        status: tool.enabled ? "启用" : "停用",
+        updatedAt: tool.updatedAt
+      }))
+    },
+    skills: {
+      title: "Skill调用配置",
+      desc: "查看该智能体已关联的 Skill 默认能力定义，具体调用时机由智能体编排和提示词策略共同决定。",
+      emptyTitle: "当前版本暂未配置 Skill",
+      emptyDesc: "选择该智能体可关联的 Skill，添加后可复用标准化判断、总结、推荐和合规能力。",
+      addText: "添加 Skill",
+      pickerTitle: "选择 Skill",
+      icon: <FileSearchOutlined />,
+      selectedKeys: selectedAiSkillKeys,
+      setSelectedKeys: setSelectedAiSkillKeys,
+      rows: aiSkills.map((skillItem) => {
+        const item = buildAgentSkillUsage(skillItem);
+        return {
+          key: item.key,
+          name: item.name,
+          type: item.type,
+          description: item.description,
+          scenario: item.scenario,
+          input: item.input,
+          output: `${item.outputType} / ${(item.outputTargets || []).join("、")}`,
+          status: item.status,
+          updatedAt: item.updatedAt
+        };
+      })
+    },
+    knowledge: {
+      title: "知识库配置",
+      desc: "配置该版本智能体可引用的知识库，作为回答、规则校验和产品说明的依据。",
+      emptyTitle: "当前版本暂未配置知识库",
+      emptyDesc: "添加后，智能体可在对话和 Skill 调用中引用对应知识内容。",
+      addText: "添加知识库",
+      pickerTitle: "选择知识库",
+      icon: <BookOutlined />,
+      selectedKeys: selectedKnowledgeResourceKeys,
+      setSelectedKeys: setSelectedKnowledgeResourceKeys,
+      rows: knowledgeResourceRows.map((resource) => ({
+        key: resource.key,
+        name: resource.name,
+        type: resource.relationType,
+        description: resource.desc,
+        scenario: resource.path,
+        input: resource.contentType,
+        output: "可引用知识片段、资料说明、边界规则",
+        status: resource.status,
+        updatedAt: resource.updatedAt
+      }))
+    }
+  };
+  const openRelationPicker = (type) => {
+    if (type === "knowledge") {
+      setAgentKnowledgePickerKeys(selectedKnowledgeResourceKeys);
+      setAgentKnowledgePickerOpen(true);
+      return;
+    }
+    setRelationPicker({ open: true, type, keyword: "", category: "全部类型" });
+  };
+  const saveAgentKnowledgeResources = () => {
+    const nextKeys = Array.from(new Set(agentKnowledgePickerKeys));
+    setSelectedKnowledgeResourceKeys(nextKeys);
+    setAgentKnowledgePickerOpen(false);
+  };
+  const toggleRelationSelection = (type, key) => {
+    const config = relationCatalogs[type];
+    config.setSelectedKeys((keys) => (
+      keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]
+    ));
+  };
+  const renderRelationConfigTab = (type) => {
+    const config = relationCatalogs[type];
+    const rows = config.rows.filter((item) => config.selectedKeys.includes(item.key));
+    const columns = [
+      { title: "名称", dataIndex: "name", width: 180 },
+      { title: "类型", dataIndex: "type", width: 110, render: (value) => <Tag color="blue">{value}</Tag> },
+      { title: "说明", dataIndex: "description", width: 260, render: (value) => <Text type="secondary" className="agent-relation-desc">{value}</Text> },
+      { title: "适用场景", dataIndex: "scenario", width: 220 },
+      { title: "状态", dataIndex: "status", width: 80, render: statusTag },
+      { title: "更新时间", dataIndex: "updatedAt", width: 160 },
+      {
+        title: "操作",
+        fixed: "right",
+        width: 84,
+        render: (_, record) => <Button type="link" size="small" danger onClick={() => toggleRelationSelection(type, record.key)}>移除</Button>
+      }
+    ];
+    return (
+      <Card
+        className="agent-relation-config-card"
+        title={<PanelTitle title={config.title} desc={config.desc} extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => openRelationPicker(type)}>{config.addText}</Button>} />}
+      >
+        {rows.length ? (
+          <Table
+            className="admin-table agent-relation-table"
+            rowKey="key"
+            pagination={false}
+            scroll={{ x: 1180 }}
+            columns={columns}
+            dataSource={rows}
+          />
+        ) : (
+          <button type="button" className="agent-relation-empty" onClick={() => openRelationPicker(type)}>
+            <span className="agent-relation-empty-icon">{config.icon}</span>
+            <span className="agent-relation-empty-title">{config.emptyTitle}</span>
+            <span className="agent-relation-empty-desc">{config.emptyDesc}</span>
+            <span className="agent-relation-empty-action">{config.addText}</span>
+          </button>
+        )}
+      </Card>
+    );
+  };
+  const renderRelationPickerModal = () => {
+    const config = relationCatalogs[relationPicker.type];
+    const categories = ["全部类型", ...Array.from(new Set(config.rows.map((item) => item.type)))];
+    const keywordText = relationPicker.keyword.trim().toLowerCase();
+    const rows = config.rows.filter((item) => {
+      const matchesCategory = relationPicker.category === "全部类型" || item.type === relationPicker.category;
+      const matchesKeyword = !keywordText || [item.name, item.type, item.description, item.scenario].some((value) => String(value || "").toLowerCase().includes(keywordText));
+      return matchesCategory && matchesKeyword;
+    });
+    return (
+      <Modal
+        title={config.pickerTitle}
+        open={relationPicker.open}
+        onCancel={() => setRelationPicker((item) => ({ ...item, open: false }))}
+        footer={<Button type="primary" onClick={() => setRelationPicker((item) => ({ ...item, open: false }))}>确定</Button>}
+        width={900}
+        className="agent-relation-picker-modal"
+      >
+        <div className="agent-relation-picker-toolbar">
+          <Input.Search
+            allowClear
+            placeholder={`搜索${config.pickerTitle}名称、类型或说明`}
+            value={relationPicker.keyword}
+            onChange={(event) => setRelationPicker((item) => ({ ...item, keyword: event.target.value }))}
+          />
+          <Select
+            value={relationPicker.category}
+            options={categories.map((value) => ({ value }))}
+            onChange={(value) => setRelationPicker((item) => ({ ...item, category: value }))}
+          />
+        </div>
+        <div className="agent-relation-card-list">
+          {rows.map((item) => {
+            const checked = config.selectedKeys.includes(item.key);
+            return (
+              <div className={checked ? "agent-relation-resource-card selected" : "agent-relation-resource-card"} key={item.key}>
+                <div className="agent-relation-resource-head">
+                  <Space size={8} wrap>
+                    <span className="agent-relation-resource-icon">{config.icon}</span>
+                    <Text className="agent-relation-resource-name">{item.name}</Text>
+                    <Tag color="blue">{item.type}</Tag>
+                    {statusTag(item.status)}
+                    {checked ? <Tag color="success">已选择</Tag> : null}
+                  </Space>
+                  <Button size="small" type={checked ? "default" : "primary"} onClick={() => toggleRelationSelection(relationPicker.type, item.key)}>
+                    {checked ? "移除" : "选择"}
+                  </Button>
+                </div>
+                <Text type="secondary" className="agent-relation-resource-desc">{item.description}</Text>
+                <div className="agent-relation-resource-meta">
+                  <div><Text type="secondary">适用场景</Text><Text>{item.scenario}</Text></div>
+                  <div><Text type="secondary">输入摘要</Text><Text>{item.input}</Text></div>
+                  <div><Text type="secondary">输出摘要</Text><Text>{item.output}</Text></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Modal>
+    );
+  };
   const [debugInput, setDebugInput] = useState("");
   const [debugTrace, setDebugTrace] = useState(null);
   const defaultDebugPresetDescription = "孩子三年级，英语基础一般，阅读总丢分。想先了解试听课怎么安排，费用大概多少？";
@@ -4339,6 +7157,7 @@ function StrategyEditor({ skill, onBack }) {
     if (section.steps) lines.push(...section.steps.map((step, index) => `${index + 1}. ${step}`));
     return lines.join("\n");
   }).join("\n\n");
+  const currentVersionLogicText = `${isStrategyAgent ? strategyAgentLogicText : logicText}\n\n# 版本调试说明\n当前选择版本：${selectedVersion.version}。下方模型、工具、Skill 和预览调试均使用该版本快照。`;
   const debugReply = skill.name === "19元A类课-第一课"
     ? "张妈妈，孩子三年级现在词汇和阅读跟不上是比较常见的情况。建议先约一节小学英语诊断试听课，老师会看孩子自然拼读、阅读理解和校内同步掌握情况，再给您一份具体提升建议。"
     : `${skill.name} 已完成调用：已识别学员年级、英语基础、试听状态和下一步跟进动作，可交给课程顾问继续确认。`;
@@ -4438,6 +7257,70 @@ function StrategyEditor({ skill, onBack }) {
     { title: "课后总结问感受", trigger: "agent生效", delay: "agent 生效 后 21小时", status: "启用" },
     { title: "课后总结问感受", trigger: "agent生效", delay: "agent 生效 后 21小时", status: "启用" }
   ];
+  const createVersion = (sourceVersion = selectedVersion) => {
+    const nextNumber = Math.max(...versionRows.map((item) => Number(item.version.replace("v", "")) || 0)) + 1;
+    const nextVersion = {
+      ...sourceVersion,
+      key: `v${nextNumber}`,
+      version: `v${nextNumber}`,
+      status: "草稿版本",
+      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " ")
+    };
+    setVersionRows((items) => [nextVersion, ...items]);
+    setSelectedVersionKey(nextVersion.key);
+    message.success("已创建草稿版本");
+  };
+  const publishVersion = (versionKey) => {
+    setVersionRows((items) => items.map((item) => ({
+      ...item,
+      status: item.key === versionKey ? "当前发布版本" : item.status === "当前发布版本" ? "历史版本" : item.status
+    })));
+    setSelectedVersionKey(versionKey);
+    message.success("已切换当前发布版本");
+  };
+  const stopVersion = (versionKey) => {
+    setVersionRows((items) => items.map((item) => (item.key === versionKey ? { ...item, status: "历史版本" } : item)));
+    message.success("版本已停用");
+  };
+  const versionColumns = [
+    {
+      title: "版本",
+      dataIndex: "version",
+      width: 110,
+      render: (value, record) => <Button type="link" className="version-name-button" onClick={() => setSelectedVersionKey(record.key)}>{value}</Button>
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: 150,
+      render: (value) => (
+        <Space direction="vertical" size={4}>
+          <Badge color={value === "当前发布版本" ? "green" : value === "草稿版本" ? "blue" : "default"} text={value === "历史版本" ? "已停用" : value} />
+          {value === "当前发布版本" ? <Tag color="success">当前发布版本</Tag> : null}
+        </Space>
+      )
+    },
+    { title: "模型", dataIndex: "model", width: 210 },
+    { title: "工具数", dataIndex: "toolKeys", width: 92, align: "center", render: (items = []) => <Tag color="success">{items.length}</Tag> },
+    { title: "Skill数", dataIndex: "aiSkillKeys", width: 92, align: "center", render: (items = []) => <Tag color="processing">{items.length}</Tag> },
+    { title: "任务数", dataIndex: "taskCount", width: 92, align: "center", render: (value) => <Tag>{value}</Tag> },
+    { title: "更新时间", dataIndex: "updatedAt", width: 170 },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 150,
+      render: (_, record) => (
+        <Space size={4} className="table-action-group">
+          <Button type="link" size="small" onClick={() => setSelectedVersionKey(record.key)}>查看</Button>
+          {record.status === "当前发布版本" ? (
+            <Button type="link" size="small" danger onClick={() => stopVersion(record.key)}>停用</Button>
+          ) : (
+            <Button type="link" size="small" onClick={() => publishVersion(record.key)}>设为发布版本</Button>
+          )}
+        </Space>
+      )
+    }
+  ];
   return (
     <Space direction="vertical" size={16} className="page-stack">
       <Card className="skill-editor-shell">
@@ -4451,34 +7334,60 @@ function StrategyEditor({ skill, onBack }) {
             <Button type="primary">保存智能体</Button>
           </Space>
         </div>
-        <div className="agent-config-overview">
-          <Descriptions
-            className="agent-basic-summary"
+        <div className="agent-version-center">
+          <div className="agent-version-head">
+            <Space size={12}>
+              <span className="agent-version-icon"><CloudSyncOutlined /></span>
+              <div>
+                <Text className="agent-version-title">版本中心</Text>
+                <Text type="secondary" className="agent-version-desc">当前已发布版本与草稿版本配置快照。选择版本后，下方配置内容会切换为该版本快照。</Text>
+              </div>
+            </Space>
+            <Space>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => createVersion()}>创建版本</Button>
+              <Tooltip title="刷新版本列表"><Button icon={<CloudSyncOutlined />} onClick={() => message.success("版本列表已刷新")} /></Tooltip>
+            </Space>
+          </div>
+          <Table
+            className="admin-table agent-version-table"
+            rowKey="key"
             size="small"
-            bordered
-            column={{ xs: 1, sm: 1, md: 2, lg: 3 }}
-          >
-            <Descriptions.Item label="智能体名称">{skill.name}</Descriptions.Item>
-            <Descriptions.Item label="Agent Code">{skill.code || `${skill.key || "agent"}_agent`}</Descriptions.Item>
-            <Descriptions.Item label="分类">{skill.type || "消息生成"}</Descriptions.Item>
-            <Descriptions.Item label="状态">{statusTag(skill.status || "启用")}</Descriptions.Item>
-            <Descriptions.Item label="模型">{modelConfig.model}</Descriptions.Item>
-            <Descriptions.Item label="工具 / Skill">{selectedToolKeys.length} 个工具 / {selectedAiSkillKeys.length} 个 Skill</Descriptions.Item>
-            <Descriptions.Item label="说明" span={3}>{skill.description || `${skill.name} 用于在指定业务场景中独立完成 AI 任务，并可按需关联工具与 Skill。`}</Descriptions.Item>
-          </Descriptions>
+            columns={versionColumns}
+            dataSource={versionRows}
+            pagination={false}
+            rowClassName={(record) => record.key === selectedVersionKey ? "agent-version-row active" : "agent-version-row"}
+            onRow={(record) => ({ onClick: () => setSelectedVersionKey(record.key) })}
+            scroll={{ x: 1260 }}
+          />
         </div>
       </Card>
       <Card className="skill-editor-tabs-card">
+        <div className="agent-selected-version-detail">
+          <div>
+            <Text className="agent-selected-version-title">{selectedVersion.version} 版本详情</Text>
+            <Text type="secondary" className="agent-selected-version-desc">当前下方配置内容来自该版本快照，可切换上方版本查看不同配置。</Text>
+          </div>
+          <Space wrap size={[8, 8]}>
+            <Tag color={selectedVersion.status === "当前发布版本" ? "success" : selectedVersion.status === "草稿版本" ? "processing" : "default"}>{selectedVersion.status}</Tag>
+            <Tag>{selectedVersion.model}</Tag>
+            <Tag>{selectedToolKeys.length} 个工具</Tag>
+            <Tag>{selectedAiSkillKeys.length} 个 Skill</Tag>
+            <Tag>{selectedKnowledgeResourceKeys.length} 个知识资源</Tag>
+            <Tag>{selectedVersion.taskCount} 个任务</Tag>
+            <Text type="secondary">更新时间：{selectedVersion.updatedAt}</Text>
+          </Space>
+        </div>
         <Tabs
           className="skill-editor-tabs"
-          defaultActiveKey="model"
+          activeKey={activeAgentTab}
+          onChange={setActiveAgentTab}
           items={[
             {
               key: "model",
               label: "模型配置",
               children: (
                 <Card size="small" title="模型基础配置" className="agent-config-card">
-                  <Form layout="vertical" initialValues={modelConfig}>
+                  <Form layout="vertical" initialValues={currentVersionModelConfig} key={selectedVersionKey}>
                     <Row gutter={16}>
                       <Col span={24}><Form.Item label="Provider" name="provider"><Select options={["DASHSCOPE", "OpenAI", "Azure OpenAI", "自定义模型"].map((value) => ({ value }))} /></Form.Item></Col>
                       <Col span={24}><Form.Item label="模型" name="model"><Input placeholder="请输入模型名称" /></Form.Item></Col>
@@ -4497,7 +7406,7 @@ function StrategyEditor({ skill, onBack }) {
                     <div className="builder-pane-head">
                       <Title level={4}>智能体逻辑描述</Title>
                     </div>
-                    <SkillLogicRichEditor defaultValue={isStrategyAgent ? strategyAgentLogicText : logicText} />
+                    <SkillLogicRichEditor key={selectedVersionKey} defaultValue={currentVersionLogicText} />
                   </section>
                   <section className="skill-config-pane">
                     <div className="builder-pane-head">
@@ -4507,7 +7416,7 @@ function StrategyEditor({ skill, onBack }) {
                       <>
                         <div className="strategy-task-config-form">
                           <div className="strategy-task-config-summary">
-                            <Text type="secondary">已配置 {strategyTasks.length} 个策略任务。点击“配置任务”在弹窗中维护任务字段；左侧提示词只维护全局角色和共性规则。</Text>
+                            <Text type="secondary">已配置 {strategyTasks.length} 个策略任务。当前仅保留“生成个性化策略提示词”任务；点击“配置任务”在侧边栏中维护任务字段。</Text>
                             <Button type="primary" icon={<PlusOutlined />} onClick={() => openStrategyTaskEditor(null)}>配置任务</Button>
                           </div>
                           <div className="strategy-task-config-list">
@@ -4546,7 +7455,6 @@ function StrategyEditor({ skill, onBack }) {
                                     <Text type="secondary">输出</Text>
                                     <Space size={[4, 4]} wrap>
                                       {(task.outputResults || []).map((item) => <Tag key={item} color="blue">{item}</Tag>)}
-                                      <Tag>{task.reviewMode}</Tag>
                                     </Space>
                                   </div>
                                   <div className="strategy-task-summary-row">
@@ -4559,80 +7467,167 @@ function StrategyEditor({ skill, onBack }) {
                             ))}
                           </div>
                         </div>
-                        <Modal
+                        <Drawer
                           title={strategyTaskEditor?.index == null ? "配置策略任务" : "编辑策略任务"}
                           open={Boolean(strategyTaskEditor)}
-                          width={860}
-                          okText="保存任务"
-                          cancelText="取消"
-                          onCancel={() => setStrategyTaskEditor(null)}
-                          onOk={saveStrategyTaskDraft}
+                          width={760}
+                          onClose={() => setStrategyTaskEditor(null)}
+                          className="strategy-task-editor-drawer"
+                          extra={<Space><Button onClick={() => setStrategyTaskEditor(null)}>取消</Button><Button type="primary" onClick={saveStrategyTaskDraft}>保存任务</Button></Space>}
                         >
-                          <Form layout="vertical" className="strategy-task-modal-form">
-                            <Row gutter={16}>
-                              <Col span={12}>
-                                <Form.Item label="任务名称">
-                                  <Input value={strategyTaskDraft.name} placeholder="例如：高意向客户晚间日报" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, name: event.target.value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item label="任务类型">
-                                  <Select value={strategyTaskDraft.type} options={strategyTaskTypeOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, type: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={8}>
-                                <Form.Item label="执行对象">
-                                  <Select value={strategyTaskDraft.scope} options={strategyScopeOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, scope: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={8}>
-                                <Form.Item label="固定执行时间">
-                                  <Input value={strategyTaskDraft.scheduleTime} placeholder="例如：20:00" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, scheduleTime: event.target.value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={8}>
-                                <Form.Item label="执行周期">
-                                  <Select value={strategyTaskDraft.scheduleCycle} options={strategyCycleOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, scheduleCycle: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={24}>
-                                <Form.Item label="适用标签人群">
-                                  <Select mode="multiple" value={strategyTaskDraft.audienceTags} options={strategyAudienceTagOptions} placeholder="选择标签确定任务适用人群" onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, audienceTags: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={24}>
-                                <Form.Item label="输入数据范围">
-                                  <Select mode="multiple" value={strategyTaskDraft.inputScope} options={strategyInputScopeOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, inputScope: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item label="输出结果">
-                                  <Select mode="multiple" value={strategyTaskDraft.outputResults} options={strategyOutputResultOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, outputResults: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item label="输出去向">
-                                  <Select mode="multiple" value={strategyTaskDraft.writeTargets} options={strategyWriteTargetOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, writeTargets: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item label="输出审核方式">
-                                  <Select value={strategyTaskDraft.reviewMode} options={strategyReviewModeOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, reviewMode: value }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item label="状态">
-                                  <Switch checked={strategyTaskDraft.status === "启用"} checkedChildren="启用" unCheckedChildren="停用" onChange={(checked) => setStrategyTaskDraft((item) => ({ ...item, status: checked ? "启用" : "停用" }))} />
-                                </Form.Item>
-                              </Col>
-                              <Col span={24}>
-                                <Form.Item label="任务逻辑描述">
-                                  <Input.TextArea rows={6} value={strategyTaskDraft.logic} showCount maxLength={1200} placeholder="描述该任务的判断条件、执行步骤、输出格式和异常处理方式。" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, logic: event.target.value }))} />
-                                </Form.Item>
-                              </Col>
-                            </Row>
+                          <Form layout="vertical" className="strategy-task-modal-form strategy-task-editor-form">
+                            <Card size="small" title="基础信息" className="strategy-task-editor-card">
+                              <Row gutter={16}>
+                                <Col span={12}>
+                                  <Form.Item label="任务名称">
+                                    <Input value={strategyTaskDraft.name} placeholder="例如：生成个性化策略提示词" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, name: event.target.value }))} />
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="任务类型">
+                                    <Select value={strategyTaskDraft.type} options={strategyTaskTypeOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, type: value }))} />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Card>
+                            <Card size="small" title="生成配置" className="strategy-task-editor-card">
+                              <div className="strategy-task-section-tip">用于控制哪些客户需要生成面向会话智能体的个性化策略提示词，以及按什么时间规则刷新。</div>
+                              <Row gutter={16}>
+                                <Col span={12}>
+                                  <Form.Item label="提示词生成对象">
+                                    <Select
+                                      value={strategyTaskDraft.scope}
+                                      options={strategyScopeOptions}
+                                      onChange={(value) => setStrategyTaskDraft((item) => ({
+                                        ...item,
+                                        scope: value,
+                                        audienceTags: value === "全部客户" ? [] : item.audienceTags
+                                      }))}
+                                    />
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="状态">
+                                    <Switch checked={strategyTaskDraft.status === "启用"} checkedChildren="启用" unCheckedChildren="停用" onChange={(checked) => setStrategyTaskDraft((item) => ({ ...item, status: checked ? "启用" : "停用" }))} />
+                                  </Form.Item>
+                                </Col>
+                                {strategyTaskDraft.scope !== "全部客户" ? (
+                                  <Col span={24}>
+                                    <Form.Item label="适用标签人群">
+                                      <CommonTagSelectButton
+                                        value={strategyTaskDraft.audienceTags}
+                                        placeholder="选择需要生成个性化提示词的客户标签"
+                                        onClick={openStrategyTaskTagPicker}
+                                        onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, audienceTags: value }))}
+                                      />
+                                    </Form.Item>
+                                  </Col>
+                                ) : null}
+                                <Col span={24}>
+                                  <Form.Item label="执行对象规则">
+                                    <div className="ai-auto-tag-trigger-panel strategy-task-trigger-panel">
+                                      <div className="ai-auto-tag-trigger-tip">满足任一条件即执行：加好友天数规则和用户发出消息条数规则是或的关系。</div>
+                                      <div className="ai-auto-tag-trigger-grid">
+                                        <div className="ai-auto-tag-trigger-card">
+                                          <div className="ai-auto-tag-trigger-card-head">
+                                            <Text className="ai-auto-tag-trigger-title">加好友第 X 天</Text>
+                                            <Button type="link" size="small" icon={<PlusOutlined />} onClick={() => addStrategyPromptTriggerRule("friendDay")}>添加</Button>
+                                          </div>
+                                          <div className="ai-auto-tag-trigger-list">
+                                            {(strategyTaskDraft.friendDayRules || []).map((value, index) => (
+                                              <div className="ai-auto-tag-trigger-row" key={`strategy-friend-day-${index}`}>
+                                                <Text className="ai-auto-tag-trigger-prefix">加好友第</Text>
+                                                <InputNumber min={1} max={365} value={value} onChange={(nextValue) => updateStrategyPromptTriggerRule("friendDay", index, nextValue)} />
+                                                <Text className="ai-auto-tag-trigger-suffix">天生成一次提示词</Text>
+                                                <Button type="link" size="small" danger onClick={() => removeStrategyPromptTriggerRule("friendDay", index)}>删除</Button>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                        <div className="ai-auto-tag-trigger-card">
+                                          <div className="ai-auto-tag-trigger-card-head">
+                                            <Text className="ai-auto-tag-trigger-title">用户发出的会话信息条数超过 X 条</Text>
+                                            <Button type="link" size="small" icon={<PlusOutlined />} onClick={() => addStrategyPromptTriggerRule("messageCount")}>添加</Button>
+                                          </div>
+                                          <div className="ai-auto-tag-trigger-list">
+                                            {(strategyTaskDraft.messageCountRules || []).map((value, index) => (
+                                              <div className="ai-auto-tag-trigger-row" key={`strategy-message-count-${index}`}>
+                                                <Text className="ai-auto-tag-trigger-prefix">用户发出消息超过</Text>
+                                                <InputNumber min={1} max={1000} value={value} onChange={(nextValue) => updateStrategyPromptTriggerRule("messageCount", index, nextValue)} />
+                                                <Text className="ai-auto-tag-trigger-suffix">条生成一次提示词</Text>
+                                                <Button type="link" size="small" danger onClick={() => removeStrategyPromptTriggerRule("messageCount", index)}>删除</Button>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="满足以上条件自然日后">
+                                    <Select value={strategyTaskDraft.executeDelayDays || "后 1 天"} options={["后 1 天", "后 2 天", "后 3 天"].map((value) => ({ value }))} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, executeDelayDays: value }))} />
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="执行时间">
+                                    <Input value={strategyTaskDraft.scheduleTime} placeholder="例如：08:00" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, scheduleTime: event.target.value }))} />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Card>
+                            <Card size="small" title="数据与输出" className="strategy-task-editor-card">
+                              <Row gutter={16}>
+                                <Col span={24}>
+                                  <div className="strategy-task-section-tip">选择 AI 生成个性化提示词时允许读取的数据。生成结果只服务会话智能体的沟通策略，不直接替代人工判断。</div>
+                                  <Form.Item label="数据来源授权">
+                                    <Checkbox.Group
+                                      value={strategyTaskDraft.inputScope}
+                                      className="ai-auto-tag-data-source-list strategy-task-data-source-list"
+                                      onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, inputScope: value }))}
+                                    >
+                                      {strategyPromptDataSourceConfigs.map((item) => (
+                                        <div className="ai-auto-tag-data-source-row" key={item.key}>
+                                          <Checkbox value={item.key}>{item.name}</Checkbox>
+                                          <Text type="secondary">{item.usage}</Text>
+                                        </div>
+                                      ))}
+                                    </Checkbox.Group>
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="生成内容">
+                                    <Select mode="multiple" value={strategyTaskDraft.outputResults} options={strategyOutputResultOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, outputResults: value }))} />
+                                  </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                  <Form.Item label="写入位置">
+                                    <Select mode="multiple" value={strategyTaskDraft.writeTargets} options={strategyWriteTargetOptions} onChange={(value) => setStrategyTaskDraft((item) => ({ ...item, writeTargets: value }))} />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Card>
+                            <Card size="small" title="提示词逻辑" className="strategy-task-editor-card">
+                              <Form.Item label="个性化提示词逻辑">
+                                <Input.TextArea rows={8} value={strategyTaskDraft.logic} showCount maxLength={1200} placeholder="描述个性化策略提示词的生成条件、引用数据、输出结构和禁止事项。" onChange={(event) => setStrategyTaskDraft((item) => ({ ...item, logic: event.target.value }))} />
+                              </Form.Item>
+                            </Card>
                           </Form>
-                        </Modal>
+                        </Drawer>
+                        <CommonTagPickerModal
+                          title="选择任务适用标签"
+                          open={strategyTaskTagPicker.open}
+                          selected={strategyTaskTagPicker.selected}
+                          keyword={strategyTaskTagPicker.keyword}
+                          rule={strategyTaskTagPicker.rule}
+                          ruleOptions={["以下标签满足其一"]}
+                          tip="策略任务会根据所选标签圈定适用人群；标签来自统一标签库，后续 AI 自动打标也会遵循标签组的 AI 写入权限。"
+                          onCancel={() => setStrategyTaskTagPicker((item) => ({ ...item, open: false }))}
+                          onOk={saveStrategyTaskTagPicker}
+                          onKeywordChange={(keyword) => setStrategyTaskTagPicker((item) => ({ ...item, keyword }))}
+                          onRuleChange={(rule) => setStrategyTaskTagPicker((item) => ({ ...item, rule }))}
+                          onSelectedChange={(selected) => setStrategyTaskTagPicker((item) => ({ ...item, selected }))}
+                        />
                       </>
                     ) : (
                     <Form
@@ -4676,7 +7671,7 @@ function StrategyEditor({ skill, onBack }) {
                                   <Text strong>选择用户标签及标准属性</Text>
                                   <div className="tag-condition-row">
                                     <Form.Item name="effectiveTag">
-                                      <Select placeholder="选择用户标签，例如：已付费、高意向、720期次" options={userTagOptions} />
+                                      <Select placeholder="选择用户标签，例如：高意向、亲子冲突高、体验后未报名" options={userTagOptions} />
                                     </Form.Item>
                                     <Form.Item name="effectiveTagAttribute">
                                       <Select placeholder="选择标签属性" options={tagAttributeOptions} />
@@ -4748,54 +7743,63 @@ function StrategyEditor({ skill, onBack }) {
                                   </div>
                                 ))}
                                 <Button type="dashed" className="schedule-add-button" icon={<PlusOutlined />} onClick={() => openTaskEditor(null)}>新增任务</Button>
-                                <Modal
-                                  className="agent-task-modal"
+                                <Drawer
+                                  className="agent-task-drawer"
                                   title={taskEditor?.index == null ? "新增策略任务" : "编辑策略任务"}
                                   open={Boolean(taskEditor)}
-                                  width={720}
-                                  okText="确定"
-                                  cancelText="取消"
-                                  onCancel={() => setTaskEditor(null)}
-                                  onOk={() => {
-                                    if (!taskDraft.taskType) {
-                                      message.warning("请选择任务类型");
-                                      return;
-                                    }
-                                    if (!taskDraft.delayType) {
-                                      message.warning("请选择触发类型");
-                                      return;
-                                    }
-                                    if (taskDraft.delayType === "DELAY" && (taskDraft.delayValue == null || taskDraft.delayValue < 0)) {
-                                      message.warning("请填写延后时间");
-                                      return;
-                                    }
-                                    if (taskDraft.delayType === "AT_TIME" && (taskDraft.delayValue == null || taskDraft.delayValue < 0 || taskDraft.delayValue > 23)) {
-                                      message.warning("请填写 0-23 点的指定时间");
-                                      return;
-                                    }
-                                    if (taskEditor.index == null) {
-                                      add(taskDraft);
-                                    } else {
-                                      updateScheduleRuleValue(taskEditor.index, taskDraft);
-                                    }
-                                    setTaskEditor(null);
-                                  }}
+                                  width={760}
+                                  onClose={() => setTaskEditor(null)}
+                                  extra={
+                                    <Space>
+                                      <Button onClick={() => setTaskEditor(null)}>取消</Button>
+                                      <Button
+                                        type="primary"
+                                        onClick={() => {
+                                          if (!taskDraft.taskType) {
+                                            message.warning("请选择任务类型");
+                                            return;
+                                          }
+                                          if (!taskDraft.delayType) {
+                                            message.warning("请选择触发类型");
+                                            return;
+                                          }
+                                          if (taskDraft.delayType === "DELAY" && (taskDraft.delayValue == null || taskDraft.delayValue < 0)) {
+                                            message.warning("请填写延后时间");
+                                            return;
+                                          }
+                                          if (taskDraft.delayType === "AT_TIME" && (taskDraft.delayValue == null || taskDraft.delayValue < 0 || taskDraft.delayValue > 23)) {
+                                            message.warning("请填写 0-23 点的指定时间");
+                                            return;
+                                          }
+                                          if (taskEditor.index == null) {
+                                            add(taskDraft);
+                                          } else {
+                                            updateScheduleRuleValue(taskEditor.index, taskDraft);
+                                          }
+                                          setTaskEditor(null);
+                                        }}
+                                      >
+                                        保存任务
+                                      </Button>
+                                    </Space>
+                                  }
                                 >
-                                  <div className="task-dialog-form">
+                                  <div className="task-dialog-form agent-task-drawer-form">
                                     <div className="task-dialog-field">
-                                      <Text className="task-dialog-label">任务类型</Text>
+                                      <Text className="task-dialog-label">任务类型 <Tooltip title="选择任务触发的时间锚点"><QuestionCircleOutlined /></Tooltip></Text>
                                       <Select value={taskDraft.taskType} placeholder="任务类型（时间锚点）" options={taskTypeOptions} onChange={(value) => setTaskDraft((item) => ({ ...item, taskType: value }))} />
                                     </div>
                                     <div className="task-dialog-field">
-                                      <Text className="task-dialog-label">触发类型</Text>
+                                      <Text className="task-dialog-label">触发类型 <Tooltip title="设置任务立即执行、延后执行或按指定时间执行"><QuestionCircleOutlined /></Tooltip></Text>
                                       <Select value={taskDraft.delayType} placeholder="触发类型" options={delayTypeOptions} onChange={(value) => setTaskDraft((item) => ({ ...item, delayType: value, delayValue: value === "IMMEDIATE" ? 0 : item.delayValue }))} />
                                     </div>
                                     {taskDraft.delayType === "DELAY" ? (
                                       <div className="task-dialog-field">
                                         <Text className="task-dialog-label">延后时间</Text>
-                                        <div className="task-row">
-                                          <InputNumber min={0} max={9999} value={taskDraft.delayValue} onChange={(value) => setTaskDraft((item) => ({ ...item, delayValue: value }))} />
-                                          <Select value={taskDraft.delayUnit} options={relativeTimeUnitOptions} onChange={(value) => setTaskDraft((item) => ({ ...item, delayUnit: value }))} />
+                                        <div className="agent-task-delay-row">
+                                          <InputNumber min={0} max={999} value={getDelayHours()} addonAfter="小时" onChange={(value) => updateTaskDelayPart("hours", value)} />
+                                          <InputNumber min={0} max={59} value={getDelayMinutes()} addonAfter="分钟" onChange={(value) => updateTaskDelayPart("minutes", value)} />
+                                          <Select value={taskDraft.delayUnit || "分钟"} options={relativeTimeUnitOptions} onChange={(value) => setTaskDraft((item) => ({ ...item, delayUnit: value }))} />
                                         </div>
                                       </div>
                                     ) : null}
@@ -4814,11 +7818,53 @@ function StrategyEditor({ skill, onBack }) {
                                       <Input value={taskDraft.taskName} allowClear placeholder="可选，便于在列表中识别" onChange={(event) => setTaskDraft((item) => ({ ...item, taskName: event.target.value }))} />
                                     </div>
                                     <div className="task-dialog-field">
+                                      <Text className="task-dialog-label">目标人群</Text>
+                                      <Radio.Group
+                                        value={taskDraft.targetAudienceMode || "全部用户"}
+                                        options={["全部用户", "标签选择"].map((value) => ({ value, label: value }))}
+                                        onChange={(event) => setTaskDraft((item) => ({
+                                          ...item,
+                                          targetAudienceMode: event.target.value,
+                                          targetTags: event.target.value === "全部用户" ? [] : item.targetTags
+                                        }))}
+                                      />
+                                      {(taskDraft.targetAudienceMode || "全部用户") === "标签选择" ? (
+                                        <CommonTagSelectButton
+                                          value={taskDraft.targetTags || []}
+                                          placeholder="选择标签筛选任务目标人群"
+                                          onClick={openTaskTagPicker}
+                                          onChange={(value) => setTaskDraft((item) => ({ ...item, targetTags: value }))}
+                                        />
+                                      ) : null}
+                                    </div>
+                                    <div className="task-dialog-field">
                                       <Text className="task-dialog-label">任务描述</Text>
-                                      <Input.TextArea value={taskDraft.taskDescription} rows={10} showCount maxLength={5000} placeholder="可选，可写较长说明（任务意图、话术要点等）" onChange={(event) => setTaskDraft((item) => ({ ...item, taskDescription: event.target.value }))} />
+                                      <Space wrap className="agent-task-material-actions">
+                                        <Upload showUploadList={false}><Button icon={<PictureOutlined />}>本地上传图片</Button></Upload>
+                                        <Upload showUploadList={false}><Button icon={<VideoCameraOutlined />}>本地上传视频</Button></Upload>
+                                        <Upload showUploadList={false}><Button icon={<PaperClipOutlined />}>本地上传文件</Button></Upload>
+                                        <Button type="primary" icon={<FileTextOutlined />}>从素材库选择</Button>
+                                        <Button icon={<LinkOutlined />}>远程地址</Button>
+                                      </Space>
+                                      <Text type="secondary" className="agent-task-variable-tip">可用变量 {"{{ attended_1 }}"}~{"{{ attended_4 }}"}（第1-4节课是否到课，含直播和回放）；{"{{ attended }}"}（当前阶段是否到课）；Skill 同款 {"{{guanxin.*}}"} 摘要变量也会在任务描述进 LLM 前解析。</Text>
+                                      <Input.TextArea value={taskDraft.taskDescription} rows={12} showCount maxLength={5000} placeholder="可选，可写较长说明。末尾单独一行写 [ASSET]code 或 [IMAGE]/[VIDEO]/[FILE] 标记，触发后自动发送" onChange={(event) => setTaskDraft((item) => ({ ...item, taskDescription: event.target.value }))} />
                                     </div>
                                   </div>
-                                </Modal>
+                                </Drawer>
+                                <CommonTagPickerModal
+                                  title="选择任务目标人群"
+                                  open={taskTagPicker.open}
+                                  selected={taskTagPicker.selected}
+                                  keyword={taskTagPicker.keyword}
+                                  rule={taskTagPicker.rule}
+                                  ruleOptions={["以下标签满足其一"]}
+                                  tip="定时任务会根据所选标签筛选目标人群；不选择标签时，默认作用于该智能体当前阶段下的全部客户。"
+                                  onCancel={() => setTaskTagPicker((item) => ({ ...item, open: false }))}
+                                  onOk={saveTaskTagPicker}
+                                  onKeywordChange={(keyword) => setTaskTagPicker((item) => ({ ...item, keyword }))}
+                                  onRuleChange={(rule) => setTaskTagPicker((item) => ({ ...item, rule }))}
+                                  onSelectedChange={(selected) => setTaskTagPicker((item) => ({ ...item, selected }))}
+                                />
                               </div>
                             )}
                           </Form.List>
@@ -4848,91 +7894,17 @@ function StrategyEditor({ skill, onBack }) {
             {
               key: "tools",
               label: "工具配置",
-              children: (
-                <Space direction="vertical" size={16} className="full-width skill-relation-tab">
-                  <Card
-                    title={
-                      <PanelTitle
-                        title="关联工具"
-                        desc="配置该智能体可调用的 AI 工具，用于外部查询、通知、跳转和托管动作。"
-                      />
-                    }
-                  >
-                    <Form layout="vertical">
-                      <Form.Item label="选择工具">
-                        <Select
-                          mode="multiple"
-                          value={selectedToolKeys}
-                          placeholder="选择该智能体可调用的 AI 工具"
-                          options={toolOptions}
-                          onChange={setSelectedToolKeys}
-                        />
-                      </Form.Item>
-                    </Form>
-                    <Table
-                      className="admin-table"
-                      rowKey="key"
-                      pagination={false}
-                      scroll={{ x: 980 }}
-                      columns={[
-                        { title: "已关联工具", dataIndex: "name", width: 220 },
-                        { title: "工具说明", dataIndex: "description", ellipsis: true },
-                        { title: "状态", dataIndex: "enabled", width: 90, render: statusTag },
-                        { title: "更新时间", dataIndex: "updatedAt", width: 170 }
-                      ]}
-                      dataSource={selectedTools}
-                    />
-                  </Card>
-                </Space>
-              )
+              children: renderRelationConfigTab("tools")
             },
             {
               key: "agent-skills",
               label: "Skill配置",
-              children: (
-                <Space direction="vertical" size={16} className="full-width skill-relation-tab">
-                  <Card
-                    title={
-                      <PanelTitle
-                        title="Skill调用配置"
-                        desc="查看该智能体已关联的 Skill 默认能力定义，具体调用时机由智能体编排和提示词策略共同决定。"
-                      />
-                    }
-                  >
-                    <Form layout="vertical">
-                      <Form.Item label="选择Skill">
-                        <Select
-                          mode="multiple"
-                          value={selectedAiSkillKeys}
-                          placeholder="选择该智能体可关联的 Skill"
-                          options={aiSkillOptions}
-                          onChange={setSelectedAiSkillKeys}
-                        />
-                      </Form.Item>
-                    </Form>
-                    <Table
-                      className="admin-table agent-skill-config-table"
-                      rowKey="key"
-                      pagination={false}
-                      scroll={{ x: 920 }}
-                      columns={[
-                        { title: "Skill名称", dataIndex: "name", width: 160 },
-                        { title: "Skill类型", dataIndex: "type", width: 96, render: (value) => <Tag color="blue">{value}</Tag> },
-                        { title: "输出类型", dataIndex: "outputType", width: 110 },
-                        { title: "默认输出去向", dataIndex: "outputTargets", width: 190, render: (items = []) => <Space wrap size={[4, 4]}>{items.map((item) => <Tag key={item}>{item}</Tag>)}</Space> },
-                        { title: "Skill描述", dataIndex: "description", width: 250, render: (value) => <Text type="secondary" className="agent-skill-desc">{value}</Text> },
-                        { title: "状态", dataIndex: "status", width: 76, render: statusTag },
-                        { title: "操作", dataIndex: "key", width: 70, render: (key) => (
-                          <Space size={4} className="table-action-group">
-                            <Button type="link" size="small" danger onClick={() => setSelectedAiSkillKeys((keys) => keys.filter((item) => item !== key))}>移除</Button>
-                          </Space>
-                        ) }
-                      ]}
-                      dataSource={agentSkillRows}
-                    />
-                  </Card>
-                </Space>
-              )
+              children: renderRelationConfigTab("skills")
+            },
+            {
+              key: "knowledge",
+              label: "知识库配置",
+              children: renderRelationConfigTab("knowledge")
             },
             {
               key: "debug",
@@ -5040,6 +8012,14 @@ function StrategyEditor({ skill, onBack }) {
           ]}
         />
       </Card>
+      {renderRelationPickerModal()}
+      <KnowledgeResourcePickerModal
+        open={agentKnowledgePickerOpen}
+        selectedKeys={agentKnowledgePickerKeys}
+        onSelectedChange={setAgentKnowledgePickerKeys}
+        onClose={() => setAgentKnowledgePickerOpen(false)}
+        onOk={saveAgentKnowledgeResources}
+      />
       <Modal
         title={debugTrace?.title || "执行链路说明"}
         open={Boolean(debugTrace)}
@@ -5253,8 +8233,128 @@ function KnowledgePage() {
   const categories = Array.from(new Set(baseRows.map((item) => item.category)));
   const totalSize = flattenedEntries.reduce((sum, entry) => sum + (entry.content?.length || 1024), 0);
   const formatSize = (bytes) => bytes >= 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${bytes} B`;
-  const getEntryContent = (entry) => entry?.content || `# ${entry?.title || "资源内容"}\n\n该资源用于 ${entry?.baseName || "当前目录"} 场景，回答时需以已维护内容为准，不编造未维护的信息。\n\n## 使用要求\n- 涉及价格、时间、链接、服务承诺时，优先引用工具返回或明确知识内容。\n- 内容不足时提示需要人工确认。\n- 不暴露内部路径、字段名或系统规则。`;
+  const getEntryContent = (entry) => entry?.content || entry?.extractedText || `# ${entry?.title || "资源内容"}\n\n该资源用于 ${entry?.baseName || "当前目录"} 场景，回答时需以已维护内容为准，不编造未维护的信息。\n\n## 使用要求\n- 涉及价格、时间、链接、服务承诺时，优先引用工具返回或明确知识内容。\n- 内容不足时提示需要人工确认。\n- 不暴露内部路径、字段名或系统规则。`;
   const selectedEntryContent = getEntryContent(selectedEntry);
+  const getResourceIcon = (media) => {
+    if (media === "图片") return <PictureOutlined />;
+    if (media === "音频" || media === "语音") return <AudioOutlined />;
+    if (media === "视频") return <VideoCameraOutlined />;
+    if (media === "PDF" || media === "文件") return <FileSearchOutlined />;
+    return <FileTextOutlined />;
+  };
+  const resourceNeedsFilePreview = (entry) => Boolean(entry?.filePath) || !["文本", "链接集合"].includes(entry?.media);
+  const getContentSectionTitle = (entry) => {
+    if (entry?.media === "图片") return "图片说明";
+    if (entry?.media === "音频" || entry?.media === "语音") return "音频转写/摘要";
+    if (entry?.media === "视频") return "视频转写/摘要";
+    if (entry?.media === "PDF" || entry?.media === "文档") return "文档摘要";
+    if (entry?.media === "链接集合") return "链接列表";
+    if (entry?.media === "文件") return "文件说明";
+    return "正文内容";
+  };
+  const getContentSectionDesc = (entry) => {
+    if (entry?.media === "图片") return "说明图片内容、适合发送的场景和注意事项";
+    if (entry?.media === "音频" || entry?.media === "语音") return "维护音频转写、摘要和适合发送的场景";
+    if (entry?.media === "视频") return "维护视频摘要、重点片段和适合发送的场景";
+    if (entry?.media === "PDF" || entry?.media === "文档") return "维护文档摘要、重点条款和关键链接";
+    if (entry?.media === "链接集合") return "维护多个链接的标题、说明和URL";
+    if (entry?.media === "文件") return "维护文件说明、摘要和使用提醒";
+    return "维护规则说明、FAQ、话术或课程介绍";
+  };
+  const renderOriginalResourcePreview = (entry) => {
+    if (entry?.fileName?.endsWith(".md")) {
+      return (
+        <div className="resource-original-preview markdown-preview">
+          <div className="mock-document-page markdown">
+            <Text># PRD</Text>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>
+            <Text>{entry.title}</Text>
+            <Text type="secondary">{entry.fileName} · {entry.fileSize || "Markdown文档"} · 已提取为右侧可编辑文本内容。</Text>
+          </div>
+        </div>
+      );
+    }
+    if (entry?.media === "图片") {
+      return (
+        <div className="resource-original-preview image-preview">
+          {entry.filePath ? <img className="resource-preview-image" src={entry.filePath} alt={entry.title} /> : (
+            <div className="mock-poster">
+              <Text>自然拼读</Text>
+              <Title level={5}>4节体验课</Title>
+              <span>扫码预约试听</span>
+            </div>
+          )}
+          <div>
+            <Text>{entry.title}</Text>
+            <Text type="secondary">{entry.fileName || "图片素材"} · {entry.fileSize || "演示素材"}</Text>
+          </div>
+        </div>
+      );
+    }
+    if (entry?.media === "音频" || entry?.media === "语音") {
+      return (
+        <div className="resource-original-preview">
+          <AudioOutlined />
+          <div>
+            <Text>{entry.title}</Text>
+            {entry.filePath ? <audio className="resource-preview-audio" controls src={entry.filePath} /> : <div className="mock-audio-bar"><span /><span /><span /><span /><span /></div>}
+            <Text type="secondary">{entry.fileName || "音频素材.mp3"} · {entry.fileSize || "演示素材"}</Text>
+          </div>
+        </div>
+      );
+    }
+    if (entry?.media === "视频") {
+      return (
+        <div className="resource-original-preview video-preview">
+          {entry.filePath ? <video className="resource-preview-video" controls src={entry.filePath} /> : <VideoCameraOutlined />}
+          <div>
+            <Text>{entry.title}</Text>
+            <Text type="secondary">{entry.fileName || "视频素材.mp4"} · {entry.fileSize || "演示素材"}</Text>
+          </div>
+        </div>
+      );
+    }
+    if (entry?.media === "PDF") {
+      return (
+        <div className="resource-original-preview document-preview">
+          {entry.filePath ? <iframe className="resource-preview-pdf" title={entry.title} src={entry.filePath} /> : <FileSearchOutlined />}
+          <div>
+            <Text>{entry.title}</Text>
+            <Text type="secondary">{entry.fileName || "PDF文档"} · {entry.fileSize || "演示素材"}</Text>
+          </div>
+        </div>
+      );
+    }
+    if (entry?.media === "文档") {
+      return (
+        <div className="resource-original-preview">
+          <div className="mock-document-page word">
+            <Text>DOCX</Text>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>
+            <Text>{entry.title}</Text>
+            <Text type="secondary">{entry.fileName || "Word文档"} · {entry.fileSize || "演示素材"} · 系统内展示文档摘要和关键内容。</Text>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="resource-original-preview">
+        {getResourceIcon(entry.media)}
+        <div>
+          <Text>{entry.title}</Text>
+          <Text type="secondary">文件资源预览位。实际接入后展示文件名、大小和预览内容。</Text>
+        </div>
+      </div>
+    );
+  };
   const renameSelected = () => {
     if (selectedEntryKey && selectedEntry) {
       setEditingEntry({ ...selectedEntry, baseKey: selectedEntry.baseKey });
@@ -5300,11 +8400,23 @@ function KnowledgePage() {
       };
     }));
   };
+  const updateSelectedEntryStatus = (checked) => {
+    if (!selectedEntry) return;
+    setBaseRows((items) => items.map((base) => {
+      if (base.key !== selectedEntry.baseKey) return base;
+      const updated = new Date().toISOString().slice(0, 16).replace("T", " ");
+      return {
+        ...base,
+        updated,
+        entries: base.entries.map((entry) => entry.key === selectedEntry.key ? { ...entry, status: checked ? "启用" : "停用", updated } : entry)
+      };
+    }));
+  };
   const knowledgeCompatHint = 'Tooltip title={record.desc} overlayClassName="knowledge-base-tooltip" width: 520 knowledge-base-title';
   const treeData = categories.map((category) => {
     const bases = baseRows.filter((item) => item.category === category);
     return {
-      title: <Tooltip title={category} placement="topLeft"><span className="resource-tree-label">{category}</span></Tooltip>,
+          title: <Tooltip title={category} placement="topLeft"><span className="resource-tree-label">{category}</span></Tooltip>,
       key: `category:${category}`,
       icon: <FolderOutlined />,
       children: bases.map((base) => ({
@@ -5330,7 +8442,7 @@ function KnowledgePage() {
             </div>
           ),
           key: `entry:${entry.key}`,
-          icon: <FileTextOutlined />
+          icon: getResourceIcon(entry.media)
         }))
       }))
     };
@@ -5354,23 +8466,28 @@ function KnowledgePage() {
   };
 
   const saveEntry = (values) => {
-    const targetBaseKey = editingEntry?.baseKey || selectedBase?.key || currentBaseForCreate?.key;
+    const targetBaseKey = values.baseKey || editingEntry?.baseKey || selectedBase?.key || currentBaseForCreate?.key;
     if (!targetBaseKey) return;
+    const nextKey = editingEntry?.key || `ke-${Date.now()}`;
     const nextEntry = {
       ...editingEntry,
       ...values,
+      key: nextKey,
       tags: values.tags || [],
       updated: new Date().toISOString().slice(0, 16).replace("T", " ")
     };
     setBaseRows((items) => items.map((item) => {
-      if (item.key !== targetBaseKey) return item;
       const { baseKey, baseName, baseDesc, category, owner, ...entryPayload } = nextEntry;
-      const entries = editingEntry?.key
+      if (editingEntry?.key && item.key === editingEntry.baseKey && item.key !== targetBaseKey) {
+        return { ...item, entries: item.entries.filter((entry) => entry.key !== editingEntry.key), updated: nextEntry.updated };
+      }
+      if (item.key !== targetBaseKey) return item;
+      const currentEntries = editingEntry?.key && item.key === editingEntry.baseKey
         ? item.entries.map((entry) => (entry.key === editingEntry.key ? entryPayload : entry))
-        : [...item.entries, { ...entryPayload, key: `ke-${Date.now()}` }];
-      return { ...item, entries, updated: nextEntry.updated };
+        : [...item.entries, entryPayload];
+      return { ...item, entries: currentEntries, updated: nextEntry.updated };
     }));
-    if (!editingEntry?.key) setSelectedTreeKey(`base:${targetBaseKey}`);
+    setSelectedTreeKey(`entry:${nextKey}`);
     setEditingEntry(null);
   };
 
@@ -5379,7 +8496,6 @@ function KnowledgePage() {
       <Space direction="vertical" size={16} className="page-stack knowledge-page">
         <Card
           className="knowledge-workbench-card"
-          title={<PanelTitle title="知识库管理" desc="知识库列表以资源目录方式维护，可管理条目、文件夹和资源内容，方便 Skill 或智能体按路径选择引用。" extra={<><Button onClick={() => setEditingBase({ category: selectedBase?.category || selectedCategory || "课程知识" })}>新建文件夹</Button><Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingEntry({ baseKey: currentBaseForCreate?.key })}>添加资源</Button></>} />}
         >
           <div className="knowledge-resource-workbench">
             <aside className="knowledge-tree-panel">
@@ -5389,7 +8505,7 @@ function KnowledgePage() {
                   <Text type="secondary">共 {flattenedEntries.length} 个资源 · {formatSize(totalSize)}</Text>
                 </div>
                 <Space size={4} className="resource-sidebar-quick-actions">
-                  <Tooltip title="添加资源"><Button size="small" icon={<PlusOutlined />} onClick={() => setEditingEntry({ baseKey: currentBaseForCreate?.key })} /></Tooltip>
+                  <Tooltip title="新增资源"><Button size="small" icon={<PlusOutlined />} onClick={() => setEditingEntry({ baseKey: currentBaseForCreate?.key, media: "文本", type: "文本", status: "启用" })} /></Tooltip>
                   <Tooltip title="新建文件夹"><Button size="small" icon={<FolderOutlined />} onClick={() => setEditingBase({ category: selectedBase?.category || selectedCategory || "课程知识" })} /></Tooltip>
                 </Space>
                 <span className="sr-only">返回知识库列表</span>
@@ -5419,20 +8535,37 @@ function KnowledgePage() {
                       </Space>
                     </div>
                     <Space size={8}>
-                      <Button onClick={renameSelected}>重命名</Button>
+                      <Button onClick={renameSelected}>重命名文件</Button>
                       <Button danger onClick={() => deleteEntry(selectedEntry)}>删除</Button>
                     </Space>
                   </div>
                   <div className="resource-editor-body">
-                    <div className="resource-line-numbers">
-                      {selectedEntryContent.split("\n").map((_, index) => <span key={index}>{index + 1}</span>)}
+                    {resourceNeedsFilePreview(selectedEntry) ? (
+                      <div className="resource-preview-block">
+                        <div className="resource-preview-title">
+                          <Text>文件预览</Text>
+                          <Text type="secondary">确认上传的原始素材是否正确</Text>
+                        </div>
+                        {renderOriginalResourcePreview(selectedEntry)}
+                      </div>
+                    ) : null}
+                    <div className="resource-readable-block">
+                      <div className="resource-preview-title">
+                        <Text>{getContentSectionTitle(selectedEntry)}</Text>
+                        <Text type="secondary">{getContentSectionDesc(selectedEntry)}</Text>
+                      </div>
+                      <div className="resource-readable-editor">
+                        <div className="resource-line-numbers">
+                          {selectedEntryContent.split("\n").map((_, index) => <span key={index}>{index + 1}</span>)}
+                        </div>
+                        <Input.TextArea
+                          className="resource-markdown-editor"
+                          value={selectedEntryContent}
+                          autoSize={{ minRows: 18, maxRows: 28 }}
+                          onChange={(event) => updateSelectedEntryContent(event.target.value)}
+                        />
+                      </div>
                     </div>
-                    <Input.TextArea
-                      className="resource-markdown-editor"
-                      value={selectedEntryContent}
-                      autoSize={{ minRows: 24, maxRows: 34 }}
-                      onChange={(event) => updateSelectedEntryContent(event.target.value)}
-                    />
                   </div>
                 </>
               ) : (
@@ -5463,27 +8596,28 @@ function KnowledgePage() {
                       <Title level={4}>{selectedEntry.title}</Title>
                       <Text type="secondary">{selectedEntry.baseName}</Text>
                     </Space>
-                    <Button size="small" onClick={() => setEditingEntry({ ...selectedEntry, baseKey: selectedEntry.baseKey })}>编辑</Button>
                   </div>
                   <Descriptions size="small" column={1} bordered>
-                    <Descriptions.Item label="媒体类型">{selectedEntry.media}</Descriptions.Item>
-                    <Descriptions.Item label="知识类型">{selectedEntry.type}</Descriptions.Item>
-                    <Descriptions.Item label="状态">{statusTag(selectedEntry.status)}</Descriptions.Item>
+                    <Descriptions.Item label="资源类型">{selectedEntry.media}</Descriptions.Item>
+                    <Descriptions.Item label="状态">
+                      <Switch
+                        size="small"
+                        checked={selectedEntry.status === "启用"}
+                        checkedChildren="启用"
+                        unCheckedChildren="停用"
+                        onChange={updateSelectedEntryStatus}
+                      />
+                    </Descriptions.Item>
                     <Descriptions.Item label="更新时间">{selectedEntry.updated}</Descriptions.Item>
+                    <Descriptions.Item label="标签">{(selectedEntry.tags || []).length ? <Space wrap size={[4, 4]}>{selectedEntry.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</Space> : "—"}</Descriptions.Item>
                   </Descriptions>
-                  <div className="knowledge-preview-section">
-                    <Text className="knowledge-preview-label">知识内容预览</Text>
-                    <div className="knowledge-content-preview">
-                      {selectedEntryContent}
-                    </div>
-                  </div>
                   <div className="knowledge-preview-section">
                     <Text className="knowledge-preview-label">引用方式</Text>
                     <div className="knowledge-reference-code">@kb.{selectedEntry.path}</div>
                   </div>
                   <div className="knowledge-preview-section">
-                    <Text className="knowledge-preview-label">资源规则</Text>
-                    <Text type="secondary">只用于当前知识库适用场景；涉及价格、时间、链接、服务承诺时，以已维护内容和工具返回为准。</Text>
+                    <Text className="knowledge-preview-label">资源说明</Text>
+                    <Text type="secondary">{selectedEntry.desc || "用于说明这个资源适合在什么咨询场景下使用，例如课程介绍、价格政策、活动链接、课程海报等。"}</Text>
                   </div>
                 </>
               ) : (
@@ -5497,7 +8631,7 @@ function KnowledgePage() {
         </Card>
       </Space>
       <KnowledgeBaseModal base={editingBase} onClose={() => setEditingBase(null)} onSave={saveBase} />
-      <KnowledgeEntryModal entry={editingEntry} onClose={() => setEditingEntry(null)} onSave={saveEntry} />
+      <KnowledgeEntryModal entry={editingEntry} baseRows={baseRows} defaultBaseKey={currentBaseForCreate?.key} onClose={() => setEditingEntry(null)} onSave={saveEntry} />
     </>
   );
 }
@@ -5517,12 +8651,12 @@ function KnowledgeBaseModal({ base, onClose, onSave }) {
     }
   }, [base, form]);
   return (
-    <Modal title={base?.key ? "编辑知识库" : "新增知识库"} open={Boolean(base)} onCancel={onClose} onOk={() => form.submit()} okText="保存知识库" cancelText="取消" width={860}>
+    <Modal title={base?.key ? "编辑文件夹" : "新建文件夹"} open={Boolean(base)} onCancel={onClose} onOk={() => form.submit()} okText="保存文件夹" cancelText="取消" width={860}>
       <Form form={form} layout="vertical" onFinish={onSave}>
         <Row gutter={16}>
-          <Col span={14}><Form.Item label="知识库名称" name="name" rules={[{ required: true, message: "请输入知识库名称" }]}><Input placeholder="例如：价格政策与异议处理库" /></Form.Item></Col>
-          <Col span={10}><Form.Item label="分类" name="category"><Select options={["课程知识", "政策规则", "FAQ", "销售话术", "案例素材", "异议处理", "活动政策"].map((value) => ({ value }))} /></Form.Item></Col>
-          <Col span={24}><Form.Item label="知识库说明" name="desc"><Input.TextArea rows={4} placeholder="说明该知识库适用的业务场景、使用边界和维护规则。" /></Form.Item></Col>
+          <Col span={14}><Form.Item label="文件夹名称" name="name" rules={[{ required: true, message: "请输入文件夹名称" }]}><Input placeholder="例如：价格政策与异议处理库" /></Form.Item></Col>
+          <Col span={10}><Form.Item label="上级类目" name="category"><Select options={["课程知识", "政策规则", "FAQ", "销售话术", "案例素材", "异议处理", "活动政策"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={24}><Form.Item label="文件夹说明" name="desc"><Input.TextArea rows={4} placeholder="说明该文件夹下资源适用的业务场景、使用边界和维护规则。" /></Form.Item></Col>
           <Col span={12}><Form.Item label="维护人" name="owner"><Input /></Form.Item></Col>
           <Col span={12}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
         </Row>
@@ -5531,58 +8665,66 @@ function KnowledgeBaseModal({ base, onClose, onSave }) {
   );
 }
 
-function KnowledgeEntryModal({ entry, onClose, onSave }) {
+function KnowledgeEntryModal({ entry, baseRows = [], defaultBaseKey, onClose, onSave }) {
   const [form] = Form.useForm();
   const mediaType = Form.useWatch("media", form);
+  const baseOptions = baseRows.map((base) => ({
+    value: base.key,
+    label: `${base.category} / ${base.name}`
+  }));
   useEffect(() => {
     if (entry) {
       form.resetFields();
       form.setFieldsValue({
         title: entry.title || "",
-        type: entry.type || "文本知识",
+        baseKey: entry.baseKey || defaultBaseKey,
+        type: entry.type || entry.media || "文本",
         media: entry.media || "文本",
+        desc: entry.desc || "",
         tags: entry.tags || [],
         status: entry.status || "启用",
-        content: entry.content || ""
+        content: entry.content || entry.extractedText || ""
       });
     }
   }, [entry, form]);
   return (
-    <Modal title={entry?.key ? "编辑知识条目" : "新增知识条目"} open={Boolean(entry)} onCancel={onClose} onOk={() => form.submit()} okText="保存知识条目" cancelText="取消" width={900}>
+    <Modal title={entry?.key ? "重命名 / 编辑资源" : "新增资源"} open={Boolean(entry)} onCancel={onClose} onOk={() => form.submit()} okText="保存资源" cancelText="取消" width={920}>
       <Form form={form} layout="vertical" onFinish={onSave}>
         <Row gutter={16}>
-          <Col span={12}><Form.Item label="标题" name="title" rules={[{ required: true, message: "请输入知识标题" }]}><Input placeholder="例如：线上课和线下课区别" /></Form.Item></Col>
-          <Col span={6}><Form.Item label="知识类型" name="type"><Select options={["文本知识", "图片素材", "语音素材", "文件素材"].map((value) => ({ value }))} /></Form.Item></Col>
-          <Col span={6}><Form.Item label="媒体类型" name="media"><Select options={["文本", "图片", "语音", "文件"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={12}><Form.Item label="资源名称" name="title" rules={[{ required: true, message: "请输入资源名称" }]}><Input placeholder="例如：自然拼读课程海报" /></Form.Item></Col>
+          <Col span={12}><Form.Item label="资源分类" name="baseKey" rules={[{ required: true, message: "请选择资源分类" }]}><Select options={baseOptions} placeholder="选择文件夹" showSearch optionFilterProp="label" /></Form.Item></Col>
+          <Col span={12}><Form.Item label="资源类型" name="media"><Select options={["文本", "图片", "音频", "视频", "PDF", "文档", "链接集合", "文件"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={12}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
+          <Col span={24}><Form.Item label="资源说明" name="desc"><Input placeholder="可选，例如：家长咨询自然拼读课程时，可发送这张课程海报或引用其中说明" /></Form.Item></Col>
         </Row>
-        <Form.Item label="文本内容">
+        <Form.Item label={mediaType === "链接集合" ? "链接内容" : mediaType === "文本" ? "文本内容" : "资源内容说明"}>
           <div className="rich-editor">
             <div className="rich-toolbar">
-              <Button size="small">加粗</Button>
               <Button size="small">标题</Button>
               <Button size="small">列表</Button>
               <Button size="small">链接</Button>
-              <Button size="small" icon={<UploadOutlined />}>插入图片</Button>
+              <Button size="small" icon={<UploadOutlined />}>插入素材</Button>
             </div>
             <Form.Item name="content" noStyle>
               <Input.TextArea
-                rows={8}
-                placeholder="支持录入文字说明、图片描述、语音摘要、文件摘要和销售话术。"
+                rows={10}
+                placeholder={mediaType === "链接集合"
+                  ? "可维护多个链接，例如：\n- 自然拼读试听课预约：https://example.com/trial\n- 课程介绍页：https://example.com/course"
+                  : mediaType === "文本"
+                    ? "输入文本内容，例如规则说明、课程介绍、FAQ、销售话术等。"
+                    : "补充资源说明、图片文字、文件摘要或使用提醒，方便后续检索和发送。"}
               />
             </Form.Item>
           </div>
         </Form.Item>
-        <Form.Item label={mediaType === "语音" ? "上传语音素材" : mediaType === "图片" ? "上传图片素材" : "附件素材"}>
-          <Upload.Dragger multiple beforeUpload={() => false} accept=".png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a,.ppt,.pptx,.pdf,.doc,.docx">
+        <Form.Item label={mediaType === "文本" || mediaType === "链接集合" ? "上传附件（可选）" : "上传文件"}>
+          <Upload.Dragger multiple beforeUpload={() => false} accept=".png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a,.mp4,.mov,.ppt,.pptx,.pdf,.doc,.docx">
             <p className="upload-icon"><FileTextOutlined /></p>
-            <p>上传图片、语音、PPT、PDF、Word 等知识素材</p>
-            <Text type="secondary">素材将作为知识内容的补充资料，后续可接入 OCR、ASR 和文件解析。</Text>
+            <p>上传图片、音频、视频、PDF、Word 等资源文件</p>
+            <Text type="secondary">上传后可在中间区域预览，资源说明和标签会帮助后续检索使用。</Text>
           </Upload.Dragger>
         </Form.Item>
-        <Row gutter={16}>
-          <Col span={16}><Form.Item label="标签" name="tags"><Select mode="tags" placeholder="输入标签后回车，例如：价格、试听课、阅读" /></Form.Item></Col>
-          <Col span={8}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
-        </Row>
+        <Form.Item label="标签" name="tags"><Select mode="tags" placeholder="输入标签后回车，例如：价格、试听课、阅读" /></Form.Item>
       </Form>
     </Modal>
   );
@@ -5896,44 +9038,276 @@ function SalesPage() {
   );
 }
 
-function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKeys = managedWecomAccounts.map((item) => item.key), onActiveWecomChange }) {
+function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustomerDrawerToken = 0, visibleWecomKeys = managedWecomAccounts.map((item) => item.key), onActiveWecomChange }) {
+  const { message } = AntApp.useApp();
   const visibleConversations = conversations.filter((item) => visibleWecomKeys.includes(item.accountKey));
-  const filteredConversations = visibleConversations.filter((item) => item.accountKey === activeWecom);
+  const accountConversations = visibleConversations.filter((item) => item.accountKey === activeWecom);
   const activeConversation = activeConversationKey ? visibleConversations.find((item) => item.key === activeConversationKey) : null;
-  const [selected, setSelected] = useState(activeConversation || filteredConversations[0] || visibleConversations[0] || null);
+  const [selected, setSelected] = useState(activeConversation || accountConversations[0] || visibleConversations[0] || null);
   const [hostingMode, setHostingMode] = useState(selected?.hosted ? "ai" : "manual");
   const [manualReply, setManualReply] = useState("");
   const [composerItems, setComposerItems] = useState([]);
   const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false);
   const [customerDrawerTab, setCustomerDrawerTab] = useState("profile");
+  const [selectedCourseOrderKey, setSelectedCourseOrderKey] = useState(null);
   const [customerTagValues, setCustomerTagValues] = useState(() => createCustomerTagValues(selected));
+  const [hostingOverrides, setHostingOverrides] = useState({});
+  const [sessionKeyword, setSessionKeyword] = useState("");
+  const [quickFilter, setQuickFilter] = useState("全部");
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [sessionPage, setSessionPage] = useState(1);
+  const [sessionPageSize, setSessionPageSize] = useState(10);
+  const [tagPickerState, setTagPickerState] = useState({ open: false, field: "tags", title: "选择客户标签", selected: [], keyword: "", rule: "满足任一" });
+  const [confirmedStrategyTaskKeys, setConfirmedStrategyTaskKeys] = useState({});
+  const [strategyInsightDrafts, setStrategyInsightDrafts] = useState({});
+  const [strategyInsightEditing, setStrategyInsightEditing] = useState(false);
+  const [strategyInsightDraft, setStrategyInsightDraft] = useState("");
+  const defaultSessionFilters = {
+    tags: [],
+    tagMatch: "满足任一",
+    excludeTags: [],
+    customerType: "全部客户类型",
+    customerLevel: "全部等级",
+    intent: "全部意向",
+    relationStatus: "全部企微关系",
+    hostingStatus: "全部用户",
+    unreadStatus: "全部消息状态",
+    lifecycle: "全部用户",
+    scheduleStatus: "全部用户",
+    attendanceStatus: "全部用户",
+    courseStatus: "全部课程状态",
+    watchTime: "全部看课时长",
+    conflictLevel: "全部亲子冲突"
+  };
+  const [sessionFilters, setSessionFilters] = useState(defaultSessionFilters);
+  const needsHumanIntervention = (item) => item.status === "待确认发送" || item.status === "人工接管" || item.sendMode === "人工确认";
+  const getHosted = (item) => hostingOverrides[item.key] ?? item.hosted;
+  const sessionInsightMap = {
+    c1: { courseStatus: "已上体验课未报名", watchMinutes: 52, conflictLevel: "中", relationStatus: "好友正常", customerType: "曾购买398", customerLevel: "A", todayActive: true },
+    c2: { courseStatus: "待预约体验课", watchMinutes: 0, conflictLevel: "低", relationStatus: "好友正常", customerType: "纯新用户", customerLevel: "B", todayActive: true },
+    c3: { courseStatus: "已上体验课未报名", watchMinutes: 68, conflictLevel: "中", relationStatus: "好友正常", customerType: "其他", customerLevel: "S", todayActive: true },
+    c4: { courseStatus: "待预约体验课", watchMinutes: 0, conflictLevel: "低", relationStatus: "好友正常", customerType: "纯新用户", customerLevel: "B", todayActive: true },
+    c5: { courseStatus: "已上体验课未报名", watchMinutes: 35, conflictLevel: "低", relationStatus: "好友正常", customerType: "其他", customerLevel: "A", todayActive: true },
+    c6: { courseStatus: "待预约体验课", watchMinutes: 0, conflictLevel: "低", relationStatus: "好友正常", customerType: "纯新用户", customerLevel: "B", todayActive: true },
+    "li-demo-1": { courseStatus: "已预约体验课", watchMinutes: 0, conflictLevel: "低", relationStatus: "好友正常", customerType: "仅体验", customerLevel: "S", todayActive: true },
+    "li-demo-2": { courseStatus: "已上体验课未报名", watchMinutes: 18, conflictLevel: "中", relationStatus: "好友正常", customerType: "其他", customerLevel: "A", todayActive: false },
+    "li-demo-3": { courseStatus: "待预约体验课", watchMinutes: 0, conflictLevel: "低", relationStatus: "好友正常", customerType: "纯新用户", customerLevel: "A", todayActive: true },
+    "li-demo-4": { courseStatus: "已上体验课未报名", watchMinutes: 41, conflictLevel: "中", relationStatus: "好友正常", customerType: "其他", customerLevel: "B", todayActive: false },
+    "li-demo-5": { courseStatus: "已上体验课未报名", watchMinutes: 8, conflictLevel: "高", relationStatus: "已删除企微", customerType: "仅体验", customerLevel: "C", todayActive: false },
+    "li-demo-6": { courseStatus: "待付款", watchMinutes: 74, conflictLevel: "低", relationStatus: "好友正常", customerType: "曾购买398", customerLevel: "S", todayActive: true },
+    "li-demo-7": { courseStatus: "待选择课程", watchMinutes: 22, conflictLevel: "低", relationStatus: "好友正常", customerType: "其他", customerLevel: "B", todayActive: false },
+    "li-demo-8": { courseStatus: "待预约体验课", watchMinutes: 0, conflictLevel: "中", relationStatus: "好友正常", customerType: "纯新用户", customerLevel: "C", todayActive: false },
+    "li-demo-9": { courseStatus: "群运营", watchMinutes: 0, conflictLevel: "低", relationStatus: "群聊", customerType: "其他", customerLevel: "B", todayActive: true }
+  };
+  const getSessionInsights = (item) => {
+    const base = sessionInsightMap[item.key] || {};
+    return {
+      courseStatus: base.courseStatus || (item.order?.includes("未报名") ? "未报名" : "待跟进"),
+      watchMinutes: base.watchMinutes ?? 0,
+      conflictLevel: base.conflictLevel || "低",
+      relationStatus: base.relationStatus || (item.type === "group" ? "群聊" : "好友正常"),
+      customerType: base.customerType || "其他",
+      customerLevel: base.customerLevel || (item.intent === "高" ? "A" : item.intent === "中" ? "B" : "C"),
+      todayActive: base.todayActive ?? ["待确认发送", "AI接待中"].includes(item.status)
+    };
+  };
+  const quickFilterOptions = ["全部", "高意向", "今日有互动", "需人工介入", "已上体验课未报名", "已删除企微", "看课>30分钟"];
+  const watchTimeMatches = (minutes, rule) => {
+    if (rule === "全部看课时长") return true;
+    if (rule === "不足10分钟") return minutes < 10;
+    if (rule === "大于10分钟") return minutes > 10;
+    if (rule === "大于30分钟") return minutes > 30;
+    if (rule === "大于60分钟") return minutes > 60;
+    return true;
+  };
+  const getScheduleStatus = (insights) => {
+    if (["待预约体验课", "待选择课程", "群运营"].includes(insights.courseStatus)) return "未排课";
+    return "已排课";
+  };
+  const getAttendanceStatus = (insights) => {
+    if (insights.courseStatus.includes("已上") || insights.watchMinutes > 0) return "已上课";
+    return "未上课";
+  };
+  const getCustomerServiceStage = (item) => {
+    const total = customerServiceStages.length;
+    const currentIndex = Math.min(Math.max(item.lifecycleStage ?? 0, 0), total - 1);
+    const baseTime = item.addedAt ? dayjs(item.addedAt) : dayjs("2026-08-23 23:06");
+    const enteredAt = baseTime.add(currentIndex, "day").format("MM-DD HH:mm");
+    const nextAt = currentIndex < total - 1 ? baseTime.add(currentIndex + 1, "day").format("MM-DD HH:mm") : "已完成";
+    return {
+      total,
+      currentIndex,
+      currentNumber: currentIndex + 1,
+      currentName: customerServiceStages[currentIndex],
+      nextName: customerServiceStages[currentIndex + 1] || "服务结束",
+      enteredAt,
+      nextAt
+    };
+  };
+  const getRecentConversationInfo = (item) => {
+    const messages = item.messages || [];
+    const lastMessage = messages[messages.length - 1];
+    const text = lastMessage?.text || item.last || "暂无最近沟通";
+    const baseDate = item.addedAt ? dayjs(item.addedAt).format("MM-DD") : dayjs().format("MM-DD");
+    const time = lastMessage?.time ? `${baseDate} ${lastMessage.time}` : baseDate;
+    return { time, text };
+  };
+  const renderServiceStageProgress = (item) => {
+    const stage = getCustomerServiceStage(item);
+    return (
+      <Popover
+        trigger="hover"
+        placement="topLeft"
+        content={
+          <div className="service-stage-popover">
+            <div><Text type="secondary">当前服务阶段</Text><Text>{stage.currentName}</Text></div>
+            <div><Text type="secondary">阶段进度</Text><Text>{stage.currentNumber}/{stage.total}</Text></div>
+            <div><Text type="secondary">进入时间</Text><Text>{stage.enteredAt}</Text></div>
+            <div><Text type="secondary">下一阶段</Text><Text>{stage.nextName}</Text></div>
+            <div><Text type="secondary">预计进入</Text><Text>{stage.nextAt}</Text></div>
+          </div>
+        }
+      >
+        <div className="service-stage-progress" aria-label={`阶段进度 ${stage.currentNumber}/${stage.total}`}>
+          {customerServiceStages.map((stageName, index) => (
+            <span
+              key={stageName}
+              className={index < stage.currentIndex ? "service-stage-dot done" : index === stage.currentIndex ? "service-stage-dot current" : "service-stage-dot"}
+            />
+          ))}
+        </div>
+      </Popover>
+    );
+  };
+  const matchesQuickFilter = (item) => {
+    const insights = getSessionInsights(item);
+    if (quickFilter === "全部") return true;
+    if (quickFilter === "高意向") return item.intent === "高";
+    if (quickFilter === "今日有互动") return insights.todayActive;
+    if (quickFilter === "需人工介入") return needsHumanIntervention(item);
+    if (quickFilter === "已上体验课未报名") return insights.courseStatus === "已上体验课未报名";
+    if (quickFilter === "已删除企微") return insights.relationStatus === "已删除企微";
+    if (quickFilter === "看课>30分钟") return insights.watchMinutes > 30;
+    return true;
+  };
+  const filteredConversations = accountConversations.filter((item) => {
+    const keywordText = sessionKeyword.trim();
+    const insights = getSessionInsights(item);
+    const tagValues = item.tags || [];
+    const matchesKeyword = !keywordText || [item.name, item.last, item.remark, ...tagValues].some((value) => String(value).includes(keywordText));
+    const matchesTags = sessionFilters.tags.length === 0 || (sessionFilters.tagMatch === "同时满足"
+      ? sessionFilters.tags.every((tag) => tagValues.includes(tag))
+      : sessionFilters.tags.some((tag) => tagValues.includes(tag)));
+    const excludesTags = sessionFilters.excludeTags.length > 0 && sessionFilters.excludeTags.some((tag) => tagValues.includes(tag));
+    const matchesCustomerType = sessionFilters.customerType === "全部客户类型" || insights.customerType === sessionFilters.customerType;
+    const matchesCustomerLevel = sessionFilters.customerLevel === "全部等级" || insights.customerLevel === sessionFilters.customerLevel;
+    const matchesIntent = sessionFilters.intent === "全部意向" || item.intent === sessionFilters.intent.replace("意向", "");
+    const matchesRelation = sessionFilters.relationStatus === "全部企微关系" || insights.relationStatus === sessionFilters.relationStatus;
+    const matchesHosting = sessionFilters.hostingStatus === "全部用户" || (sessionFilters.hostingStatus === "已托管" ? getHosted(item) : !getHosted(item));
+    const matchesUnread = sessionFilters.unreadStatus === "全部消息状态" || (sessionFilters.unreadStatus === "有未读消息" ? item.unread > 0 : item.unread === 0);
+    const matchesLifecycle = sessionFilters.lifecycle === "全部用户" || item.lifecycle === sessionFilters.lifecycle;
+    const matchesSchedule = sessionFilters.scheduleStatus === "全部用户" || getScheduleStatus(insights) === sessionFilters.scheduleStatus;
+    const matchesAttendance = sessionFilters.attendanceStatus === "全部用户" || getAttendanceStatus(insights) === sessionFilters.attendanceStatus;
+    const matchesCourse = sessionFilters.courseStatus === "全部课程状态" || insights.courseStatus === sessionFilters.courseStatus;
+    const matchesWatch = watchTimeMatches(insights.watchMinutes, sessionFilters.watchTime);
+    const matchesConflict = sessionFilters.conflictLevel === "全部亲子冲突" || insights.conflictLevel === sessionFilters.conflictLevel;
+    return matchesKeyword && matchesQuickFilter(item) && matchesTags && !excludesTags && matchesCustomerType && matchesCustomerLevel && matchesIntent && matchesRelation && matchesHosting && matchesUnread && matchesLifecycle && matchesSchedule && matchesAttendance && matchesCourse && matchesWatch && matchesConflict;
+  });
+  const activeFilterCount = [
+    quickFilter !== "全部",
+    sessionFilters.tags.length > 0,
+    sessionFilters.excludeTags.length > 0,
+    sessionFilters.customerType !== "全部客户类型",
+    sessionFilters.customerLevel !== "全部等级",
+    sessionFilters.intent !== "全部意向",
+    sessionFilters.relationStatus !== "全部企微关系",
+    sessionFilters.hostingStatus !== "全部用户",
+    sessionFilters.unreadStatus !== "全部消息状态",
+    sessionFilters.lifecycle !== "全部用户",
+    sessionFilters.scheduleStatus !== "全部用户",
+    sessionFilters.attendanceStatus !== "全部用户",
+    sessionFilters.courseStatus !== "全部课程状态",
+    sessionFilters.watchTime !== "全部看课时长",
+    sessionFilters.conflictLevel !== "全部亲子冲突"
+  ].filter(Boolean).length;
+  const effectiveSessionPage = Math.min(sessionPage, Math.max(1, Math.ceil(filteredConversations.length / sessionPageSize)));
+  const paginatedConversations = filteredConversations.slice((effectiveSessionPage - 1) * sessionPageSize, effectiveSessionPage * sessionPageSize);
   useEffect(() => {
-    setSelected(activeConversation || filteredConversations[0] || visibleConversations[0] || null);
-  }, [activeWecom, activeConversationKey, visibleWecomKeys.join("|")]);
+    setSessionPage(1);
+  }, [activeWecom, activeConversationKey, visibleWecomKeys.join("|"), sessionKeyword, quickFilter, JSON.stringify(sessionFilters)]);
   useEffect(() => {
-    if (selected) setHostingMode(selected.hosted ? "ai" : "manual");
+    setSelected(activeConversation || filteredConversations[0] || accountConversations[0] || visibleConversations[0] || null);
+  }, [activeWecom, activeConversationKey, visibleWecomKeys.join("|"), sessionKeyword, quickFilter, JSON.stringify(sessionFilters)]);
+  useEffect(() => {
+    if (selected) setHostingMode(getHosted(selected) ? "ai" : "manual");
     if (selected) {
       setCustomerTagValues(createCustomerTagValues(selected));
     }
+    setSelectedCourseOrderKey(null);
     setManualReply("");
     setComposerItems([]);
-  }, [selected?.key]);
+    setStrategyInsightEditing(false);
+  }, [selected?.key, hostingOverrides]);
+  useEffect(() => {
+    if (autoOpenCustomerDrawerToken && activeConversationKey && selected?.key === activeConversationKey) {
+      setCustomerDrawerTab("profile");
+      setCustomerDrawerOpen(true);
+    }
+  }, [autoOpenCustomerDrawerToken, activeConversationKey, selected?.key]);
   const confirmHostingChange = (checked) => {
     Modal.confirm({
       title: checked ? "确认开启AI托管？" : "确认关闭AI托管？",
       content: checked ? "开启后，AI将继续参与该会话的接待与回复建议。" : "关闭后，该会话将切换为人工跟进。",
       okText: checked ? "确认开启" : "确认关闭",
       cancelText: "取消",
-      onOk: () => setHostingMode(checked ? "ai" : "manual")
+      onOk: () => {
+        setHostingMode(checked ? "ai" : "manual");
+        setHostingOverrides((items) => ({ ...items, [selected.key]: checked }));
+      }
     });
   };
-  const needsHumanIntervention = (item) => item.status === "待确认发送" || item.status === "人工接管" || item.sendMode === "人工确认";
+  const confirmListHostingChange = (item, checked) => {
+    Modal.confirm({
+      title: checked ? "确认开启AI托管？" : "确认关闭AI托管？",
+      content: checked ? `开启后，AI将继续参与 ${item.name} 的接待与回复建议。` : `关闭后，${item.name} 将切换为人工跟进。`,
+      okText: checked ? "确认开启" : "确认关闭",
+      cancelText: "取消",
+      onOk: () => {
+        setHostingOverrides((items) => ({ ...items, [item.key]: checked }));
+        if (selected?.key === item.key) setHostingMode(checked ? "ai" : "manual");
+      }
+    });
+  };
+  const openCustomerDetail = (item, tabKey = "profile") => {
+    setSelected(item);
+    setCustomerDrawerTab(tabKey === "chat" ? "profile" : tabKey);
+    setCustomerDrawerOpen(true);
+  };
+  const openSessionTagPicker = (field) => {
+    setTagPickerState({
+      open: true,
+      field,
+      title: field === "tags" ? "选择客户标签" : "选择排除标签",
+      selected: sessionFilters[field] || [],
+      keyword: "",
+      rule: field === "tags" && sessionFilters.tagMatch === "同时满足" ? "以下标签同时满足" : "以下标签满足其一"
+    });
+  };
+  const saveSessionTagPicker = () => {
+    setSessionFilters((item) => ({
+      ...item,
+      [tagPickerState.field]: tagPickerState.selected,
+      tagMatch: tagPickerState.field === "tags" ? (tagPickerState.rule === "以下标签同时满足" ? "同时满足" : "满足任一") : item.tagMatch
+    }));
+    setTagPickerState((item) => ({ ...item, open: false }));
+  };
   const visibleWecomAccounts = managedWecomAccounts.filter((item) => visibleWecomKeys.includes(item.key));
   const activeWecomAccount = visibleWecomAccounts.find((item) => item.key === activeWecom) || visibleWecomAccounts[0];
   const wecomAccountRows = visibleWecomAccounts.map((account) => {
     const accountConversations = visibleConversations.filter((item) => item.accountKey === account.key);
     return {
       ...account,
+      customerTotal: accountConversations.length,
       hostedTotal: accountConversations.filter((item) => item.hosted).length
     };
   });
@@ -5959,11 +9333,50 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
               <Text className="wecom-account-name" ellipsis>{account.label}</Text>
               <Tag>{account.department}</Tag>
             </div>
+            <Text type="secondary" className="wecom-account-count">{account.customerTotal}</Text>
           </List.Item>
         )}
       />
     </aside>
   );
+  const renderSessionFilterPanel = () => {
+    const resetFilters = () => {
+      setSessionKeyword("");
+      setQuickFilter("全部");
+      setSessionFilters(defaultSessionFilters);
+    };
+    const focusFirstResult = () => {
+      if (filteredConversations[0]) setSelected(filteredConversations[0]);
+    };
+    return (
+      <div className="session-filter-panel">
+        <div className="session-filter-grid">
+          <label className="session-filter-control session-filter-search">
+            <Input.Search placeholder="搜索客户、群或消息" allowClear value={sessionKeyword} onChange={(event) => setSessionKeyword(event.target.value)} onSearch={focusFirstResult} />
+          </label>
+          <label className="session-filter-control">
+            <Select value={sessionFilters.hostingStatus} options={[{ value: "全部用户", label: "筛选托管" }, ...["已托管", "未托管"].map((value) => ({ value, label: value }))]} onChange={(value) => setSessionFilters((item) => ({ ...item, hostingStatus: value }))} />
+          </label>
+          <label className="session-filter-control session-filter-stage">
+            <Select value={sessionFilters.lifecycle} options={[{ value: "全部用户", label: "筛选阶段" }, ...Array.from(new Set(visibleConversations.map((item) => item.lifecycle).filter(Boolean))).map((value) => ({ value, label: value }))]} onChange={(value) => setSessionFilters((item) => ({ ...item, lifecycle: value }))} />
+          </label>
+          <label className="session-filter-control">
+            <Select value={sessionFilters.scheduleStatus} options={[{ value: "全部用户", label: "筛选排课" }, ...["已排课", "未排课"].map((value) => ({ value, label: value }))]} onChange={(value) => setSessionFilters((item) => ({ ...item, scheduleStatus: value }))} />
+          </label>
+          <label className="session-filter-control">
+            <Select value={sessionFilters.attendanceStatus} options={[{ value: "全部用户", label: "筛选上课" }, ...["已上课", "未上课"].map((value) => ({ value, label: value }))]} onChange={(value) => setSessionFilters((item) => ({ ...item, attendanceStatus: value }))} />
+          </label>
+          <label className="session-filter-control session-filter-tags">
+            <CommonTagSelectButton value={sessionFilters.tags} placeholder="选择客户标签" onClick={() => openSessionTagPicker("tags")} onChange={(value) => setSessionFilters((item) => ({ ...item, tags: value }))} />
+          </label>
+          <div className="session-filter-actions">
+            <Button onClick={resetFilters}>重置</Button>
+            <Button type="primary" onClick={focusFirstResult}>搜索</Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const addComposerItem = (type) => {
     const labelMap = {
       emoji: "表情：😊",
@@ -5980,6 +9393,17 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
     setManualReply("");
     setComposerItems([]);
   };
+  if (!selected) {
+    return (
+      <div className="wecom-workbench">
+        {renderWecomAccountList()}
+        <aside className="wecom-session-list">
+          {renderSessionFilterPanel()}
+          <List className="session-list" dataSource={[]} locale={{ emptyText: "当前权限下暂无同步会话" }} />
+        </aside>
+      </div>
+    );
+  }
   const selectedOrder = selected.orders?.[0];
   const insightStatus = selectedOrder?.amount && selectedOrder.amount.startsWith("¥") ? `曾购买${selectedOrder.amount.replace("¥", "")}` : selected.order;
   const insightRows = [
@@ -5988,34 +9412,88 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
     { label: "亲子冲突", value: selected.key === "c1" ? "家长担心孩子三年级后英语拉开差距，希望先找到适合班型，不想盲目报长期课" : "需要先确认家长期望、孩子基础和可上课时间，避免直接推长期班" },
     { label: "用户目标", value: selected.key === "c1" ? "找回开口信心与背词方法；通过诊断试听确认班型；优先提升词汇和阅读基础" : selected.suggestion }
   ];
-  const courseRows = [
-    { key: "lesson-1", lesson: "第 1 节", duration: selected.key === "c1" ? "52 分钟" : "已沟通", format: "直播" },
-    { key: "lesson-2", lesson: "第 2 节", duration: selected.key === "c1" ? "今日应上" : "待确认", format: "直播" },
-    { key: "lesson-3", lesson: "第 3 节", duration: "待上课", format: "直播" }
-  ];
+  const customerCourseOrders = (() => {
+    const baseOrders = selected.key === "c1"
+      ? [
+          {
+            key: "order-trial-c1",
+            type: "体验课",
+            product: "青少年同行者计划 · 4节体验课",
+            amount: "¥398",
+            status: "已支付",
+            orderedAt: "2026-08-18 19:58:11",
+            teacher: "韩冰老师",
+            advisor: selected.owner,
+            totalLessons: 4,
+            completedLessons: 1,
+            currentLesson: "第2节 · 家庭沟通观察",
+            latestLessonAt: "2026-08-24 20:00",
+            lessons: [
+              { key: "trial-c1-1", index: 1, name: "第1节 · 问题梳理与家庭沟通评估", status: "已上课", planAt: "2026-08-23 20:00", finishedAt: "2026-08-23 20:52", duration: "52分钟" },
+              { key: "trial-c1-2", index: 2, name: "第2节 · 孩子学习动力与情绪观察", status: "待上课", planAt: "2026-08-25 20:00", finishedAt: "—", duration: "—" },
+              { key: "trial-c1-3", index: 3, name: "第3节 · 亲子沟通方式调整", status: "待上课", planAt: "2026-08-27 20:00", finishedAt: "—", duration: "—" },
+              { key: "trial-c1-4", index: 4, name: "第4节 · 体验课复盘与方案建议", status: "待上课", planAt: "2026-08-29 20:00", finishedAt: "—", duration: "—" }
+            ]
+          },
+          {
+            key: "order-formal-c1",
+            type: "正价课",
+            product: "家庭教育陪跑营 · 12周系统课",
+            amount: "¥4,980",
+            status: "待支付",
+            orderedAt: "2026-08-24 21:10:36",
+            teacher: "课程中心待分配",
+            advisor: selected.owner,
+            totalLessons: 12,
+            completedLessons: 0,
+            currentLesson: "待确认班型",
+            latestLessonAt: "—",
+            lessons: [
+              { key: "formal-c1-1", index: 1, name: "第1周 · 家庭关系评估与目标确认", status: "待排课", planAt: "—", finishedAt: "—", duration: "—" },
+              { key: "formal-c1-2", index: 2, name: "第2周 · 孩子状态识别与沟通边界", status: "待排课", planAt: "—", finishedAt: "—", duration: "—" },
+              { key: "formal-c1-3", index: 3, name: "第3周 · 学习动力重建策略", status: "待排课", planAt: "—", finishedAt: "—", duration: "—" }
+            ]
+          }
+        ]
+      : [];
+    if (baseOrders.length) return baseOrders;
+    return (selected.orders || []).map((order, index) => ({
+      key: order.id || `order-${selected.key}-${index}`,
+      type: order.amount === "免费试听" || order.product?.includes("试听") ? "体验课" : order.amount?.startsWith("¥") ? "正价课" : "其他",
+      product: order.product || selected.order || "课程订单",
+      amount: order.amount || "—",
+      status: order.status?.includes("预约") ? "已预约" : order.status || "待确认",
+      orderedAt: order.paidAt && order.paidAt !== "-" ? order.paidAt : selected.addedAt || "—",
+      teacher: selected.key === "c3" ? "张老师" : "课程中心待分配",
+      advisor: selected.owner,
+      totalLessons: order.amount === "免费试听" || order.product?.includes("试听") ? 4 : 8,
+      completedLessons: getSessionInsights(selected).watchMinutes > 0 ? 1 : 0,
+      currentLesson: getSessionInsights(selected).watchMinutes > 0 ? "第2节 · 待跟进" : "第1节 · 待预约",
+      latestLessonAt: getSessionInsights(selected).watchMinutes > 0 ? "2026-08-24 20:00" : "—",
+      lessons: [
+        { key: `${order.id || selected.key}-lesson-1`, index: 1, name: "第1节 · 课程体验与问题评估", status: getSessionInsights(selected).watchMinutes > 0 ? "已上课" : "待预约", planAt: selected.addedAt || "—", finishedAt: getSessionInsights(selected).watchMinutes > 0 ? "2026-08-24 20:00" : "—", duration: getSessionInsights(selected).watchMinutes > 0 ? `${getSessionInsights(selected).watchMinutes}分钟` : "—" },
+        { key: `${order.id || selected.key}-lesson-2`, index: 2, name: "第2节 · 家庭沟通与学习状态复盘", status: "待上课", planAt: "待确认", finishedAt: "—", duration: "—" },
+        { key: `${order.id || selected.key}-lesson-3`, index: 3, name: "第3节 · 个性化方案建议", status: "待上课", planAt: "待确认", finishedAt: "—", duration: "—" },
+        { key: `${order.id || selected.key}-lesson-4`, index: 4, name: "第4节 · 体验总结与后续规划", status: "待上课", planAt: "待确认", finishedAt: "—", duration: "—" }
+      ]
+    }));
+  })();
+  const activeCourseOrder = customerCourseOrders.find((order) => order.key === selectedCourseOrderKey) || customerCourseOrders[0];
+  const courseSummaryItems = activeCourseOrder
+    ? [
+        { key: "product", label: "课程名称", children: activeCourseOrder.product },
+        { key: "type", label: "课程类型", children: activeCourseOrder.type },
+        { key: "progress", label: "课节进度", children: `${activeCourseOrder.completedLessons}/${activeCourseOrder.totalLessons}` },
+        { key: "current", label: "当前课节", children: activeCourseOrder.currentLesson },
+        { key: "latest", label: "最近上课", children: activeCourseOrder.latestLessonAt },
+        { key: "teacher", label: "负责老师", children: activeCourseOrder.teacher },
+        { key: "advisor", label: "课程顾问", children: activeCourseOrder.advisor }
+      ]
+    : [];
   const conversationMetrics = {
     sent: Math.max(393, (selected.messages || []).filter((item) => item.from === "customer").length * 76 + selected.unread * 23),
     received: Math.max(351, (selected.messages || []).filter((item) => item.from === "ai").length * 88 + 175)
   };
-  if (!selected) {
-    return (
-      <div className="wecom-workbench">
-        {renderWecomAccountList()}
-        <aside className="wecom-session-list">
-          <div className="session-search">
-            <Input.Search placeholder="搜索客户、群或消息" allowClear />
-            <Button icon={<PlusOutlined />} />
-          </div>
-          <List className="session-list" dataSource={[]} locale={{ emptyText: "当前权限下暂无同步会话" }} />
-        </aside>
-        <main className="wecom-chat-panel">
-          <div className="empty-chat-state">
-            <Text type="secondary">请选择有会话数据的企微账号。</Text>
-          </div>
-        </main>
-      </div>
-    );
-  }
   const currentStageIndex = selected.lifecycleStage || 0;
   const chatPlans = [
     {
@@ -6081,109 +9559,275 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
       }
     }));
   };
-  const courseStageRows = [
-    { key: "sop-0", index: 1, name: "B类开课前", code: "sop_0", status: "进行中", planAt: "2026-08-19 12:15" },
-    { key: "sop-1", index: 2, name: "B类第一节课", code: "sop_1", status: "待开始", planAt: "—" },
-    { key: "sop-2", index: 3, name: "B类第二节课", code: "sop_2", status: "待开始", planAt: "—" },
-    { key: "sop-3", index: 4, name: "B类第三节课", code: "sop_3", status: "待开始", planAt: "—" },
-    { key: "sop-4", index: 5, name: "B类第四节课", code: "sop_4", status: "待开始", planAt: "—" },
-    { key: "sop-other", index: 6, name: "B类课后", code: "sop_ot...", status: "待开始", planAt: "—" }
-  ];
   const salesStrategyUpdatedAt = "2026-08-19 12:30:18";
   const salesStrategyRows = [
-    { title: "孩子情况", text: "女，19岁，现半休学在家，原就读港澳台联考班，因证件问题今年未报考，计划明年再考；与父亲、哥哥无沟通，和母亲共同生活；有严重洁癖，初中曾休学一年服药近两年，后考上高中。" },
-    { title: "主要问题", text: "多疑，对男同学有敌对情绪，同学关系差，几乎闭门不出不与外界往来；在家暴躁，有暴力倾向；存在反复长时间冲水、洗杯子的行为，状态持续多年，今年报考受阻后状态变差。" },
-    { title: "亲子冲突", text: "高，近期孩子刻意回避母亲，几乎无沟通，一沟通就易起冲突；曾因宿舍单独住等事爆发激烈矛盾，孩子对母亲缺乏信任。" },
-    { title: "用户目标", text: "希望改善与孩子的沟通僵局，修复亲子信任；同时希望孩子的情绪、人际及洁癖问题得到缓解。隐含诉求是找到合适的干预方式帮助孩子。" },
-    { title: "策略建议", text: "本阶段不建议直接强推产品或连续追问价格，应先围绕母亲当前最痛的沟通僵局做承接，帮助其确认孩子长期状态、家庭互动模式和可执行的第一步干预方向。若用户主动问服务或方案，可引导人工介入，重点说明需要系统性评估与持续陪跑，不承诺效果，不做医疗诊断。" }
+    { title: "孩子情况", text: selected.key === "c1" ? "三年级，英语不敢开口，单词记忆慢，阅读理解有压力；家长希望先通过 4 节体验课判断孩子是否能跟上，并确认是否需要长期系统训练。" : "女，19岁，现半休学在家，原就读港澳台联考班，因证件问题今年未报考，计划明年再考；与父亲、哥哥无沟通，和母亲共同生活；有严重洁癖，初中曾休学一年服药近两年，后考上高中。" },
+    { title: "用户洞察", text: selected.key === "c1" ? "家长已经明确表达孩子问题和课程咨询意愿，关注点不是单纯价格，而是孩子是否适合、能否坚持、老师是否能给出清晰判断。当前适合用体验课结果建立信任，再引导确认后续方案。" : "家长长期处于焦虑和无力状态，表层诉求是改善亲子沟通，深层诉求是希望有人帮助判断孩子状态和家庭互动问题。当前阶段需要先承接情绪和事实，不适合直接推销。" },
+    { title: "关键风险", text: selected.key === "c1" ? "如果过早强调报名优惠，容易让家长觉得销售导向过强；应先围绕孩子课堂表现、薄弱点和可执行改善路径沟通。" : "孩子存在明显情绪和行为风险，销售沟通中不能做诊断、不能承诺疗效，也不能持续追问敏感家庭冲突细节；必要时应提示人工销售介入。" },
+    { title: "销售建议", text: selected.key === "c1" ? "下一轮建议先反馈孩子体验课观察结果，再给出 2 个可选路径：短期补弱巩固或系统班型规划。若家长追问价格，可说明班型需要结合孩子课堂表现确认，并邀请人工顾问进一步沟通。" : "先围绕母亲当前最痛的沟通僵局做承接，帮助其确认孩子长期状态、家庭互动模式和可执行的第一步干预方向。若用户主动问服务或方案，可引导人工介入，重点说明需要系统性评估与持续陪跑。" }
   ];
-  return (
-    <>
-      <div className="wecom-workbench">
-        {renderWecomAccountList()}
-        <aside className="wecom-session-list">
-        <div className="session-search">
-          <Input.Search placeholder="搜索客户、群或消息" allowClear />
-          <Button icon={<PlusOutlined />} />
-        </div>
-        <List
-          className="session-list"
-          dataSource={filteredConversations}
-          locale={{ emptyText: "当前企微暂无同步会话" }}
-          renderItem={(item) => (
-            <List.Item className={selected.key === item.key ? "session-item active" : "session-item"} onClick={() => setSelected(item)}>
-              <WecomAvatar item={item} />
-              <div className="session-main">
-                <div className="session-title-row">
-                  <Space className="session-title-main" size={6}>
-                    <Text ellipsis>{item.name}</Text>
-                    <span className={`intent-pill intent-${item.intent}`}>{intentLabelMap[item.intent] || `${item.intent}意向`}</span>
-                  </Space>
-                  <Text type="secondary">10:20</Text>
-                </div>
-                <div className="session-meta-row">
-                  <Text type="secondary" ellipsis>{item.last}</Text>
-                  <Space size={4}>
-                    {item.type === "group" ? <Tag color="green">群</Tag> : null}
-                    {needsHumanIntervention(item) ? (
-                      <Tooltip title="需要人工介入">
-                        <span className="session-human-alert"><AlertOutlined /></span>
-                      </Tooltip>
-                    ) : item.hosted ? (
-                      <Tag color="processing">托管</Tag>
-                    ) : (
-                      <Tag>人工</Tag>
-                    )}
-                  </Space>
-                </div>
-              </div>
-            </List.Item>
-          )}
-        />
-      </aside>
-        <main className="wecom-chat-panel">
-        <div className="chat-header">
-          <div>
-            <Space size={8} align="center">
-              <Title level={4}>{selected.name}</Title>
-              <Tag color="success">@微信</Tag>
-              {selected.type === "group" ? <Tag color="green">群聊</Tag> : null}
-            </Space>
-          </div>
-          <button
-            className="chat-lifecycle-stage"
-            type="button"
-            onClick={() => {
-              setCustomerDrawerTab("lifecycle");
-              setCustomerDrawerOpen(true);
-            }}
-          >
-            <Text type="secondary">当前阶段</Text>
-            <Tag color="blue">{selected.lifecycle}</Tag>
-            <Text type="secondary">{currentStageIndex + 1}/{lifecycleStages.length}</Text>
-          </button>
-          <div className="chat-header-actions">
-            <Button
-              className="customer-drawer-trigger"
-              aria-label="客户资料"
-              icon={<UserOutlined />}
-              onClick={() => {
-                setCustomerDrawerTab("profile");
-                setCustomerDrawerOpen(true);
-              }}
+  const personalizedPrompt = selected.key === "c1"
+    ? "该用户处于体验课转化阶段。会话智能体应先反馈孩子课堂观察和学习薄弱点，再自然引导家长确认后续班型；避免直接催单，避免承诺短期提分效果。若家长主动询问价格或名额，引导人工销售介入。"
+    : "该用户情绪敏感且亲子冲突较高。会话智能体应先共情家长压力，围绕事实收集和可执行小步骤沟通；避免诊断、避免承诺疗效、避免连续追问孩子敏感行为。涉及方案和费用时转人工销售。";
+  const defaultStrategyInsightText = [
+    ...salesStrategyRows.map((row) => `${row.title}：${row.text}`),
+    `提示词摘要：${personalizedPrompt}`
+  ].join("\n\n");
+  const strategyInsightText = strategyInsightDrafts[selected.key] || defaultStrategyInsightText;
+  useEffect(() => {
+    setStrategyInsightDraft(strategyInsightDrafts[selected?.key] || defaultStrategyInsightText);
+  }, [selected?.key, defaultStrategyInsightText, strategyInsightDrafts]);
+  const startEditStrategyInsight = () => {
+    setStrategyInsightDraft(strategyInsightText);
+    setStrategyInsightEditing(true);
+  };
+  const cancelEditStrategyInsight = () => {
+    setStrategyInsightDraft(strategyInsightText);
+    setStrategyInsightEditing(false);
+  };
+  const saveStrategyInsight = () => {
+    setStrategyInsightDrafts((items) => ({ ...items, [selected.key]: strategyInsightDraft }));
+    setStrategyInsightEditing(false);
+    message.success("销售策略内容已保存");
+  };
+  const personalizedTasks = [
+    { key: "task-1", time: "今天 20:00", title: selected.key === "c1" ? "发送体验课复盘" : "发送沟通状态复盘", desc: selected.key === "c1" ? "根据第一节体验课表现，发送孩子课堂观察、薄弱点和下一节课准备建议。" : "围绕家长描述的亲子冲突，发送温和复盘，先确认家长最想解决的一个问题。" },
+    { key: "task-2", time: "明天 10:00", title: "提醒人工跟进", desc: selected.key === "c1" ? "若家长回复价格、班型或名额问题，提醒销售人工介入确认课程方案。" : "若家长继续表达无助、冲突升级或孩子风险行为，提醒销售转人工谨慎沟通。" },
+    { key: "task-3", time: "第 3 天 19:30", title: selected.key === "c1" ? "推送同类案例" : "推送家长课内容", desc: selected.key === "c1" ? "如仍未报名，发送同年级词汇和阅读改善案例，降低家长决策顾虑。" : "发送亲子沟通或孩子状态理解相关课程片段，引导家长先参加体验课。" }
+  ];
+  const confirmPersonalizedTask = (task) => {
+    const taskKey = `${selected.key}:${task.key}`;
+    setConfirmedStrategyTaskKeys((items) => ({ ...items, [taskKey]: true }));
+    message.success("已加入该用户当前流程阶段定时任务");
+  };
+  const formatStageDate = (value) => {
+    if (!value || ["—", "待确认", "未排课", "待进入", "当前进行中", "已进入后续阶段"].includes(value)) return "";
+    const parsed = dayjs(value);
+    return parsed.isValid() ? parsed.format("MM.DD") : "";
+  };
+  const formatStageDateTime = (value) => {
+    if (!value || ["—", "待确认", "未排课", "待上课"].includes(value)) return value || "—";
+    const parsed = dayjs(value);
+    return parsed.isValid() ? parsed.format("MM-DD HH:mm") : value;
+  };
+  const getServiceStageTimeRange = (index) => {
+    const baseTime = selected.addedAt ? dayjs(selected.addedAt) : dayjs("2026-08-23 23:06");
+    const start = baseTime.add(index, "day");
+    const end = baseTime.add(index + 1, "day");
+    return {
+      startAt: start.format("MM-DD HH:mm"),
+      endAt: end.format("MM-DD HH:mm"),
+      shortRange: `${start.format("MM.DD")}-${end.format("MM.DD")}`
+    };
+  };
+  const getCourseStageAttendance = (stageName, index) => {
+    const serviceTime = getServiceStageTimeRange(index);
+    if (!stageName.includes("节课")) {
+      return {
+        type: "service",
+        label: index < currentStageIndex ? "已完成" : index === currentStageIndex ? "当前阶段" : "未开始",
+        icon: null,
+        plannedAt: serviceTime.startAt,
+        finishedAt: "—",
+        stageStartAt: serviceTime.startAt,
+        stageEndAt: serviceTime.endAt,
+        courseStartAt: "—",
+        courseEndAt: "—",
+        attendanceAt: "—",
+        timeRange: serviceTime.shortRange
+      };
+    }
+    const lessonIndex = index - 1;
+    const lesson = activeCourseOrder?.lessons?.[lessonIndex];
+    const isAttended = lesson?.status === "已上课" || (lesson?.finishedAt && lesson.finishedAt !== "—");
+    const isScheduled = !isAttended && lesson && !["待排课", "待预约"].includes(lesson.status) && lesson.planAt && !["—", "待确认"].includes(lesson.planAt);
+    const plannedDate = formatStageDate(lesson?.planAt);
+    const finishedDate = formatStageDate(lesson?.finishedAt);
+    const fallbackRange = getServiceStageTimeRange(index).shortRange;
+    const timeRange = plannedDate && finishedDate && plannedDate !== finishedDate
+      ? `${plannedDate}-${finishedDate}`
+      : plannedDate || finishedDate || fallbackRange;
+    if (isAttended) {
+      return {
+        type: "attended",
+        label: "已上课",
+        icon: <CheckCircleOutlined />,
+        plannedAt: lesson.planAt || "—",
+        finishedAt: lesson.finishedAt || "—",
+        stageStartAt: serviceTime.startAt,
+        stageEndAt: serviceTime.endAt,
+        courseStartAt: formatStageDateTime(lesson.planAt || "—"),
+        courseEndAt: formatStageDateTime(lesson.finishedAt || "—"),
+        attendanceAt: formatStageDateTime(lesson.finishedAt || "—"),
+        timeRange
+      };
+    }
+    if (isScheduled) {
+      return {
+        type: "scheduled",
+        label: "已排课未上课",
+        icon: <ClockCircleOutlined />,
+        plannedAt: lesson.planAt || "—",
+        finishedAt: "—",
+        stageStartAt: serviceTime.startAt,
+        stageEndAt: serviceTime.endAt,
+        courseStartAt: formatStageDateTime(lesson.planAt || "—"),
+        courseEndAt: "待上课",
+        attendanceAt: "—",
+        timeRange
+      };
+    }
+    return {
+      type: "not-attended",
+      label: "未上课",
+      icon: <MinusCircleOutlined />,
+      plannedAt: lesson?.planAt || "未排课",
+      finishedAt: "—",
+      stageStartAt: serviceTime.startAt,
+      stageEndAt: serviceTime.endAt,
+      courseStartAt: formatStageDateTime(lesson?.planAt || "未排课"),
+      courseEndAt: "—",
+      attendanceAt: "—",
+      timeRange: lesson?.planAt && lesson.planAt !== "待确认" ? timeRange : "待定"
+    };
+  };
+  const renderStagePopoverContent = (stage) => (
+    <div className="service-stage-popover">
+      <div><Text type="secondary">流程阶段</Text><Text>{stage.currentName}</Text></div>
+      <div><Text type="secondary">阶段进度</Text><Text>{stage.currentNumber}/{stage.total}</Text></div>
+      <div><Text type="secondary">阶段开始</Text><Text>{stage.enteredAt}</Text></div>
+      <div><Text type="secondary">阶段结束</Text><Text>{stage.nextAt}</Text></div>
+      <div><Text type="secondary">课程开始</Text><Text>—</Text></div>
+      <div><Text type="secondary">课程结束</Text><Text>—</Text></div>
+      <div><Text type="secondary">到课时间</Text><Text>—</Text></div>
+      <div><Text type="secondary">上课老师</Text><Text>{activeCourseOrder?.teacher || "课程中心待分配"}</Text></div>
+    </div>
+  );
+  const renderCourseStagePopoverContent = (stageName, index, attendance) => (
+    <div className="service-stage-popover">
+      <div><Text type="secondary">流程阶段</Text><Text>{stageName}</Text></div>
+      <div><Text type="secondary">阶段进度</Text><Text>{index + 1}/{customerServiceStages.length}</Text></div>
+      <div><Text type="secondary">阶段开始</Text><Text>{attendance.stageStartAt}</Text></div>
+      <div><Text type="secondary">阶段结束</Text><Text>{attendance.stageEndAt}</Text></div>
+      <div><Text type="secondary">课程开始</Text><Text>{attendance.courseStartAt}</Text></div>
+      <div><Text type="secondary">课程结束</Text><Text>{attendance.courseEndAt}</Text></div>
+      <div><Text type="secondary">到课时间</Text><Text>{attendance.attendanceAt}</Text></div>
+      <div><Text type="secondary">上课老师</Text><Text>{activeCourseOrder?.teacher || "课程中心待分配"}</Text></div>
+    </div>
+  );
+  const renderSelectedStageTimeline = () => {
+    const stage = getCustomerServiceStage(selected);
+    return (
+      <div className="chat-stage-timeline" aria-label={`当前阶段 ${stage.currentName} ${stage.currentNumber}/${stage.total}`}>
+        {customerServiceStages.map((stageName, index) => {
+          const attendance = getCourseStageAttendance(stageName, index);
+          const stageClassName = index < stage.currentIndex
+            ? "chat-stage-segment done"
+            : index === stage.currentIndex
+              ? "chat-stage-segment current"
+              : "chat-stage-segment";
+          return (
+            <Popover key={stageName} trigger="hover" placement="bottomLeft" content={stageName.includes("节课") ? renderCourseStagePopoverContent(stageName, index, attendance) : renderStagePopoverContent(stage)}>
+            <button
+              type="button"
+              className={`${stageClassName} attendance-${attendance.type}`}
+              aria-label={`${stageName} ${attendance.label}`}
             >
-              客户资料
-            </Button>
-            <div className="hosting-switch-wrap">
-              <Text className="hosting-label">托管给AI</Text>
-              <Switch
-                className="hosting-switch"
-                checked={hostingMode === "ai"}
-                checkedChildren="开"
-                unCheckedChildren="关"
-                onChange={confirmHostingChange}
-              />
+              <span className="chat-stage-main">
+                <span className="chat-stage-name">{stageName}</span>
+                {attendance.icon ? <span className="chat-stage-attendance-icon">{attendance.icon}</span> : null}
+              </span>
+              <span className="chat-stage-time">{attendance.timeRange}</span>
+            </button>
+          </Popover>
+          );
+        })}
+      </div>
+    );
+  };
+  const renderConversationList = () => (
+    <div className="session-conversation-column">
+      <List
+        className="conversation-list"
+        dataSource={paginatedConversations}
+        locale={{ emptyText: "当前企微暂无同步会话" }}
+        renderItem={(item) => {
+          const insights = getSessionInsights(item);
+          const recentConversation = getRecentConversationInfo(item);
+          const manualTakeover = !getHosted(item) || needsHumanIntervention(item);
+          return (
+            <List.Item className={selected.key === item.key ? "conversation-list-item active" : "conversation-list-item"} onClick={() => setSelected(item)}>
+              <WecomAvatar item={item} />
+              <div className="conversation-list-main">
+                <div className="conversation-list-name-row">
+                  <Text ellipsis>{item.name}</Text>
+                  {item.type === "group" ? <Tag color="green">群</Tag> : null}
+                  {insights.relationStatus === "已删除企微" ? <Tag color="red" className="system-status-tag">删</Tag> : null}
+                </div>
+                <Tooltip title={`${recentConversation.time} · ${recentConversation.text}`} placement="topLeft">
+                  <div className="conversation-list-recent">
+                    <Text type="secondary">{recentConversation.time}</Text>
+                    <Text type="secondary" ellipsis>{recentConversation.text}</Text>
+                  </div>
+                </Tooltip>
+              </div>
+              {manualTakeover ? (
+                <Tooltip title="人工接管：AI 已断开托管，需要员工关注" placement="left">
+                  <span className="manual-takeover-icon" aria-label="人工接管">
+                    <UserOutlined />
+                  </span>
+                </Tooltip>
+              ) : <span className="manual-takeover-placeholder" />}
+            </List.Item>
+          );
+        }}
+      />
+      <div className="conversation-list-pagination">
+        <Pagination
+          size="small"
+          current={effectiveSessionPage}
+          pageSize={sessionPageSize}
+          total={filteredConversations.length}
+          pageSizeOptions={["10", "20", "50"]}
+          showSizeChanger
+          onChange={(page, pageSize) => {
+            setSessionPage(page);
+            setSessionPageSize(pageSize);
+          }}
+        />
+      </div>
+    </div>
+  );
+  const renderMainChatPanel = () => {
+    const insights = getSessionInsights(selected);
+    const scheduleStatus = getScheduleStatus(insights);
+    return (
+      <section className="wecom-chat-panel">
+        <div className="chat-header">
+          <div className="chat-header-top">
+            <div className="chat-header-user">
+              <WecomAvatar item={selected} size={34} />
+              <Title level={4}>{selected.name}</Title>
+              <span className={scheduleStatus === "已排课" ? "chat-schedule-pill arranged" : "chat-schedule-pill"}>{scheduleStatus}</span>
             </div>
+            <div className="chat-header-actions">
+              <span className="hosting-switch-wrap">
+                <Text className="hosting-label">托管给AI</Text>
+                <Switch
+                  size="small"
+                  className="hosting-switch"
+                  checked={hostingMode === "ai"}
+                  checkedChildren="开"
+                  unCheckedChildren="关"
+                  onChange={confirmHostingChange}
+                />
+              </span>
+              <Button icon={<CloudSyncOutlined />} onClick={() => message.success("客户资料已同步")}>同步资料</Button>
+              <Button icon={<UserOutlined />} onClick={() => openCustomerDetail(selected, "profile")}>客户资料</Button>
+            </div>
+          </div>
+          <div className="chat-header-stage-row">
+            {renderSelectedStageTimeline()}
           </div>
         </div>
         <div className="wecom-message-area">
@@ -6207,10 +9851,10 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
         </div>
         <div className="chat-composer">
           <Input.TextArea
-            key={`${selected.key}-manual`}
+            key={`${selected.key}-main-manual`}
             value={manualReply}
             rows={4}
-            placeholder="输入人工回复内容"
+            placeholder="输入人工回复内容（可粘贴图片发送）"
             onChange={(event) => setManualReply(event.target.value)}
           />
           {composerItems.length ? (
@@ -6231,14 +9875,119 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
             <Button type="primary" icon={<SendOutlined />} onClick={sendManualReply}>发送</Button>
           </div>
         </div>
-        </main>
+      </section>
+    );
+  };
+  return (
+    <>
+      <div className="wecom-workbench">
+        {renderWecomAccountList()}
+        <aside className="wecom-session-list">
+          {renderSessionFilterPanel()}
+          <div className="session-chat-layout">
+            {renderConversationList()}
+            {renderMainChatPanel()}
+          </div>
+        </aside>
       </div>
       <Drawer
-        title={`${selected.name} · 客户资料`}
+        title="客户筛选"
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        width={520}
+        className="session-filter-drawer"
+        extra={<Space><Button onClick={() => { setQuickFilter("全部"); setSessionFilters(defaultSessionFilters); }}>重置</Button><Button type="primary" onClick={() => setFilterDrawerOpen(false)}>完成</Button></Space>}
+      >
+        <div className="session-filter-summary">
+          <Text>当前结果</Text>
+          <Text className="session-filter-count">{filteredConversations.length} 个客户</Text>
+        </div>
+        <div className="session-filter-section">
+          <div className="session-filter-section-title">客户标签</div>
+          <Form layout="vertical">
+            <Form.Item label="包含标签">
+              <CommonTagSelectButton value={sessionFilters.tags} placeholder="选择需要查看的客户标签" onClick={() => openSessionTagPicker("tags")} onChange={(value) => setSessionFilters((item) => ({ ...item, tags: value }))} />
+            </Form.Item>
+            <Form.Item label="标签关系">
+              <Radio.Group
+                value={sessionFilters.tagMatch}
+                options={["满足任一", "同时满足"].map((value) => ({ value, label: value }))}
+                onChange={(event) => setSessionFilters((item) => ({ ...item, tagMatch: event.target.value }))}
+              />
+            </Form.Item>
+            <Form.Item label="排除标签">
+              <CommonTagSelectButton value={sessionFilters.excludeTags} placeholder="选择不希望出现在结果里的标签" onClick={() => openSessionTagPicker("excludeTags")} onChange={(value) => setSessionFilters((item) => ({ ...item, excludeTags: value }))} />
+            </Form.Item>
+          </Form>
+        </div>
+        <div className="session-filter-section">
+          <div className="session-filter-section-title">补充状态</div>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item label="意向等级">
+                <Select value={sessionFilters.intent} options={["全部意向", "高意向", "中意向", "低意向"].map((value) => ({ value }))} onChange={(value) => setSessionFilters((item) => ({ ...item, intent: value }))} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="当前阶段">
+                <Select value={sessionFilters.lifecycle} options={["全部阶段", ...Array.from(new Set(visibleConversations.map((item) => item.lifecycle).filter(Boolean)))].map((value) => ({ value }))} onChange={(value) => setSessionFilters((item) => ({ ...item, lifecycle: value }))} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="企微关系">
+                <Select value={sessionFilters.relationStatus} options={["全部企微关系", "好友正常", "已删除企微", "群聊"].map((value) => ({ value }))} onChange={(value) => setSessionFilters((item) => ({ ...item, relationStatus: value }))} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="消息状态">
+                <Select value={sessionFilters.unreadStatus} options={["全部消息状态", "有未读消息", "无未读消息"].map((value) => ({ value }))} onChange={(value) => setSessionFilters((item) => ({ ...item, unreadStatus: value }))} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
+        <div className="session-filter-section">
+          <div className="session-filter-section-title">课程与成交行为</div>
+          <Row gutter={12}>
+            <Col span={24}>
+              <Form.Item label="课程状态">
+                <Select value={sessionFilters.courseStatus} options={["全部课程状态", "待预约体验课", "已预约体验课", "已上体验课未报名", "待付款", "未报名", "待选择课程", "群运营"].map((value) => ({ value }))} onChange={(value) => setSessionFilters((item) => ({ ...item, courseStatus: value }))} />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
+      </Drawer>
+      <CommonTagPickerModal
+        title={tagPickerState.title}
+        open={tagPickerState.open}
+        selected={tagPickerState.selected}
+        keyword={tagPickerState.keyword}
+        rule={tagPickerState.rule}
+        ruleOptions={tagPickerState.field === "tags" ? ["以下标签满足其一", "以下标签同时满足"] : ["以下标签满足其一"]}
+        tip="标签来自统一标签库，用于筛选需要查看和跟进的客户；带（AI）的标签表示由策略智能体判断写入。"
+        onCancel={() => setTagPickerState((item) => ({ ...item, open: false }))}
+        onOk={saveSessionTagPicker}
+        onKeywordChange={(keyword) => setTagPickerState((item) => ({ ...item, keyword }))}
+        onRuleChange={(rule) => setTagPickerState((item) => ({ ...item, rule }))}
+        onSelectedChange={(selected) => setTagPickerState((item) => ({ ...item, selected }))}
+      />
+      <Drawer
+        title={`${selected.name} · 客户详情`}
         open={customerDrawerOpen}
         onClose={() => setCustomerDrawerOpen(false)}
-        width={560}
+        width={720}
         className="customer-side-drawer"
+        extra={
+          <Space>
+            <Text type="secondary">托管给AI</Text>
+            <Switch
+              size="small"
+              checked={hostingMode === "ai"}
+              checkedChildren="开"
+              unCheckedChildren="关"
+              onChange={confirmHostingChange}
+            />
+          </Space>
+        }
       >
         <div className="customer-side-panel drawer-mode">
           <Tabs
@@ -6282,8 +10031,8 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                                   options={group.tags.map((tag) => ({
                                     value: tag.value,
                                     label: (
-                                      <span className={tag.source === "AI打标" ? "customer-ai-tag-option" : undefined}>
-                                        {tag.source === "AI打标" ? `${tag.value}（AI）` : tag.value}
+                                      <span className={isAiGeneratedTag(tag.value) ? "customer-ai-tag-option" : undefined}>
+                                        {getTagDisplayLabel(tag.value)}
                                       </span>
                                     )
                                   }))}
@@ -6291,7 +10040,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                                   maxTagCount="responsive"
                                   allowClear
                                   tagRender={({ value, closable, onClose }) => {
-                                    const isAiTag = group.tags.some((tag) => tag.value === value && tag.source === "AI打标");
+                                    const isAiTag = isAiGeneratedTag(value);
                                     return (
                                       <Tag
                                         className={isAiTag ? "customer-selected-ai-tag" : "customer-selected-tag"}
@@ -6299,7 +10048,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                                         onClose={onClose}
                                         onMouseDown={(event) => event.preventDefault()}
                                       >
-                                        {isAiTag ? `${value}（AI）` : value}
+                                        {getTagDisplayLabel(value)}
                                       </Tag>
                                     );
                                   }}
@@ -6308,20 +10057,6 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                               </div>
                             ))}
                           </div>
-                        </div>
-                        <div className="customer-tag-source">
-                          <div className="customer-tag-source-head">
-                            <Text>个人标签</Text>
-                            <Text type="secondary">销售自己手动打的标签，仅自己可见</Text>
-                          </div>
-                          <Select
-                            mode="tags"
-                            size="middle"
-                            value={customerTagValues.personal}
-                            placeholder="输入个人标签后回车"
-                            maxTagCount="responsive"
-                            onChange={(value) => setCustomerTagValues((prev) => ({ ...prev, personal: value }))}
-                          />
                         </div>
                       </div>
                     </section>
@@ -6332,20 +10067,66 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                 key: "course",
                 label: "课程信息",
                 children: (
-                  <Table
-                    className="customer-course-table"
-                    size="small"
-                    rowKey="key"
-                    pagination={false}
-                    dataSource={courseStageRows}
-                    columns={[
-                      { title: "#", dataIndex: "index", width: 48 },
-                      { title: "阶段名称", dataIndex: "name", width: 130 },
-                      { title: "标识", dataIndex: "code", width: 92 },
-                      { title: "状态", dataIndex: "status", width: 82, render: (value) => <Tag color={value === "进行中" ? "processing" : "default"}>{value}</Tag> },
-                      { title: "计划进入", dataIndex: "planAt" }
-                    ]}
-                  />
+                  <div className="customer-course-tab">
+                    <section className="customer-profile-section">
+                      <div className="customer-section-head">
+                        <Text>用户订单</Text>
+                        <Text type="secondary">共 {customerCourseOrders.length} 个订单</Text>
+                      </div>
+                      <Table
+                        className="customer-course-table customer-order-table"
+                        size="small"
+                        rowKey="key"
+                        pagination={false}
+                        dataSource={customerCourseOrders}
+                        rowClassName={(record) => record.key === activeCourseOrder?.key ? "customer-order-row active" : "customer-order-row"}
+                        onRow={(record) => ({
+                          onClick: () => setSelectedCourseOrderKey(record.key)
+                        })}
+                        columns={[
+                          { title: "类型", dataIndex: "type", width: 74, render: (value) => <Tag color={value === "正价课" ? "blue" : value === "体验课" ? "orange" : "default"}>{value}</Tag> },
+                          { title: "商品", dataIndex: "product", ellipsis: true },
+                          { title: "金额", dataIndex: "amount", width: 82 },
+                          { title: "状态", dataIndex: "status", width: 88, render: (value) => <Tag color={value === "已支付" || value === "已预约" ? "success" : value === "待支付" ? "warning" : "default"}>{value}</Tag> },
+                          { title: "下单时间", dataIndex: "orderedAt", width: 138 }
+                        ]}
+                      />
+                    </section>
+                    {activeCourseOrder ? (
+                      <>
+                        <section className="customer-profile-section">
+                          <div className="customer-section-head">
+                            <Text>当前订单课程概览</Text>
+                            <Text type="secondary">{activeCourseOrder.completedLessons}/{activeCourseOrder.totalLessons} 节</Text>
+                          </div>
+                          <Descriptions className="customer-course-summary" size="small" column={2} bordered items={courseSummaryItems} />
+                        </section>
+                        <section className="customer-profile-section">
+                          <div className="customer-section-head">
+                            <Text>课节进度</Text>
+                            <Text type="secondary">{activeCourseOrder.product}</Text>
+                          </div>
+                          <Table
+                            className="customer-course-table customer-lesson-table"
+                            size="small"
+                            rowKey="key"
+                            pagination={false}
+                            dataSource={activeCourseOrder.lessons}
+                            columns={[
+                              { title: "#", dataIndex: "index", width: 44 },
+                              { title: "课节名称", dataIndex: "name", ellipsis: true },
+                              { title: "状态", dataIndex: "status", width: 84, render: (value) => <Tag color={value === "已上课" ? "success" : value === "待上课" ? "processing" : "default"}>{value}</Tag> },
+                              { title: "计划上课", dataIndex: "planAt", width: 130 },
+                              { title: "完成时间", dataIndex: "finishedAt", width: 130 },
+                              { title: "看课时长", dataIndex: "duration", width: 82 }
+                            ]}
+                          />
+                        </section>
+                      </>
+                    ) : (
+                      <div className="empty-panel">暂无课程订单</div>
+                    )}
+                  </div>
                 )
               },
               {
@@ -6353,14 +10134,65 @@ function ConversationsPage({ activeWecom, activeConversationKey, visibleWecomKey
                 label: "销售策略",
                 children: (
                   <div className="sales-strategy-panel">
-                    <Text type="secondary" className="sales-strategy-meta">最近更新：{salesStrategyUpdatedAt}</Text>
-                    <div className="sales-strategy-content">
-                      {salesStrategyRows.map((row) => (
-                        <Paragraph key={row.title}>
-                          <Text strong>{row.title}：</Text>{row.text}
-                        </Paragraph>
-                      ))}
+                    <div className="sales-strategy-header">
+                      <div>
+                        <Text className="sales-strategy-title">策略智能体输出结果</Text>
+                        <Text type="secondary" className="sales-strategy-meta">最近更新：{salesStrategyUpdatedAt} · 来源：体验课转化策略智能体</Text>
+                      </div>
                     </div>
+                    <section className="sales-strategy-section">
+                      <div className="sales-strategy-section-head">
+                        <div className="sales-strategy-section-title">用户洞察与销售建议</div>
+                        {strategyInsightEditing ? (
+                          <Space size={8}>
+                            <Button size="small" onClick={cancelEditStrategyInsight}>取消</Button>
+                            <Button size="small" type="primary" onClick={saveStrategyInsight}>保存</Button>
+                          </Space>
+                        ) : (
+                          <Button size="small" icon={<EditOutlined />} onClick={startEditStrategyInsight}>编辑</Button>
+                        )}
+                      </div>
+                      {strategyInsightEditing ? (
+                        <Input.TextArea
+                          value={strategyInsightDraft}
+                          rows={12}
+                          className="sales-strategy-editor"
+                          onChange={(event) => setStrategyInsightDraft(event.target.value)}
+                        />
+                      ) : (
+                        <Paragraph className="sales-strategy-content">{strategyInsightText}</Paragraph>
+                      )}
+                    </section>
+                    <section className="sales-strategy-section">
+                      <div className="sales-strategy-section-title">个性化定时任务</div>
+                      <div className="personalized-task-list">
+                        {personalizedTasks.map((task) => (
+                          (() => {
+                            const taskKey = `${selected.key}:${task.key}`;
+                            const confirmed = Boolean(confirmedStrategyTaskKeys[taskKey]);
+                            return (
+                              <div className="personalized-task-item" key={task.key}>
+                                <div className="personalized-task-time">{task.time}</div>
+                                <div className="personalized-task-body">
+                                  <Text>{task.title}</Text>
+                                  <Paragraph type="secondary">{task.desc}</Paragraph>
+                                </div>
+                                <Button
+                                  size="small"
+                                  type={confirmed ? "default" : "primary"}
+                                  icon={confirmed ? <CheckCircleOutlined /> : null}
+                                  disabled={confirmed}
+                                  className="personalized-task-confirm"
+                                  onClick={() => confirmPersonalizedTask(task)}
+                                >
+                                  {confirmed ? "已加入" : "确认加入"}
+                                </Button>
+                              </div>
+                            );
+                          })()
+                        ))}
+                      </div>
+                    </section>
                   </div>
                 )
               },
@@ -6774,6 +10606,7 @@ function AppShell({ user, onLogout }) {
   const [activeOrg, setActiveOrg] = useState("all");
   const [activeWecom, setActiveWecom] = useState(userWecomAccounts[0]?.key || managedWecomAccounts[0].key);
   const [activeConversationKey, setActiveConversationKey] = useState("");
+  const [autoOpenCustomerDrawerToken, setAutoOpenCustomerDrawerToken] = useState(0);
   const platform = user.role === "platform_admin";
   const showOrgSwitch = user.role !== "employee";
   const scopedWecomAccounts = userWecomAccounts.filter((item) => activeOrg === "all" || item.department === activeOrg || item.employee === activeOrg);
@@ -6808,8 +10641,11 @@ function AppShell({ user, onLogout }) {
   }, [activeWecom, visibleWecomKeys.join("|")]);
 
   const handleViewConversation = (record) => {
-    setActiveWecom(record.accountKey);
-    setActiveConversationKey(record.key);
+    const targetConversation = conversations.find((item) => item.key === (record.conversationKey || record.key)) || conversations.find((item) => item.name === record.name);
+    if (!targetConversation) return;
+    setActiveWecom(targetConversation.accountKey);
+    setActiveConversationKey(targetConversation.key);
+    setAutoOpenCustomerDrawerToken((value) => value + 1);
     setRoute("conversations");
   };
 
@@ -6822,7 +10658,8 @@ function AppShell({ user, onLogout }) {
     skills: <AISkillPage />,
     tools: <ToolsPage />,
     knowledge: <KnowledgePage />,
-    tagLibrary: <TagLibraryPage />,
+    tagLibrary: <TagLibraryPage onViewConversation={handleViewConversation} />,
+    strategyInsight: <StrategyInsightPage onViewConversation={handleViewConversation} />,
     massMessage: <MassMessagePage />,
     wecom: <WecomPage />,
     sales: <SalesPage />,
@@ -6831,6 +10668,7 @@ function AppShell({ user, onLogout }) {
       <ConversationsPage
         activeWecom={activeWecom}
         activeConversationKey={activeConversationKey}
+        autoOpenCustomerDrawerToken={autoOpenCustomerDrawerToken}
         visibleWecomKeys={visibleWecomKeys}
         onActiveWecomChange={(key) => {
           setActiveWecom(key);
@@ -6840,7 +10678,7 @@ function AppShell({ user, onLogout }) {
     ),
     suggestions: <SuggestionsPage />,
     settings: <SettingsPage platform={platform} />
-  })[route], [route, platform, activeWecom, activeConversationKey, visibleWecomKeys.join("|")]);
+  })[route], [route, platform, activeWecom, activeConversationKey, autoOpenCustomerDrawerToken, visibleWecomKeys.join("|")]);
 
   return (
     <Layout className="app-layout">

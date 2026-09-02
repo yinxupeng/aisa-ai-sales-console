@@ -30,6 +30,56 @@ const aiSkillColumnsSource = aiSkillPageSource.slice(aiSkillColumnsStartIndex, a
 const aiSkillTabsStartIndex = aiSkillPageSource.indexOf("if (configSkill)");
 const aiSkillTabsEndIndex = aiSkillPageSource.length;
 const aiSkillTabsSource = aiSkillPageSource.slice(aiSkillTabsStartIndex, aiSkillTabsEndIndex);
+const strategyPromptDataSourceStartIndex = agentEditorSource.indexOf("const strategyPromptDataSourceConfigs = [");
+const strategyAudienceTagStartIndex = agentEditorSource.indexOf("const strategyAudienceTagOptions", strategyPromptDataSourceStartIndex);
+const strategyPromptDataSourceSource = strategyPromptDataSourceStartIndex >= 0 && strategyAudienceTagStartIndex > strategyPromptDataSourceStartIndex
+  ? agentEditorSource.slice(strategyPromptDataSourceStartIndex, strategyAudienceTagStartIndex)
+  : "";
+const tagLibraryStartIndex = source.indexOf("function TagLibraryPage");
+const massMessageStartIndex = source.indexOf("function MassMessagePage");
+const tagLibrarySource = source.slice(tagLibraryStartIndex, massMessageStartIndex);
+const aiTagAgentDrawerStartIndex = tagLibrarySource.indexOf('title="AI标签生成管理智能体"');
+const aiTagAgentRecordModalStartIndex = tagLibrarySource.indexOf('title="AI生成标签库记录"', aiTagAgentDrawerStartIndex);
+const aiTagAgentDrawerSource = aiTagAgentDrawerStartIndex >= 0 && aiTagAgentRecordModalStartIndex > aiTagAgentDrawerStartIndex
+  ? tagLibrarySource.slice(aiTagAgentDrawerStartIndex, aiTagAgentRecordModalStartIndex)
+  : "";
+const aiAutoTagDrawerStartIndex = tagLibrarySource.indexOf('title="AI自动打标配置"');
+const aiAutoTagRecordModalStartIndex = tagLibrarySource.indexOf('title="AI打标记录"', aiAutoTagDrawerStartIndex);
+const aiAutoTagDrawerSource = aiAutoTagDrawerStartIndex >= 0 && aiAutoTagRecordModalStartIndex > aiAutoTagDrawerStartIndex
+  ? tagLibrarySource.slice(aiAutoTagDrawerStartIndex, aiAutoTagRecordModalStartIndex)
+  : "";
+const aiAutoTagRecordColumnsStartIndex = tagLibrarySource.indexOf("const aiAutoTagRecordColumns = [");
+const aiAutoTagVariableColumnsStartIndex = tagLibrarySource.indexOf("const toggleAutoTagVariable", aiAutoTagRecordColumnsStartIndex);
+const aiAutoTagRecordColumnsSource = aiAutoTagRecordColumnsStartIndex >= 0 && aiAutoTagVariableColumnsStartIndex > aiAutoTagRecordColumnsStartIndex
+  ? tagLibrarySource.slice(aiAutoTagRecordColumnsStartIndex, aiAutoTagVariableColumnsStartIndex)
+  : "";
+const aiAutoTagRecordModalEndIndex = tagLibrarySource.indexOf('title={tagGroupReason?.title}', aiAutoTagRecordModalStartIndex);
+const aiAutoTagRecordModalSource = aiAutoTagRecordModalStartIndex >= 0 && aiAutoTagRecordModalEndIndex > aiAutoTagRecordModalStartIndex
+  ? tagLibrarySource.slice(aiAutoTagRecordModalStartIndex, aiAutoTagRecordModalEndIndex)
+  : "";
+const strategyInsightStartIndex = source.indexOf("function StrategyInsightPage");
+const strategyInsightEndIndex = source.indexOf("function MassMessagePage");
+const strategyInsightSource = strategyInsightStartIndex >= 0 && strategyInsightEndIndex > strategyInsightStartIndex
+  ? source.slice(strategyInsightStartIndex, strategyInsightEndIndex)
+  : "";
+const commonTagPickerStartIndex = source.indexOf("function CommonTagPickerModal");
+const tagLibraryPageStartIndex = source.indexOf("function TagLibraryPage");
+const commonTagPickerSource = source.slice(commonTagPickerStartIndex, tagLibraryPageStartIndex);
+const massMessagePageSource = source.slice(massMessageStartIndex, source.indexOf("function ToolsPage", massMessageStartIndex));
+const knowledgePageStartIndex = source.indexOf("function KnowledgePage");
+const wecomPageStartIndex = source.indexOf("function WecomPage");
+const knowledgePageSource = source.slice(knowledgePageStartIndex, wecomPageStartIndex);
+const sessionFilterPanelStartIndex = source.indexOf("const renderSessionFilterPanel = () =>");
+const addComposerItemStartIndex = source.indexOf("const addComposerItem =", sessionFilterPanelStartIndex);
+const sessionFilterPanelSource = source.slice(sessionFilterPanelStartIndex, addComposerItemStartIndex);
+const sessionStageTimelineStartIndex = source.indexOf("const renderSelectedStageTimeline = () =>");
+const sessionConversationListStartIndex = source.indexOf("const renderConversationList = () =>");
+const sessionMainChatStartIndex = source.indexOf("const renderMainChatPanel = () =>");
+const sessionMainReturnStartIndex = source.indexOf("<div className=\"session-chat-layout\">", sessionMainChatStartIndex);
+const sessionWorkspaceSource = source.slice(sessionStageTimelineStartIndex, source.indexOf("<Drawer", sessionMainReturnStartIndex));
+const customerStrategyTabStartIndex = source.indexOf("<div className=\"sales-strategy-panel\">");
+const customerStrategyTaskStartIndex = source.indexOf("<div className=\"personalized-task-list\">", customerStrategyTabStartIndex);
+const customerStrategyTabSource = source.slice(customerStrategyTabStartIndex, customerStrategyTaskStartIndex);
 const contentMapStartIndex = source.indexOf("const content = useMemo(() => ({");
 const contentMapEndIndex = source.indexOf("  })[route]", contentMapStartIndex);
 const contentMapSource = source.slice(contentMapStartIndex, contentMapEndIndex);
@@ -47,10 +97,30 @@ assert.ok(agentEditorStartIndex >= 0 && lifecyclePageStartIndex > agentEditorSta
 assert.ok(aiSkillPageStartIndex >= 0 && toolPageStartIndex > aiSkillPageStartIndex, "页面应包含 Skill 管理组件");
 assert.ok(aiSkillColumnsStartIndex >= 0 && aiSkillColumnsEndIndex > aiSkillColumnsStartIndex, "Skill 管理页应包含列表字段配置");
 assert.ok(aiSkillTabsStartIndex >= 0 && aiSkillTabsEndIndex > aiSkillTabsStartIndex, "Skill 管理页应包含编辑页签配置");
+assert.ok(tagLibraryStartIndex >= 0 && massMessageStartIndex > tagLibraryStartIndex, "页面应包含标签库管理组件");
+assert.ok(aiTagAgentDrawerStartIndex >= 0 && aiTagAgentRecordModalStartIndex > aiTagAgentDrawerStartIndex, "标签库管理页应包含 AI 标签生成管理侧边栏");
+assert.ok(aiAutoTagDrawerStartIndex >= 0 && aiAutoTagRecordModalStartIndex > aiAutoTagDrawerStartIndex, "标签库管理页应包含 AI 自动打标配置侧边栏");
+assert.ok(aiAutoTagRecordColumnsStartIndex >= 0 && aiAutoTagVariableColumnsStartIndex > aiAutoTagRecordColumnsStartIndex, "标签库管理页应包含 AI 打标记录列表字段");
+assert.ok(aiAutoTagRecordModalStartIndex >= 0 && aiAutoTagRecordModalEndIndex > aiAutoTagRecordModalStartIndex, "标签库管理页应包含 AI 打标记录弹窗");
+assert.ok(strategyInsightStartIndex >= 0 && strategyInsightEndIndex > strategyInsightStartIndex, "页面应包含策略洞察组件");
+assert.ok(commonTagPickerStartIndex >= 0 && tagLibraryPageStartIndex > commonTagPickerStartIndex, "页面应包含通用标签选择弹窗组件");
+assert.ok(sessionFilterPanelStartIndex >= 0 && addComposerItemStartIndex > sessionFilterPanelStartIndex, "会话中心应包含默认筛选区");
+assert.ok(sessionStageTimelineStartIndex >= 0 && sessionConversationListStartIndex > sessionStageTimelineStartIndex, "会话中心应包含课程服务阶段条");
+assert.ok(sessionConversationListStartIndex >= 0 && sessionMainChatStartIndex > sessionConversationListStartIndex, "会话中心应包含左侧用户会话列表");
+assert.ok(sessionMainChatStartIndex >= 0 && sessionMainReturnStartIndex > sessionMainChatStartIndex, "会话中心应包含右侧聊天面板");
+assert.ok(customerStrategyTabStartIndex >= 0 && customerStrategyTaskStartIndex > customerStrategyTabStartIndex, "客户详情应包含销售策略 Tab 内容");
 assert.ok(contentMapStartIndex >= 0 && contentMapEndIndex > contentMapStartIndex, "页面应包含路由内容映射");
 assert.ok(contentMapSource.includes("agentManager: <IntelligentAgentPage />"), "角色管理菜单 agentManager 应渲染原智能体管理页面");
 assert.ok(contentMapSource.includes("strategy: <StrategyPage />"), "智能体管理菜单 strategy 应渲染原 Skill 管理页面");
 assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜单 skills 应渲染 Skill 管理页面");
+assert.ok(contentMapSource.includes("strategyInsight: <StrategyInsightPage"), "策略洞察菜单 strategyInsight 应渲染策略洞察页面");
+assert.ok(!customerStrategyTabSource.includes("已写入客户档案"), "客户详情销售策略 Tab 不应展示已写入客户档案标签");
+assert.ok(!customerStrategyTabSource.includes("AI写入标签"), "客户详情销售策略 Tab 不应展示 AI 写入标签模块");
+assert.ok(!customerStrategyTabSource.includes("个性化提示词摘要"), "客户详情销售策略 Tab 应将个性化提示词摘要合并到用户洞察与销售建议");
+assert.ok(customerStrategyTabSource.includes("strategyInsightEditing"), "客户详情销售策略 Tab 应支持编辑态");
+assert.ok(customerStrategyTabSource.includes("保存"), "客户详情销售策略 Tab 应支持保存编辑内容");
+assert.ok(customerStrategyTabSource.includes("取消"), "客户详情销售策略 Tab 应支持取消编辑");
+assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销售策略 Tab 合并内容应使用可编辑文本域");
 
 [
   { key: "dashboard", label: "工作台" },
@@ -63,6 +133,9 @@ assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜
   { key: "tools", label: "工具管理" },
   { key: "knowledge", label: "知识库管理" },
   { key: "humanization", label: "拟人化设置" },
+  { key: "tagLibrary", label: "标签库管理" },
+  { key: "strategyInsight", label: "策略洞察" },
+  { key: "massMessage", label: "用户群发" },
   { key: "settings", label: "系统管理" }
 ].reduce((previousIndex, item) => {
   const currentIndex = menuSource.indexOf(`key: "${item.key}"`);
@@ -72,6 +145,86 @@ assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜
   assert.ok(itemSource.includes(`label: "${item.label}"`), `左侧导航名称错误：${item.key}`);
   return currentIndex;
 }, -1);
+
+[
+  "策略洞察",
+  "洞察列表",
+  "用户洞察日报",
+  "AI生成洞察",
+  "insightGenerateModalOpen",
+  "AI生成用户洞察日报",
+  "洞察类型",
+  "分析人群",
+  "指定标签人群",
+  "指定阶段人群",
+  "数据范围",
+  "用户沟通数据",
+  "客户档案",
+  "课程行为",
+  "标签数据",
+  "生成时间",
+  "立即生成",
+  "定时生成",
+  "输出内容",
+  "人群整体结论",
+  "分层洞察",
+  "重点用户清单",
+  "销售建议",
+  "生成逻辑",
+  "任务提示词",
+  "insightGeneratePrompt",
+  "请基于所选用户沟通数据、客户档案、课程行为和标签数据，生成用户洞察日报",
+  "不要基于单条对话做过度判断",
+  "重点用户必须说明判断依据",
+  "审核方式",
+  "生成后直接进入洞察列表",
+  "需人工确认后入库",
+  "覆盖人数",
+  "重点人数",
+  "人群整体结论",
+  "人群分层",
+  "重点用户清单",
+  "洞察摘要",
+  "用户清单",
+  "insight-clickable-count",
+  "insight-user-list-modal",
+  "userListColumns",
+  "insight-user-list-table",
+  "insight-wrap-cell",
+  "openInsightUserList",
+  "onViewConversation",
+  "openInsightCustomerChat",
+  "strategy-insight-detail-drawer",
+  "建议动作",
+  "处理状态",
+  "高意向用户",
+  "观望培育用户",
+  "风险关注用户",
+  "查看会话",
+  "创建跟进任务"
+].forEach((token) => {
+  assert.ok(strategyInsightSource.includes(token) || styles.includes(token), `策略洞察页面缺少：${token}`);
+});
+
+assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞察页按钮应改为 AI生成洞察");
+
+[
+  "AI生成动作结果",
+  "输出项",
+  "写入位置",
+  "是否需要确认",
+  "下一步处理建议",
+  "加入群发人群",
+  "标记已处理",
+  "全部输出类型",
+  "风险预警 / 人工提醒",
+  "转化分析 / 跟进任务",
+  "insight-action-result-table",
+  "insight-next-actions",
+  "actionResultColumns"
+].forEach((token) => {
+  assert.ok(!strategyInsightSource.includes(token) && !styles.includes(token), `策略洞察页面不应再包含旧详情内容：${token}`);
+});
 
 [
   "height: 46px;",
@@ -116,16 +269,13 @@ assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜
   "查看逻辑",
   "工具管理",
   "知识库管理",
-  "知识库列表",
-  "知识条目",
-  "新增知识库",
-  "新增知识条目",
-  "管理条目",
-  "返回知识库列表",
-  "文本知识",
-  "图片素材",
-  "语音素材",
-  "文件素材",
+  "资源目录",
+  "新建文件夹",
+  "新增资源",
+  "资源类型",
+  "资源内容",
+  "资源说明",
+  "链接集合",
   "AI工具提示词",
   "编辑工具提示词",
   "提示词内容",
@@ -193,9 +343,34 @@ assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜
   'title: "操作"',
   "角色流程配置",
   "配置该角色按什么服务流程执行，以及每个流程阶段绑定哪个智能体。",
-  'label: "角色流程管理"'
+  'label: "角色流程管理"',
+  "<IntelligentAgentStageModal",
+  "onSave={saveStage}"
 ].forEach((token) => {
   assert.ok(rolePageSource.includes(token), `角色管理页缺少截图内容：${token}`);
+});
+
+[
+  "编辑流程阶段",
+  "新增流程阶段",
+  "阶段标识",
+  "阶段名称",
+  "智能体",
+  "展示名称",
+  "排序",
+  "阶段状态",
+  "知识库检索",
+  "本阶段启用",
+  "配置知识库",
+  "已选 ${selectedKnowledgeRows.length} 个知识资源",
+  "未选择知识库文件",
+  "agent-stage-knowledge-tags",
+  "KnowledgeResourcePickerModal",
+  "knowledgeResourceKeys",
+  "getKnowledgeBaseKeysFromResources",
+  ".agent-stage-knowledge-config"
+].forEach((token) => {
+  assert.ok(source.includes(token) || styles.includes(token), `角色流程阶段编辑弹窗缺少：${token}`);
 });
 
 [
@@ -246,6 +421,54 @@ assert.ok(!source.includes("bindSkills"), "知识库数据结构不应再包含 
 assert.ok(!source.includes('name="bindSkills"'), "知识库编辑弹窗不应提供绑定 Skill 字段");
 assert.ok(!source.includes('dataIndex: "bindSkills"'), "知识库列表不应展示绑定 Skill 列");
 assert.ok(source.includes("选择该 Skill 可引用的知识库"), "资源管理 Tab 应说明知识库关联方向");
+[
+  "buildKnowledgeResourceRows",
+  "getKnowledgeBaseKeysFromResources",
+  "selectedKeys = []",
+  "onSelectedChange",
+  "checkable",
+  "checkStrictly",
+  "checkedKeys={{ checked: selectedKeys, halfChecked: [] }}",
+  "已选 {selectedKeys.length}",
+  "加入已选",
+  "移出已选",
+  "已选资源",
+  "确认关联"
+].forEach((token) => {
+  assert.ok(source.includes(token) || styles.includes(token), `知识库选择弹窗应支持多选关联：${token}`);
+});
+assert.ok(!source.includes("selectedKey={knowledgePickerKey}"), "Skill 关联知识库不应再使用单选 selectedKey");
+assert.ok(!source.includes("onSelect={setKnowledgePickerKey}"), "Skill 关联知识库不应再使用单选 onSelect");
+[
+  "agentKnowledgePickerOpen",
+  "agentKnowledgePickerKeys",
+  "saveAgentKnowledgeResources",
+  "setAgentKnowledgePickerKeys(selectedKnowledgeResourceKeys)",
+  "selectedKnowledgeResourceKeys",
+  "个知识资源"
+].forEach((token) => {
+  assert.ok(agentEditorSource.includes(token), `智能体知识库配置应复用多选知识库弹窗：${token}`);
+});
+[
+  "toolPickerOpen",
+  "toolPickerKeys",
+  "openSkillToolPicker",
+  "toggleSkillToolSelection",
+  "saveSkillTools",
+  "renderSkillToolPickerModal",
+  "选择工具",
+  "搜索工具名称、类型或说明",
+  "确认关联",
+  "当前 Skill 暂未配置工具",
+  "agent-relation-picker-modal",
+  "agent-relation-resource-card",
+  "适用场景",
+  "输入摘要",
+  "输出摘要"
+].forEach((token) => {
+  assert.ok(aiSkillTabsSource.includes(token), `Skill 关联工具应使用统一弹窗卡片选择交互：${token}`);
+});
+assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工具不应继续使用下拉多选工具 options");
 
 [
   "logic-token-heading-1",
@@ -279,16 +502,431 @@ assert.ok(source.includes("选择该 Skill 可引用的知识库"), "资源管�
   "按标签组展示和编辑",
   "AI打标",
   "customer-selected-ai-tag",
-  "个人标签",
-  "销售自己手动打的标签",
   "customer-profile-tab",
   "customer-basic-table",
   "customer-course-table",
-  "sales-strategy-panel"
+  "sales-strategy-panel",
+  "策略智能体输出结果",
+  "用户洞察与销售建议",
+  "strategyInsightDrafts",
+  "strategyInsightEditing",
+  "startEditStrategyInsight",
+  "saveStrategyInsight",
+  "sales-strategy-editor",
+  "个性化定时任务",
+  "confirmedStrategyTaskKeys",
+  "确认加入",
+  "已加入",
+  "已加入该用户当前流程阶段定时任务"
 ].forEach((token) => {
   assert.ok(source.includes(token) || styles.includes(token), `客户资料缺少新版资料结构：${token}`);
 });
+[
+  "个人标签",
+  "销售自己手动打的标签",
+  "customerTagValues.personal",
+  "输入个人标签后回车"
+].forEach((token) => {
+  assert.ok(!customerStrategyTabSource.includes(token) && !source.slice(source.indexOf("customer-profile-tab"), source.indexOf('key: "course"', source.indexOf("customer-profile-tab"))).includes(token), `客户详情侧边栏不应展示个人标签：${token}`);
+});
 assert.ok(!styles.includes(".course-progress-item > span"), "上课情况进度圆点不应使用直接 span 选择器，避免影响 Ant Text 标签");
+
+[
+  "孩子问题画像",
+  "家庭关系画像",
+  "家长认知阶段",
+  "购买意向",
+  "产品兴趣",
+  "跟进策略",
+  "风险预警",
+  "运营人群",
+  "厌学",
+  "休学",
+  "手机成瘾",
+  "亲子冲突高",
+  "开始接受心理因素",
+  "父母成长营意向",
+  "适合邀约专家连麦",
+  "孩子高危风险",
+  "体验后未报名"
+].forEach((token) => {
+  assert.ok(source.includes(token), `标签体系缺少青春同行业务标签：${token}`);
+});
+
+[
+  "CommonTagPickerModal",
+  "CommonTagSelectButton",
+  "common-tag-picker-modal",
+  "tagSelectionGroups",
+  "tagPickerState",
+  "openSessionTagPicker",
+  "openTagPicker(\"audienceTags\")",
+  "openTagPicker(\"excludeTags\")",
+  "closable",
+  "onTagRemove"
+].forEach((token) => {
+  assert.ok(source.includes(token) || styles.includes(token), `通用标签选择能力缺少：${token}`);
+});
+
+[
+  "搜索客户、群或消息",
+  "sessionFilters.lifecycle",
+  "sessionFilters.scheduleStatus",
+  "sessionFilters.attendanceStatus",
+  "CommonTagSelectButton",
+  "全部用户",
+  "筛选托管",
+  "筛选阶段",
+  "筛选排课",
+  "筛选上课",
+  "已排课",
+  "未排课",
+  "已上课",
+  "未上课",
+  "已托管",
+  "未托管"
+].forEach((token) => {
+  assert.ok(sessionFilterPanelSource.includes(token), `会话中心默认筛选区缺少字段：${token}`);
+});
+[
+  "getScheduleStatus",
+  "getAttendanceStatus"
+].forEach((token) => {
+  assert.ok(source.includes(token), `会话中心默认筛选区缺少筛选逻辑：${token}`);
+});
+assert.ok(
+  sessionFilterPanelSource.indexOf("sessionFilters.hostingStatus") < sessionFilterPanelSource.indexOf("sessionFilters.lifecycle") &&
+    sessionFilterPanelSource.indexOf("sessionFilters.lifecycle") < sessionFilterPanelSource.indexOf("sessionFilters.scheduleStatus") &&
+    sessionFilterPanelSource.indexOf("sessionFilters.scheduleStatus") < sessionFilterPanelSource.indexOf("sessionFilters.attendanceStatus") &&
+    sessionFilterPanelSource.indexOf("sessionFilters.attendanceStatus") < sessionFilterPanelSource.indexOf("CommonTagSelectButton"),
+  "会话中心阶段、排课、到课筛选应位于托管状态和标签筛选之间"
+);
+
+[
+  "客户类型",
+  "用户等级",
+  "看课时长",
+  "亲子冲突",
+  "意向等级",
+  "当前阶段",
+  "课程状态",
+  "未读状态"
+].forEach((token) => {
+  assert.ok(!sessionFilterPanelSource.includes(token), `会话中心默认筛选区不应再展示旧字段：${token}`);
+});
+
+[
+  "conversation-list-item",
+  "conversation-list-recent",
+  "manual-takeover-icon",
+  "manualTakeover",
+  "人工接管",
+  "system-status-tag",
+  "insights.relationStatus === \"已删除企微\"",
+  "className=\"system-status-tag\">删</Tag>",
+  "renderSelectedStageTimeline",
+  "renderMainChatPanel",
+  "chat-header-top",
+  "chat-schedule-pill",
+  "同步资料",
+  "客户资料"
+].forEach((token) => {
+  assert.ok(sessionWorkspaceSource.includes(token), `会话中心新工作台缺少内容：${token}`);
+});
+
+[
+  "customerServiceStages",
+  "当前服务阶段",
+  "getCustomerServiceStage",
+  "getCourseStageAttendance",
+  "formatStageDate",
+  "formatStageDateTime",
+  "getServiceStageTimeRange",
+  "renderCourseStagePopoverContent",
+  "流程阶段",
+  "timeRange",
+  "chat-stage-main",
+  "chat-stage-time",
+  "阶段进度",
+  "阶段开始",
+  "阶段结束",
+  "课程开始",
+  "课程结束",
+  "到课时间",
+  "上课老师",
+  "已排课未上课",
+  "未上课",
+  "MinusCircleOutlined",
+  "chat-stage-attendance-icon",
+  "chat-stage-timeline",
+  "chat-stage-segment",
+  "chat-header-stage-row"
+].forEach((token) => {
+  assert.ok(source.includes(token) || styles.includes(token), `会话中心阶段进度缺少：${token}`);
+});
+
+[
+  "<Text>意向</Text>",
+  "<Text>当前阶段</Text>",
+  "<Text>课程状态</Text>",
+  "<Text>行为数据</Text>",
+  "<Text>AI判断</Text>",
+  "className=\"session-time\"",
+  "看课${insights.watchMinutes}分钟",
+  "暂无看课",
+  "条未读",
+  "openCustomerDetail(item, \"lifecycle\")}>阶段"
+].forEach((token) => {
+  assert.ok(!sessionWorkspaceSource.includes(token), `会话中心客户列表不应再展示旧字段：${token}`);
+});
+
+[
+  ".session-chat-layout",
+  ".conversation-list-item",
+  ".chat-stage-timeline",
+  ".chat-stage-segment.current",
+  ".chat-schedule-pill",
+  ".wecom-chat-panel",
+  ".chat-header-actions"
+].forEach((token) => {
+  assert.ok(styles.includes(token), `会话中心应包含聊天工作台样式：${token}`);
+});
+assert.ok(!sessionWorkspaceSource.includes("chat-current-stage-pill"), "会话中心聊天头部不应重复展示当前阶段胶囊");
+assert.ok(!styles.includes(".chat-current-stage-pill"), "会话中心聊天头部不应保留当前阶段胶囊样式");
+[
+  ".session-stage-timeline",
+  ".session-stage-step"
+].forEach((token) => {
+  assert.ok(!styles.includes(token), `会话中心课程阶段已移入聊天头部，不应保留顶部横条样式：${token}`);
+});
+
+[
+  "搜索客户、群或消息",
+  "筛选托管",
+  "筛选阶段",
+  "筛选排课",
+  "筛选上课",
+  "选择客户标签",
+  "客户资料"
+].forEach((token) => {
+  assert.ok(sessionWorkspaceSource.includes(token) || sessionFilterPanelSource.includes(token), `会话中心新结构缺少：${token}`);
+});
+[
+  "全部托管状态",
+  "全部阶段",
+  "全部排课",
+  "全部到课"
+].forEach((token) => {
+  assert.ok(!sessionFilterPanelSource.includes(token), `会话中心默认筛选项应统一显示全部用户，不应包含：${token}`);
+});
+[
+  "<Text type=\"secondary\">客户搜索</Text>",
+  "<Text type=\"secondary\">托管状态</Text>",
+  "<Text type=\"secondary\">阶段筛选</Text>",
+  "<Text type=\"secondary\">标签筛选</Text>"
+].forEach((token) => {
+  assert.ok(!sessionFilterPanelSource.includes(token), `会话中心默认筛选区不应展示筛选标题：${token}`);
+});
+
+assert.ok(!sessionWorkspaceSource.includes('key: "chat"'), "客户详情抽屉不应再包含聊天内容 Tab");
+
+[
+  "客户状态",
+  "用户画像",
+  "咨询产品",
+  "学习问题",
+  "自然拼读",
+  "同步企微标签"
+].forEach((token) => {
+  assert.ok(!tagLibrarySource.includes(token), `标签库管理不应再使用旧标签体系：${token}`);
+});
+
+[
+  "AI智能生成标签",
+  "aiTagAgentOpen",
+  "AI标签生成管理智能体",
+  "AI生成标签库记录",
+  "tagReviewModalOpen",
+  "tagReviewDetailBatchKey",
+  "openTagReviewDetail",
+  "renderTagReviewDetailPage",
+  "tagReviewDetailColumns",
+  "activeTagReviewBatchKey",
+  "aiTagReviewBatches",
+  "reviewChangeDecision",
+  "applyTagReviewChange",
+  "AI生成批次",
+  "待审核变更",
+  "新增标签",
+  "修改标签规则",
+  "建议删除",
+  "查看详情",
+  "审核详情",
+  "返回标签库",
+  "批次摘要",
+  "变更类型",
+  "变更内容",
+  "AI判断原因",
+  "AI建议",
+  "当前生效",
+  "通过",
+  "驳回",
+  "tagGroupReason",
+  "tagRuleDetail",
+  "manualTagRules",
+  "getTagMeta",
+  "tagSourceIcon",
+  "tagRuleEditedIcon",
+  "tag-meta-line",
+  "tagRuleDraft",
+  "saveTagRuleDetail",
+  "AI生成逻辑",
+  "标签AI打标规则",
+  "AI打标依据",
+  "排除条件",
+  "证据样例",
+  "人工修改后优先于AI生成规则",
+  "人工新增",
+  "AI生成",
+  "人工已改",
+  "AI规则",
+  "手动新增的标签默认进入人工来源",
+  "点击标签查看AI打标规则",
+  "openTagRuleDetail",
+  "AI智能生成标签",
+  "输入数据范围",
+  "aiTagAgentDataSourceConfigs",
+  "activeAiTagAgentDataSourceKey",
+  "ai-tag-agent-data-source-list",
+  "ai-tag-agent-data-source-row",
+  "ai-tag-agent-prompt-list",
+  "ai-tag-agent-prompt-row",
+  "企业知识库",
+  "智能体提示词",
+  "用户沟通数据",
+  "选择知识库文件",
+  "选择智能体提示词",
+  "用户沟通数据配置",
+  "最近",
+  "个月加的好友",
+  "用户发出的对话条数超过",
+  "上传导入用户对话数据文件",
+  "适用部门角色",
+  'roles: ["市场", "销售", "班主任"]',
+  "生成标签组",
+  "生成标签内容",
+  "生成AI打标规则",
+  "提示词配置",
+  "AI标签库生成管理智能体",
+  "生成标签提案",
+  "至少需要≥10个独立用户稳定出现",
+  "禁止生成明确医疗诊断标签",
+  "人工标签、人工修改规则和人工审核结论永远优先于 AI 生成结果",
+  "自杀",
+  "自残"
+].forEach((token) => {
+  assert.ok(tagLibrarySource.includes(token), `标签库管理缺少 AI 智能标签配置：${token}`);
+});
+[
+  "客户档案",
+  "用户业务数据",
+  "现有标签数据",
+  "生成周期配置",
+  "生成时间",
+  "生成频率",
+  'name="generateAt"',
+  'name="generateFrequency"',
+  "每周一次",
+  "仅新增标签需审核",
+  "高风险标签必须审核",
+  "审核规则",
+  'name="reviewMode"',
+  "不需要人工审核",
+  "优化已有标签",
+  "识别重复标签"
+].forEach((token) => {
+  assert.ok(!aiTagAgentDrawerSource.includes(token), `AI标签生成管理配置不应保留旧项：${token}`);
+});
+[
+  "输入：{item.input}",
+  "输出：{item.output}",
+  "{item.type}",
+  "statusTag(item.status)"
+].forEach((token) => {
+  assert.ok(!aiTagAgentDrawerSource.includes(token), `选择智能体提示词弹窗不应展示冗余信息：${token}`);
+});
+
+assert.ok(!tagLibrarySource.includes('"新增标签组"'), "AI生成标签内容不应再包含新增标签组");
+assert.ok(!tagLibrarySource.includes("编辑后通过"), "AI生成标签审核操作不应再包含编辑后通过");
+assert.ok(!tagLibrarySource.includes("单标签AI自动打标"), "标签库管理不应控制到单个标签是否允许 AI 自动打标");
+assert.ok(!tagLibrarySource.includes("getTagRuleDetail(tagRuleDetail).basis.map"), "标签规则弹窗不应再拆分展示 AI打标依据列表");
+assert.ok(!tagLibrarySource.includes("getTagRuleDetail(tagRuleDetail).excludes.map"), "标签规则弹窗不应再拆分展示排除条件列表");
+assert.ok(!tagLibrarySource.includes("getTagRuleDetail(tagRuleDetail).examples.map"), "标签规则弹窗不应再拆分展示证据样例列表");
+
+[
+  "标签库策略智能体",
+  "基于业务服务情况，生成标签组、标签内容和AI打标判定规则",
+  "AI生成建议",
+  "ai-tag-suggestion-table"
+].forEach((token) => {
+  assert.ok(!tagLibrarySource.includes(token), `AI智能标签配置不应再展示：${token}`);
+});
+
+[
+  "mass-audience-tags",
+  "items.slice(0, 2)",
+  "items.length > 2",
+  "mass-estimate-count-cell",
+  "scroll={{ x: 1180 }}",
+  "width: 146",
+  "audienceStatusFields",
+  "audienceStatuses",
+  "所处阶段",
+  "全部阶段",
+  "lifecycle",
+  "全部托管状态",
+  "getAudienceStatusSummary",
+  "mass-audience-status-summary",
+  "openTagPicker(\"audienceTags\")",
+  "openTagPicker(\"excludeTags\")",
+  "openTaskDrawer(\"view\", record)",
+  "openTaskDrawer(\"edit\", record)",
+  "查看群发任务",
+  "编辑群发任务",
+  "saveTask",
+  "disabled={isViewMode}"
+].forEach((token) => {
+  assert.ok(massMessagePageSource.includes(token) || styles.includes(token), `用户群发表格缺少紧凑样式或展示规则：${token}`);
+});
+[
+  "全部用户状态",
+  "用户等级",
+  "全部等级",
+  "看课时长",
+  "全部时长",
+  "课程状态",
+  "全部课程状态"
+].forEach((token) => {
+  assert.ok(!massMessagePageSource.includes(token), `用户群发选择客户筛选不应再包含：${token}`);
+});
+[
+  'title={<PanelTitle title="用户群发"',
+  'desc="人工创建群发任务，按标签和基础条件筛选客户，支持立即发送或定时发送。"'
+].forEach((token) => {
+  assert.ok(!massMessagePageSource.includes(token), `用户群发页不应再包含重复页面标题：${token}`);
+});
+[
+  'label: "企微关系"',
+  'name: "wecomRelation"',
+  'title="基础信息"',
+  'title="选择客户"',
+  'title="群发内容"',
+  'title="发送设置"',
+  "mass-audience-section-title",
+  "原型中编辑会复用创建表单"
+].forEach((token) => {
+  assert.ok(!massMessagePageSource.includes(token), `用户群发创建任务不应再包含占位标题或企微关系：${token}`);
+});
 
 [
   "Statistic title=\"知识库\"",
@@ -297,6 +935,128 @@ assert.ok(!styles.includes(".course-progress-item > span"), "上课情况进度�
   "Statistic title=\"绑定 Skill\""
 ].forEach((token) => {
   assert.ok(!source.includes(token), `知识库管理页不应展示顶部统计卡片：${token}`);
+});
+
+[
+  'title={<PanelTitle title="标签库管理"',
+  "维护受控标签体系，标签组可按部门角色使用"
+].forEach((token) => {
+  assert.ok(!tagLibrarySource.includes(token), `标签库管理页不应再包含重复页面标题：${token}`);
+});
+[
+  "新增标签组",
+  "AI智能生成标签",
+  "AI生成标签库记录",
+  "AI自动打标配置",
+  "AI打标记录",
+  "aiAutoTagConfigOpen",
+  "aiAutoTagRecordOpen",
+  "角色选择",
+  "执行对象规则",
+  "加好友第 X 天",
+  "用户发出的会话信息条数超过 X 条",
+  "满足任一条件即执行",
+  "ai-auto-tag-trigger-grid",
+  "ai-auto-tag-trigger-card",
+  "满足以上条件自然日后",
+  "后 1 天",
+  "后 2 天",
+  "后 3 天",
+  "执行时间",
+  "addAutoTagTriggerRule",
+  "removeAutoTagTriggerRule",
+  "数据来源授权",
+  "自动打标仅作用于已开启",
+  "自动打标逻辑说明",
+  "aiAutoTagDataSourceConfigs",
+  "activeAutoTagDataSourceKey",
+  "autoTagConfigForm",
+  "selectedAutoTagVariables",
+  "toggleAutoTagVariable",
+  "ai-auto-tag-data-source-list",
+  "ai-auto-tag-data-source-row",
+  "输入数据项配置",
+  "数据来源",
+  "可用字段",
+  "变量字段",
+  "变量标识",
+  "默认取数",
+  "已选择",
+  "选择变量字段",
+  "{{conversation.recent_messages}}",
+  "{{profile.current_summary}}",
+  "取数参数",
+  "AI使用方式",
+  "企微会话记录、AI托管消息记录",
+  "要打标签用户的全部对话数据",
+  "企业给到的客户档案数据",
+  "AI生成标签提案",
+  "候选标签库",
+  "只在已选择的已有标签组下生成",
+  "人工标签优先",
+  "最小样本量",
+  "语义相似度≥70%",
+  "新增标签 / 修改标签规则 / 建议删除",
+  "修改后通过",
+  "审核通过后才允许写入正式标签库",
+  "不得覆盖人工维护标签",
+  "人工修改过的规则优先于AI生成规则",
+  "判断依据必须来自用户沟通数据或客户档案",
+  "输出结果必须包含：用户、角色、标签、变更类型、判断依据、置信度、触发规则和执行时间",
+  "AI打标记录",
+  "aiAutoTagRecordDetail",
+  "aiAutoTagRecordDetailColumns",
+  "openAiAutoTagRecordDetail",
+  "查看用户标签",
+  "打标对象",
+  "操作类型",
+  "打标原因",
+  "新增",
+  "删除",
+  "修改",
+  "tag-library-summary-text",
+  "tag-filter-panel",
+  "tag-filter-fields",
+  "tag-filter-actions"
+].forEach((token) => {
+  assert.ok(tagLibrarySource.includes(token) || styles.includes(token), `标签库管理页应保留筛选和主操作：${token}`);
+});
+assert.ok(!tagLibrarySource.includes(">AI智能标签</Button>"), "标签库管理入口应改为 AI智能生成标签");
+assert.ok(!tagLibrarySource.includes(">生成记录</Button>"), "标签库管理入口应改为 AI生成标签库记录");
+assert.ok(!tagLibrarySource.includes('name="tagGroupScope"'), "AI自动打标配置不应重复配置允许自动打标的标签组");
+assert.ok(!tagLibrarySource.includes("insertAutoTagVariable"), "变量配置不应继续使用插入变量逻辑");
+assert.ok(!tagLibrarySource.includes("插入变量"), "变量配置操作应改为勾选变量字段");
+assert.ok(!aiAutoTagRecordColumnsSource.includes("pendingReview"), "AI打标记录列表不应展示待审核内容");
+assert.ok(!aiAutoTagRecordColumnsSource.includes('dataIndex: "status"'), "AI打标记录列表不应展示状态列");
+[
+  "执行用户范围",
+  "执行频率",
+  "审核方式",
+  'name="reviewMode"',
+  "课程行为",
+  "订单状态",
+  "已有标签",
+  "用户业务数据",
+  "最近7天有互动用户",
+  "每天一次"
+].forEach((token) => {
+  assert.ok(!aiAutoTagDrawerSource.includes(token), `AI自动打标配置不应保留旧项：${token}`);
+});
+assert.ok(!aiAutoTagDrawerSource.includes("onClick={() => setActiveAutoTagDataSourceKey(item.key)}"), "AI自动打标数据来源授权不应再展示配置入口");
+assert.ok(styles.includes(".ai-auto-tag-trigger-grid") && styles.includes("grid-template-columns: 1fr;"), "AI自动打标执行对象规则应上下排列");
+[
+  'title={<PanelTitle title="知识库管理"',
+  "知识库列表以资源目录方式维护"
+].forEach((token) => {
+  assert.ok(!knowledgePageSource.includes(token), `知识库管理页不应再包含重复页面标题：${token}`);
+});
+[
+  "resource-sidebar-head",
+  "新建文件夹",
+  "新增资源",
+  "资源内容"
+].forEach((token) => {
+  assert.ok(knowledgePageSource.includes(token) || styles.includes(token), `知识库管理页应保留资源操作：${token}`);
 });
 
 [
@@ -351,22 +1111,55 @@ assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管�
   'label: "逻辑与任务编排"',
   'label: "工具配置"',
   'label: "Skill配置"',
+  'label: "知识库配置"',
+  "relationPicker",
+  "openRelationPicker",
+  "renderRelationConfigTab",
+  "renderRelationPickerModal",
+  "当前版本暂未配置工具",
+  "当前版本暂未配置 Skill",
+  "当前版本暂未配置知识库",
+  "添加工具",
+  "添加 Skill",
+  "添加知识库",
+  "选择工具",
+  "选择 Skill",
+  "选择知识库",
+  "适用场景",
+  "输入摘要",
+  "输出摘要",
+  "已选择",
+  "agent-relation-empty",
+  "agent-relation-picker-modal",
+  "agent-relation-card-list",
+  "agent-relation-resource-card",
   'label: "预览调试"',
   'label="Provider"',
   'label="模型"',
   'label="Base URL"',
   "选择该智能体可关联的 Skill",
   "查看该智能体已关联的 Skill 默认能力定义，具体调用时机由智能体编排和提示词策略共同决定。",
-  'title: "Skill名称"',
-  'title: "Skill类型"',
-  'title: "输出类型"',
-  'title: "默认输出去向"',
-  'title: "Skill描述"',
+  'title: "名称"',
+  'title: "类型"',
+  'title: "说明"',
+  'title: "适用场景"',
   'title: "操作"',
-  "agent-config-overview",
-  "agent-basic-summary",
-  'label="智能体名称"',
-  'label="工具 / Skill"',
+  "agent-version-center",
+  "agent-version-table",
+  "selectedVersionKey",
+  "selectedVersion",
+  "versionRows",
+  "版本中心",
+  "当前已发布版本与草稿版本配置快照",
+  "创建版本",
+  "当前发布版本",
+  "草稿版本",
+  "历史版本",
+  "设为发布版本",
+  "选择版本后，下方配置内容会切换为该版本快照。",
+  "agent-selected-version-detail",
+  "版本详情",
+  "currentVersionModelConfig",
   "智能体编排",
   "1. 智能体名称",
   "2. 生效条件配置",
@@ -382,16 +1175,49 @@ assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管�
   "延后时间",
   "指定时间",
   "任务名称",
+  "目标人群",
   "任务描述",
   "新增任务",
   "新增策略任务",
   "编辑策略任务",
+  "agent-task-drawer",
+  "taskTagPicker",
+  "targetAudienceMode",
+  "全部用户",
+  "标签选择",
+  "选择任务目标人群",
+  "从素材库选择",
+  "远程地址",
   "结束事件",
   "endRefType",
   "endValue",
   "endUnit"
 ].forEach((token) => {
   assert.ok(agentEditorSource.includes(token), `智能体编辑调试页缺少：${token}`);
+});
+assert.ok(!agentEditorSource.includes("agent-task-modal"), "会话智能体定时任务编辑器应改为侧边栏 Drawer，不应继续使用 Modal");
+
+assert.ok(!agentEditorSource.includes('placeholder="选择该智能体可调用的 AI 工具"'), "工具配置不应再使用多选下拉作为主选择交互");
+assert.ok(!agentEditorSource.includes('placeholder="选择该智能体可关联的 Skill"'), "Skill配置不应再使用多选下拉作为主选择交互");
+
+[
+  "agent-config-overview",
+  "agent-basic-summary",
+  'label="智能体名称"',
+  'label="工具 / Skill"'
+].forEach((token) => {
+  assert.ok(!agentEditorSource.includes(token), `智能体编辑调试页不应再展示旧基础信息区：${token}`);
+});
+
+[
+  'title: "测试状态"',
+  "runVersionDebug",
+  "版本对比能力为原型占位",
+  ">对比</Button>",
+  ">试跑</Button>",
+  "复制为新版本"
+].forEach((token) => {
+  assert.ok(!agentEditorSource.includes(token), `智能体版本列表不应再展示：${token}`);
 });
 
 [
@@ -411,15 +1237,89 @@ assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管�
   "客户运营策略智能体",
   "策略智能体",
   "策略任务配置",
-  "客户销售策略日报",
-  "周期性AI打标",
   "生成个性化策略提示词",
-  "自动生成跟进任务",
-  "任务逻辑描述",
-  "左侧提示词只维护全局角色和共性规则",
-  "strategy-task-config-card"
+  "当前仅保留“生成个性化策略提示词”任务",
+  "在侧边栏中维护任务字段",
+  "strategy-task-config-card",
+  "strategyTaskTagPicker",
+  "openStrategyTaskTagPicker",
+  "CommonTagSelectButton",
+  "CommonTagPickerModal",
+  "strategy-task-editor-drawer",
+  "strategy-task-editor-card",
+  "提示词生成对象",
+  "执行对象规则",
+  "加好友第 X 天",
+  "用户发出的会话信息条数超过 X 条",
+  "满足以上条件自然日后",
+  "执行时间",
+  "数据来源授权",
+  "strategyPromptDataSourceConfigs",
+  "addStrategyPromptTriggerRule",
+  "friendDayRules",
+  "messageCountRules",
+  "生成内容",
+  "写入位置",
+  "个性化提示词逻辑",
+  "策略提示词",
+  "系统提示词",
+  "客户档案"
 ].forEach((token) => {
   assert.ok(source.includes(token) || styles.includes(token), `策略智能体配置缺少：${token}`);
+});
+[
+  "周期性AI打标",
+  "自动生成跟进任务",
+  "生成定时任务"
+].forEach((token) => {
+  assert.ok(!agentEditorSource.includes(token), `策略智能体任务配置应只保留生成个性化策略提示词，不应包含：${token}`);
+});
+assert.ok(!agentEditorSource.includes("<Modal\n                          title={strategyTaskEditor"), "策略任务编辑器应改为侧边栏 Drawer，不应继续使用 Modal");
+assert.ok(agentEditorSource.includes("<Drawer\n                          title={strategyTaskEditor"), "策略任务编辑器应使用侧边栏 Drawer");
+assert.ok(styles.includes(".strategy-task-editor-card .ant-card-head"), "策略任务侧边栏模块标题应有压缩样式");
+assert.ok(strategyPromptDataSourceSource.includes('key: "用户沟通数据"'), "策略任务数据来源应包含用户沟通数据");
+assert.ok(strategyPromptDataSourceSource.includes('key: "客户档案"'), "策略任务数据来源应包含客户档案");
+[
+  'key: "流程阶段"',
+  'key: "最近10轮会话"',
+  'key: "用户标签"',
+  'key: "销售策略"'
+].forEach((token) => {
+  assert.ok(!strategyPromptDataSourceSource.includes(token), `策略任务数据来源授权不应再包含：${token}`);
+});
+assert.ok(!agentEditorSource.includes('<Select mode="multiple" value={strategyTaskDraft.audienceTags}'), "策略任务适用标签人群应使用统一标签选择弹窗");
+assert.ok(agentEditorSource.includes('strategyTaskDraft.scope !== "全部客户"'), "执行对象为全部客户时应隐藏适用标签人群");
+assert.ok(!agentEditorSource.includes('const strategyScopeOptions = ["单个客户"'), "策略任务执行对象不应包含单个客户");
+assert.ok(!agentEditorSource.includes('scope: "单个客户"'), "策略任务示例不应继续使用单个客户");
+assert.ok(!agentEditorSource.includes("strategyReviewModeOptions"), "策略任务配置不应保留输出审核方式选项");
+assert.ok(!agentEditorSource.includes('label="输出审核方式"'), "策略任务配置弹窗不应展示输出审核方式");
+assert.ok(!agentEditorSource.includes('key: "daily-report"'), "策略智能体任务配置不应再包含日报任务");
+assert.ok(!agentEditorSource.includes("客户销售策略日报"), "策略智能体任务配置不应再展示客户销售策略日报");
+assert.ok(!agentEditorSource.includes("高意向客户晚间日报"), "策略任务配置弹窗不应再使用日报示例");
+assert.ok(!agentEditorSource.includes('"销售策略总结"'), "策略任务类型不应再保留日报对应的销售策略总结");
+[
+  'label="固定执行时间"',
+  'label="执行周期"',
+  'label="输入数据范围"',
+  'label="提示词生成数据范围"',
+  'label="输出去向"',
+  'label="任务逻辑描述"'
+].forEach((token) => {
+  assert.ok(!agentEditorSource.includes(token), `策略任务编辑器应使用个性化提示词配置文案，不应保留：${token}`);
+});
+[
+  "打标理由",
+  "会话智能体上下文",
+  "定时任务",
+  "人工提醒",
+  "客户档案-销售策略",
+  "客户档案-策略记录",
+  "打标记录",
+  "聊天计划",
+  "人工工作台",
+  "会话中心提醒"
+].forEach((token) => {
+  assert.ok(!agentEditorSource.includes(`"${token}"`), `策略任务输出结果/去向不应再包含旧选项：${token}`);
 });
 
 [
@@ -450,8 +1350,7 @@ assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管�
 });
 
 [
-  'title="Skill管理"',
-  'desc="维护可复用 AI Skill 能力，供智能体按场景组合调用。"',
+  "compact-card-toolbar",
   "新增Skill",
   "Skill名称",
   "Skill描述",
@@ -466,6 +1365,13 @@ assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管�
   "调试测试"
 ].forEach((token) => {
   assert.ok(aiSkillPageSource.includes(token), `Skill 管理页缺少新功能原型内容：${token}`);
+});
+
+[
+  'title="Skill管理"',
+  'desc="维护可复用 AI Skill 能力，供智能体按场景组合调用。"'
+].forEach((token) => {
+  assert.ok(!aiSkillPageSource.includes(token), `Skill 管理页不应再包含重复页面标题：${token}`);
 });
 
 [
@@ -580,9 +1486,9 @@ const agentSkillConfigSource = agentEditorSource.slice(agentSkillConfigStartInde
 });
 
 [
-  "knowledge-entry-back",
-  "knowledge-base-info-strip",
-  "知识库说明"
+  "resource-original-preview",
+  "resource-readable-editor",
+  "资源说明"
 ].forEach((token) => {
   assert.ok(source.includes(token) || styles.includes(token), `知识条目管理页布局缺少 ${token}`);
 });
