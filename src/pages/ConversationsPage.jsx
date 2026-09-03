@@ -823,24 +823,52 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       <div><Text type="secondary">阶段进度</Text><Text>{stage.currentNumber}/{stage.total}</Text></div>
       <div><Text type="secondary">阶段开始</Text><Text>{stage.enteredAt}</Text></div>
       <div><Text type="secondary">阶段结束</Text><Text>{stage.nextAt}</Text></div>
-      <div><Text type="secondary">课程开始</Text><Text>—</Text></div>
-      <div><Text type="secondary">课程结束</Text><Text>—</Text></div>
-      <div><Text type="secondary">到课时间</Text><Text>—</Text></div>
-      <div><Text type="secondary">上课老师</Text><Text>{activeCourseOrder?.teacher || "课程中心待分配"}</Text></div>
+      <div><Text type="secondary">上课形式</Text><Text>—</Text></div>
+      <div><Text type="secondary">课程状态</Text><Text>—</Text></div>
+      <div><Text type="secondary">是否到课</Text><Text>—</Text></div>
+      <div><Text type="secondary">上课总时长</Text><Text>—</Text></div>
     </div>
   );
-  const renderCourseStagePopoverContent = (stageName, index, attendance) => (
-    <div className="service-stage-popover">
-      <div><Text type="secondary">流程阶段</Text><Text>{stageName}</Text></div>
-      <div><Text type="secondary">阶段进度</Text><Text>{index + 1}/{customerServiceStages.length}</Text></div>
-      <div><Text type="secondary">阶段开始</Text><Text>{attendance.stageStartAt}</Text></div>
-      <div><Text type="secondary">阶段结束</Text><Text>{attendance.stageEndAt}</Text></div>
-      <div><Text type="secondary">课程开始</Text><Text>{attendance.courseStartAt}</Text></div>
-      <div><Text type="secondary">课程结束</Text><Text>{attendance.courseEndAt}</Text></div>
-      <div><Text type="secondary">到课时间</Text><Text>{attendance.attendanceAt}</Text></div>
-      <div><Text type="secondary">上课老师</Text><Text>{activeCourseOrder?.teacher || "课程中心待分配"}</Text></div>
-    </div>
-  );
+  const renderCourseStagePopoverContent = (stageName, index, attendance) => {
+    const lessonInfo = trialLessons[index - 1] || {
+      format: "直播",
+      status: attendance.type === "attended" ? "已结束" : attendance.type === "waiting" ? "已开始" : "未开始",
+      attended: attendance.type === "attended",
+      duration: attendance.type === "attended" ? "34min" : "待上课"
+    };
+    return (
+      <div className="service-stage-popover">
+        <div><Text type="secondary">流程阶段</Text><Text>{stageName}</Text></div>
+        <div><Text type="secondary">阶段进度</Text><Text>{index + 1}/{customerServiceStages.length}</Text></div>
+        <div><Text type="secondary">阶段开始</Text><Text>{attendance.stageStartAt}</Text></div>
+        <div><Text type="secondary">阶段结束</Text><Text>{attendance.stageEndAt}</Text></div>
+        <div><Text type="secondary">上课形式</Text><Text>{lessonInfo.format}</Text></div>
+        <div>
+          <Text type="secondary">课程状态</Text>
+          <Text>
+            <Tag
+              color={lessonInfo.status === "已结束" ? "default" : lessonInfo.status === "已开始" ? "processing" : "warning"}
+              style={{ margin: 0 }}
+            >
+              {lessonInfo.status}
+            </Tag>
+          </Text>
+        </div>
+        <div>
+          <Text type="secondary">是否到课</Text>
+          <Text style={{ color: lessonInfo.attended ? "#16a34a" : "#94a3b8", fontWeight: lessonInfo.attended ? 500 : 400 }}>
+            {lessonInfo.attended ? "已到课" : "未到课"}
+          </Text>
+        </div>
+        <div>
+          <Text type="secondary">上课总时长</Text>
+          <Text style={{ fontWeight: lessonInfo.attended ? 500 : 400, color: lessonInfo.attended ? "#1e293b" : "#faad14" }}>
+            {lessonInfo.attended ? lessonInfo.duration : "待上课"}
+          </Text>
+        </div>
+      </div>
+    );
+  };
   const renderSelectedStageTimeline = () => {
     const stage = getCustomerServiceStage(selected);
     return (
