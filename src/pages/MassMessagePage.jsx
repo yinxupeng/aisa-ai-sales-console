@@ -16,6 +16,7 @@ import {
   Statistic,
   Table,
   Tag,
+  Tooltip,
   Typography,
   Upload
 } from "antd";
@@ -56,13 +57,13 @@ function MassMessagePage() {
       key: "mass-1",
       name: "体验后未报名家长回访",
       role: "销售",
+      targetWecomAccounts: ["wecom-li", "wecom-wu", "wecom-lin"],
       audienceMode: "筛选客户",
       audienceStatuses: { ...getDefaultAudienceStatuses(), hostingStatus: "已托管", lifecycle: "催单阶段" },
       audienceTags: ["高意向", "体验后未报名", "关注效果保障"],
       excludeTags: ["明确拒绝", "删除企微风险"],
       estimatedCount: 128,
       sendTime: "2026-08-20 09:30",
-      sendAccountMode: "按客户所属销售发送",
       status: "待发送",
       creator: "运营-张敏",
       updatedAt: "2026-08-19 15:20"
@@ -71,13 +72,13 @@ function MassMessagePage() {
       key: "mass-2",
       name: "今晚家长直播课提醒",
       role: "班主任",
+      targetWecomAccounts: ["wecom-chen"],
       audienceMode: "筛选客户",
       audienceStatuses: { ...getDefaultAudienceStatuses(), hostingStatus: "已托管", lifecycle: "提升认知" },
       audienceTags: ["直播课用户", "适合邀约直播课"],
       excludeTags: ["删除企微风险"],
       estimatedCount: 86,
       sendTime: "2026-08-19 18:30",
-      sendAccountMode: "按客户所属销售发送",
       status: "发送中",
       creator: "班主任-陈老师",
       updatedAt: "2026-08-19 18:02"
@@ -86,13 +87,13 @@ function MassMessagePage() {
       key: "mass-3",
       name: "周末家庭教育直播邀约",
       role: "市场",
+      targetWecomAccounts: ["wecom-zhou"],
       audienceMode: "筛选客户",
       audienceStatuses: { ...getDefaultAudienceStatuses(), lifecycle: "定义用户" },
       audienceTags: ["家长高焦虑", "亲子冲突高", "父母成长营意向"],
       excludeTags: ["投诉风险", "不适合AI继续沟通"],
       estimatedCount: 214,
       sendTime: "立即发送",
-      sendAccountMode: "指定企微账号发送",
       status: "草稿",
       creator: "市场-周老师",
       updatedAt: "2026-08-18 17:45"
@@ -111,10 +112,12 @@ function MassMessagePage() {
   const getTaskFormValues = (record = {}) => {
     const sendMode = record.sendTime === "立即发送" ? "立即发送" : "定时发送";
     const sendAt = sendMode === "定时发送" && record.sendTime && record.sendTime !== "未设置" ? dayjs(record.sendTime) : null;
+    const defaultAccounts = managedWecomAccounts.map((item) => item.key);
     return {
       name: record.name || "",
       description: record.description || "",
       role: record.role || "全部角色",
+      targetWecomAccounts: record.targetWecomAccounts || (record.sendAccounts && record.sendAccounts.length ? record.sendAccounts : defaultAccounts),
       audienceMode: record.audienceMode || "全部客户",
       audienceTags: record.audienceTags || [],
       excludeTags: record.excludeTags || [],
@@ -124,19 +127,19 @@ function MassMessagePage() {
       ...(record.audienceStatuses || {}),
       sendMode,
       sendAt,
-      sendAccountMode: record.sendAccountMode || "按客户所属销售发送",
-      sendAccounts: record.sendAccounts || [],
       content: record.content || getDefaultMassContent(),
       materialType: record.materialType || "文本"
     };
   };
   const estimateCount = () => {
     const values = form.getFieldsValue();
-    if (values.audienceMode === "全部客户") return 1268;
+    const accounts = values.targetWecomAccounts || [];
+    const accountRatio = accounts.length ? accounts.length / managedWecomAccounts.length : 1;
+    if (values.audienceMode === "全部客户") return Math.round(1268 * accountRatio);
     const tagCount = (values.audienceTags || []).length;
     const excludeCount = (values.excludeTags || []).length;
     const statusCount = audienceStatusFields.filter((item) => values[item.name] && values[item.name] !== item.all).length;
-    return Math.max(18, 96 + tagCount * 32 - excludeCount * 14 - statusCount * 11);
+    return Math.max(18, Math.round((96 + tagCount * 32 - excludeCount * 14 - statusCount * 11) * accountRatio));
   };
   const openCreate = () => {
     form.resetFields();
@@ -191,8 +194,7 @@ function MassMessagePage() {
         estimatedCount: estimateCount(),
         sendTime,
         sendMode: values.sendMode,
-        sendAccountMode: values.sendAccountMode,
-        sendAccounts: values.sendAccounts || [],
+        targetWecomAccounts: values.targetWecomAccounts || [],
         content: values.content,
         materialType: values.materialType || "文本",
         status: values.sendMode === "立即发送" ? "发送中" : activeTask?.status || "待发送",
@@ -251,7 +253,21 @@ function MassMessagePage() {
     },
     { title: "预计发送人数", dataIndex: "estimatedCount", width: 112, align: "center", render: (value) => <span className="mass-estimate-count-cell">{value} 人</span> },
     { title: "发送时间", dataIndex: "sendTime", width: 128 },
-    { title: "发送账号", dataIndex: "sendAccountMode", width: 150 },
+    {
+      title: "企微账号",
+      dataIndex: "targetWecomAccounts",
+      width: 170,
+      render: (accounts = []) => {
+        if (!accounts || !accounts.length) return <Text type="secondary">全部企微</Text>;
+        const names = accounts.map((key) => managedWecomAccounts.find((a) => a.key === key)?.label || key);
+        if (names.length === 1) return names[0];
+        return (
+          <Tooltip title={names.join("、")}>
+            <span>{names[0]} 等 {names.length} 个企微</span>
+          </Tooltip>
+        );
+      }
+    },
     { title: "发送状态", dataIndex: "status", width: 96, render: (value) => <Tag color={value === "已完成" ? "success" : value === "发送中" ? "processing" : value === "待发送" ? "blue" : "default"}>{value}</Tag> },
     { title: "创建人", dataIndex: "creator", width: 104 },
     { title: "更新时间", dataIndex: "updatedAt", width: 132 },
@@ -317,6 +333,23 @@ function MassMessagePage() {
             </Row>
           </Card>
           <Card size="small">
+            <Form.Item
+              label="选择企微账号"
+              name="targetWecomAccounts"
+              rules={[{ required: true, message: "请至少选择一个企微账号" }]}
+              extra="该登录账号下分配的企微账号，支持多选"
+            >
+              <Select
+                mode="multiple"
+                allowClear
+                placeholder="请选择企微账号（该登录账号下分配的企微，支持多选）"
+                options={managedWecomAccounts.map((item) => ({
+                  value: item.key,
+                  label: `${item.label}（${item.owner} · ${item.department}）`
+                }))}
+                maxTagCount="responsive"
+              />
+            </Form.Item>
             <Form.Item label="选择客户" name="audienceMode" rules={[{ required: true }]}>
               <Radio.Group
                 options={["全部客户", "筛选客户"].map((value) => ({ value, label: value }))}
@@ -335,7 +368,7 @@ function MassMessagePage() {
                 if (audienceMode !== "筛选客户") {
                   return (
                     <div className="mass-all-audience-box">
-                      <Text type="secondary">将发送给当前可触达的全部客户。</Text>
+                      <Text type="secondary">将发送给所选企微账号下可触达的全部客户。</Text>
                       <div className="mass-estimate-box">
                         <Text type="secondary">预计发送人数</Text>
                         <Text className="mass-estimate-count">{estimateCount()} 人</Text>
@@ -410,8 +443,6 @@ function MassMessagePage() {
                   <Col span={12}><Form.Item label="定时发送时间" name="sendAt"><DatePicker showTime className="full-width" /></Form.Item></Col>
                 ) : null}
               </Form.Item>
-              <Col span={12}><Form.Item label="发送账号" name="sendAccountMode"><Radio.Group options={["按客户所属销售发送", "指定企微账号发送"].map((value) => ({ value, label: value }))} /></Form.Item></Col>
-              <Col span={12}><Form.Item label="指定企微账号" name="sendAccounts"><Select mode="multiple" options={managedWecomAccounts.map((item) => ({ value: item.key, label: item.label }))} placeholder="发送账号为指定时选择" /></Form.Item></Col>
             </Row>
           </Card>
         </Form>
