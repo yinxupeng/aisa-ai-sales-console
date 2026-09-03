@@ -3,29 +3,12 @@ import { Button, Card, Col, Row, Select, Space, Statistic, Table, Tabs, Tag, Typ
 import { PlusOutlined } from "@ant-design/icons";
 import { conversations } from "../data/conversations";
 import { getTagDisplayLabel } from "../data/appData";
+import { PanelTitle, statusTag } from "../components/PageChrome";
+
 
 const { Paragraph, Text, Title } = Typography;
 
-function statusTag(status) {
-  if (status === "启用" || status === "已连接" || status === true) return <Tag color="success">启用</Tag>;
-  if (status === "停用" || status === false) return <Tag>停用</Tag>;
-  return <Tag color="processing">{status}</Tag>;
-}
 
-function PanelTitle({ title, desc, extra, before }) {
-  return (
-    <div className="panel-title">
-      <div className={before ? "panel-title-main with-before" : "panel-title-main"}>
-        {before ? <div className="panel-title-before">{before}</div> : null}
-        <div>
-          <Title level={4}>{title}</Title>
-          {desc ? <Text type="secondary">{desc}</Text> : null}
-        </div>
-      </div>
-      {extra ? <Space wrap>{extra}</Space> : null}
-    </div>
-  );
-}
 
 function DataDictionaryPage() {
   const [sampleUserKey, setSampleUserKey] = useState(conversations.find((item) => item.type === "single")?.key || conversations[0]?.key);

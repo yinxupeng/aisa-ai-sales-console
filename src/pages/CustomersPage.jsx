@@ -3,23 +3,11 @@ import { Button, Card, Input, Select, Space, Table, Tag, Typography } from "antd
 import WecomAvatar from "../components/WecomAvatar";
 import { conversations } from "../data/conversations";
 import { managedWecomAccounts } from "../data/appData";
+import { PanelTitle } from "../components/PageChrome";
+
 
 const { Text, Title } = Typography;
 
-function PanelTitle({ title, desc, extra, before }) {
-  return (
-    <div className="panel-title">
-      <div className={before ? "panel-title-main with-before" : "panel-title-main"}>
-        {before ? <div className="panel-title-before">{before}</div> : null}
-        <div>
-          <Title level={4}>{title}</Title>
-          {desc ? <Text type="secondary">{desc}</Text> : null}
-        </div>
-      </div>
-      {extra ? <Space wrap>{extra}</Space> : null}
-    </div>
-  );
-}
 
 function CustomersPage({ onViewConversation, visibleWecomKeys = managedWecomAccounts.map((item) => item.key) }) {
   const customerRows = conversations.filter((item) => item.type === "single" && visibleWecomKeys.includes(item.accountKey));

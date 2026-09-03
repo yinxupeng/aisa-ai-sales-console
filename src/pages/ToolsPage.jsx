@@ -16,23 +16,11 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { agentTools } from "../data/appData";
+import { PanelTitle } from "../components/PageChrome";
+
 
 const { Text, Title } = Typography;
 
-function PanelTitle({ title, desc, extra, before }) {
-  return (
-    <div className="panel-title">
-      <div className={before ? "panel-title-main with-before" : "panel-title-main"}>
-        {before ? <div className="panel-title-before">{before}</div> : null}
-        <div>
-          <Title level={4}>{title}</Title>
-          {desc ? <Text type="secondary">{desc}</Text> : null}
-        </div>
-      </div>
-      {extra ? <Space wrap>{extra}</Space> : null}
-    </div>
-  );
-}
 
 function ToolsPage() {
   const [form] = Form.useForm();

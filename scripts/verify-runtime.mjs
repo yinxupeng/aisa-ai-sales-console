@@ -81,3 +81,5 @@ try {
 } finally {
   try { rmSync(tmpBundle); } catch {}
 }
+
+process.exit(0);

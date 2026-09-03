@@ -22,23 +22,11 @@ import {
 import { RobotOutlined } from "@ant-design/icons";
 import { conversations } from "../data/conversations";
 import { CommonTagPickerModal, CommonTagSelectButton } from "../components/CommonTagPicker";
+import { PanelTitle } from "../components/PageChrome";
+
 
 const { Text, Paragraph, Title } = Typography;
 
-function PanelTitle({ title, desc, extra, before }) {
-  return (
-    <div className="panel-title">
-      <div className={before ? "panel-title-main with-before" : "panel-title-main"}>
-        {before ? <div className="panel-title-before">{before}</div> : null}
-        <div>
-          <Title level={4}>{title}</Title>
-          {desc ? <Text type="secondary">{desc}</Text> : null}
-        </div>
-      </div>
-      {extra ? <Space wrap>{extra}</Space> : null}
-    </div>
-  );
-}
 
 function StrategyInsightPage({ onViewConversation }) {
   const { message } = AntApp.useApp();
