@@ -41,7 +41,7 @@ jobs:
           cp -R assets site/assets
           cp -R images site/images
           cp -R Resource site/Resource
-          cp prototype-screenshot.png script.js styles.css site/
+          cp prototype-screenshot.png site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
