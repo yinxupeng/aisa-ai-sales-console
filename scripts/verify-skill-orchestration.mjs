@@ -2,28 +2,84 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 const source = fs.readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+const appDataSource = fs.readFileSync(new URL("../src/data/appData.js", import.meta.url), "utf8");
+const conversationDataSource = fs.readFileSync(new URL("../src/data/conversations.js", import.meta.url), "utf8");
+const tagLibrarySource = fs.readFileSync(new URL("../src/pages/TagLibraryPage.jsx", import.meta.url), "utf8");
+const strategyInsightSource = fs.readFileSync(new URL("../src/pages/StrategyInsightPage.jsx", import.meta.url), "utf8");
+const conversationPageSource = fs.readFileSync(new URL("../src/pages/ConversationsPage.jsx", import.meta.url), "utf8");
+const customersPageSource = fs.readFileSync(new URL("../src/pages/CustomersPage.jsx", import.meta.url), "utf8");
+const dataDictionarySource = fs.readFileSync(new URL("../src/pages/DataDictionaryPage.jsx", import.meta.url), "utf8");
+const wecomPageSource = fs.readFileSync(new URL("../src/pages/WecomPage.jsx", import.meta.url), "utf8");
+const suggestionsPageSource = fs.readFileSync(new URL("../src/pages/SuggestionsPage.jsx", import.meta.url), "utf8");
+const humanizationPageSource = fs.readFileSync(new URL("../src/pages/HumanizationPage.jsx", import.meta.url), "utf8");
+const settingsPageSource = fs.readFileSync(new URL("../src/pages/SettingsPage.jsx", import.meta.url), "utf8");
+const commonTagPickerSource = fs.readFileSync(new URL("../src/components/CommonTagPicker.jsx", import.meta.url), "utf8");
+const wecomAvatarSource = fs.readFileSync(new URL("../src/components/WecomAvatar.jsx", import.meta.url), "utf8");
+const dashboardPageSource = fs.readFileSync(new URL("../src/pages/DashboardPage.jsx", import.meta.url), "utf8");
+const intelligentAgentPageSource = fs.readFileSync(new URL("../src/pages/IntelligentAgentPage.jsx", import.meta.url), "utf8");
+const strategyPageSource = fs.readFileSync(new URL("../src/pages/StrategyPage.jsx", import.meta.url), "utf8");
+const strategyEditorSource = fs.readFileSync(new URL("../src/pages/StrategyEditor.jsx", import.meta.url), "utf8");
+const aiSkillPageSource = fs.readFileSync(new URL("../src/pages/AISkillPage.jsx", import.meta.url), "utf8");
+const toolsPageSource = fs.readFileSync(new URL("../src/pages/ToolsPage.jsx", import.meta.url), "utf8");
+const knowledgePageSource = fs.readFileSync(new URL("../src/pages/KnowledgePage.jsx", import.meta.url), "utf8");
+const salesPageSource = fs.readFileSync(new URL("../src/pages/SalesPage.jsx", import.meta.url), "utf8");
+const massMessagePageSource = fs.readFileSync(new URL("../src/pages/MassMessagePage.jsx", import.meta.url), "utf8");
+const companyPageSource = fs.readFileSync(new URL("../src/pages/CompanyPage.jsx", import.meta.url), "utf8");
+const knowledgePickerSource = fs.readFileSync(new URL("../src/components/KnowledgeResourcePickerModal.jsx", import.meta.url), "utf8");
+const skillLogicRichEditorSource = fs.readFileSync(new URL("../src/components/SkillLogicRichEditor.jsx", import.meta.url), "utf8");
+const sourceWithData = [
+  source,
+  appDataSource,
+  conversationDataSource,
+  tagLibrarySource,
+  strategyInsightSource,
+  conversationPageSource,
+  customersPageSource,
+  dataDictionarySource,
+  wecomPageSource,
+  suggestionsPageSource,
+  humanizationPageSource,
+  settingsPageSource,
+  commonTagPickerSource,
+  wecomAvatarSource,
+  dashboardPageSource,
+  intelligentAgentPageSource,
+  strategyPageSource,
+  strategyEditorSource,
+  aiSkillPageSource,
+  toolsPageSource,
+  knowledgePageSource,
+  salesPageSource,
+  massMessagePageSource,
+  companyPageSource,
+  knowledgePickerSource,
+  skillLogicRichEditorSource
+].join("\n");
 const styles = fs.readFileSync(new URL("../src/app.css", import.meta.url), "utf8");
+const packageJson = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+
+assert.ok(!fs.existsSync(new URL("../script.js", import.meta.url)), "根目录旧版 script.js 已无入口引用，应移除");
+assert.ok(!fs.existsSync(new URL("../styles.css", import.meta.url)), "根目录旧版 styles.css 已无入口引用，应移除");
+assert.equal(packageJson.scripts?.build, "node scripts/build.mjs", "构建应使用直接 Node 脚本，避免包管理器触发 install 检查");
+assert.ok(fs.existsSync(new URL("./build.mjs", import.meta.url)), "应提供 scripts/build.mjs 作为低消耗直接构建入口");
 
 const menuStartIndex = source.indexOf("const menuItems = [");
 const menuEndIndex = source.indexOf("];", menuStartIndex);
 const menuSource = source.slice(menuStartIndex, menuEndIndex);
-const intelligentAgentModalStartIndex = source.indexOf("function IntelligentAgentModal");
-const intelligentAgentStageModalStartIndex = source.indexOf("function IntelligentAgentStageModal");
-const intelligentAgentModalSource = source.slice(intelligentAgentModalStartIndex, intelligentAgentStageModalStartIndex);
-const rolePageStartIndex = source.indexOf("function IntelligentAgentPage");
-const roleModalStartIndex = source.indexOf("function IntelligentAgentModal");
-const rolePageSource = source.slice(rolePageStartIndex, roleModalStartIndex);
-const strategyPageStartIndex = source.indexOf("function StrategyPage");
-const strategyEditorStartIndex = source.indexOf("function escapeMarkup");
-const strategyPageSource = source.slice(strategyPageStartIndex, strategyEditorStartIndex);
-const agentEditorStartIndex = source.indexOf("function StrategyEditor");
-const lifecyclePageStartIndex = source.indexOf("function RoleLifecyclePage");
-const agentEditorSource = source.slice(agentEditorStartIndex, lifecyclePageStartIndex);
+const intelligentAgentModalStartIndex = intelligentAgentPageSource.indexOf("function IntelligentAgentModal");
+const intelligentAgentStageModalStartIndex = intelligentAgentPageSource.indexOf("function IntelligentAgentStageModal");
+const intelligentAgentModalSource = intelligentAgentPageSource.slice(intelligentAgentModalStartIndex, intelligentAgentStageModalStartIndex);
+const rolePageStartIndex = intelligentAgentPageSource.indexOf("function IntelligentAgentPage");
+const roleModalStartIndex = intelligentAgentPageSource.indexOf("function IntelligentAgentModal");
+const rolePageSource = intelligentAgentPageSource.slice(rolePageStartIndex, roleModalStartIndex);
+const strategyPageStartIndex = strategyPageSource.indexOf("function StrategyPage");
+const strategyEditorStartIndex = strategyPageSource.indexOf("function StrategyBasicModal");
+const agentEditorStartIndex = strategyEditorSource.indexOf("function StrategyEditor");
+const agentEditorSource = strategyEditorSource;
 const effectiveIndex = agentEditorSource.indexOf("2. 生效条件配置");
 const scheduleIndex = agentEditorSource.indexOf("3. 策略任务配置");
-const aiSkillPageStartIndex = source.indexOf("function AISkillPage");
-const toolPageStartIndex = source.indexOf("function ToolsPage");
-const aiSkillPageSource = source.slice(aiSkillPageStartIndex, toolPageStartIndex);
+const aiSkillPageStartIndex = aiSkillPageSource.indexOf("function AISkillPage");
+const toolPageStartIndex = toolsPageSource.indexOf("function ToolsPage");
 const aiSkillColumnsStartIndex = aiSkillPageSource.indexOf("const columns = [");
 const aiSkillColumnsEndIndex = aiSkillPageSource.indexOf("  ];", aiSkillColumnsStartIndex);
 const aiSkillColumnsSource = aiSkillPageSource.slice(aiSkillColumnsStartIndex, aiSkillColumnsEndIndex);
@@ -35,9 +91,7 @@ const strategyAudienceTagStartIndex = agentEditorSource.indexOf("const strategyA
 const strategyPromptDataSourceSource = strategyPromptDataSourceStartIndex >= 0 && strategyAudienceTagStartIndex > strategyPromptDataSourceStartIndex
   ? agentEditorSource.slice(strategyPromptDataSourceStartIndex, strategyAudienceTagStartIndex)
   : "";
-const tagLibraryStartIndex = source.indexOf("function TagLibraryPage");
-const massMessageStartIndex = source.indexOf("function MassMessagePage");
-const tagLibrarySource = source.slice(tagLibraryStartIndex, massMessageStartIndex);
+const massMessageStartIndex = massMessagePageSource.indexOf("function MassMessagePage");
 const aiTagAgentDrawerStartIndex = tagLibrarySource.indexOf('title="AI标签生成管理智能体"');
 const aiTagAgentRecordModalStartIndex = tagLibrarySource.indexOf('title="AI生成标签库记录"', aiTagAgentDrawerStartIndex);
 const aiTagAgentDrawerSource = aiTagAgentDrawerStartIndex >= 0 && aiTagAgentRecordModalStartIndex > aiTagAgentDrawerStartIndex
@@ -57,62 +111,131 @@ const aiAutoTagRecordModalEndIndex = tagLibrarySource.indexOf('title={tagGroupRe
 const aiAutoTagRecordModalSource = aiAutoTagRecordModalStartIndex >= 0 && aiAutoTagRecordModalEndIndex > aiAutoTagRecordModalStartIndex
   ? tagLibrarySource.slice(aiAutoTagRecordModalStartIndex, aiAutoTagRecordModalEndIndex)
   : "";
-const strategyInsightStartIndex = source.indexOf("function StrategyInsightPage");
-const strategyInsightEndIndex = source.indexOf("function MassMessagePage");
-const strategyInsightSource = strategyInsightStartIndex >= 0 && strategyInsightEndIndex > strategyInsightStartIndex
-  ? source.slice(strategyInsightStartIndex, strategyInsightEndIndex)
-  : "";
-const commonTagPickerStartIndex = source.indexOf("function CommonTagPickerModal");
-const tagLibraryPageStartIndex = source.indexOf("function TagLibraryPage");
-const commonTagPickerSource = source.slice(commonTagPickerStartIndex, tagLibraryPageStartIndex);
-const massMessagePageSource = source.slice(massMessageStartIndex, source.indexOf("function ToolsPage", massMessageStartIndex));
-const knowledgePageStartIndex = source.indexOf("function KnowledgePage");
-const wecomPageStartIndex = source.indexOf("function WecomPage");
-const knowledgePageSource = source.slice(knowledgePageStartIndex, wecomPageStartIndex);
-const sessionFilterPanelStartIndex = source.indexOf("const renderSessionFilterPanel = () =>");
-const addComposerItemStartIndex = source.indexOf("const addComposerItem =", sessionFilterPanelStartIndex);
-const sessionFilterPanelSource = source.slice(sessionFilterPanelStartIndex, addComposerItemStartIndex);
-const sessionStageTimelineStartIndex = source.indexOf("const renderSelectedStageTimeline = () =>");
-const sessionConversationListStartIndex = source.indexOf("const renderConversationList = () =>");
-const sessionMainChatStartIndex = source.indexOf("const renderMainChatPanel = () =>");
-const sessionMainReturnStartIndex = source.indexOf("<div className=\"session-chat-layout\">", sessionMainChatStartIndex);
-const sessionWorkspaceSource = source.slice(sessionStageTimelineStartIndex, source.indexOf("<Drawer", sessionMainReturnStartIndex));
-const customerStrategyTabStartIndex = source.indexOf("<div className=\"sales-strategy-panel\">");
-const customerStrategyTaskStartIndex = source.indexOf("<div className=\"personalized-task-list\">", customerStrategyTabStartIndex);
-const customerStrategyTabSource = source.slice(customerStrategyTabStartIndex, customerStrategyTaskStartIndex);
+const commonTagPickerStartIndex = commonTagPickerSource.indexOf("function CommonTagPickerModal");
+const tagLibraryPageStartIndex = tagLibrarySource.indexOf("function TagLibraryPage");
+const strategyInsightStartIndex = strategyInsightSource.indexOf("function StrategyInsightPage");
+const knowledgePageStartIndex = knowledgePageSource.indexOf("function KnowledgePage");
+const salesPageStartIndex = salesPageSource.indexOf("function SalesPage");
+const conversationPageStartIndex = conversationPageSource.indexOf("function ConversationsPage");
+const sessionFilterPanelStartIndex = conversationPageSource.indexOf("const renderSessionFilterPanel = () =>");
+const addComposerItemStartIndex = conversationPageSource.indexOf("const addComposerItem =", sessionFilterPanelStartIndex);
+const sessionFilterPanelSource = conversationPageSource.slice(sessionFilterPanelStartIndex, addComposerItemStartIndex);
+const sessionStageTimelineStartIndex = conversationPageSource.indexOf("const renderSelectedStageTimeline = () =>");
+const sessionConversationListStartIndex = conversationPageSource.indexOf("const renderConversationList = () =>");
+const sessionMainChatStartIndex = conversationPageSource.indexOf("const renderMainChatPanel = () =>");
+const sessionMainReturnStartIndex = conversationPageSource.indexOf("<div className=\"session-chat-layout\">", sessionMainChatStartIndex);
+const sessionWorkspaceSource = conversationPageSource.slice(sessionStageTimelineStartIndex, conversationPageSource.indexOf("<Drawer", sessionMainReturnStartIndex));
+const customerStrategyTabStartIndex = conversationPageSource.indexOf("<div className=\"sales-strategy-panel\">");
+const customerStrategyTabEndIndex = conversationPageSource.indexOf('key: "lifecycle"', customerStrategyTabStartIndex);
+const customerStrategyTabSource = conversationPageSource.slice(customerStrategyTabStartIndex, customerStrategyTabEndIndex);
 const contentMapStartIndex = source.indexOf("const content = useMemo(() => ({");
 const contentMapEndIndex = source.indexOf("  })[route]", contentMapStartIndex);
 const contentMapSource = source.slice(contentMapStartIndex, contentMapEndIndex);
+const dataDictionaryPageStartIndex = dataDictionarySource.indexOf("function DataDictionaryPage");
+const dataDictionaryPageSource = dataDictionarySource;
 
 assert.ok(effectiveIndex >= 0, "智能体编排应包含生效条件配置");
 assert.ok(scheduleIndex > effectiveIndex, "策略任务配置应展示在生效条件配置下方");
 assert.ok(menuStartIndex >= 0 && menuEndIndex > menuStartIndex, "页面应包含左侧导航配置");
+assert.ok(source.includes('from "./data/conversations"'), "会话 mock 数据应从独立模块导入，避免 App.jsx 持续膨胀");
+assert.ok(!source.includes("const rawConversations = ["), "App.jsx 不应继续内联会话 mock 数据");
+assert.ok(source.includes('from "./data/appData"'), "通用 mock 配置应从独立模块导入，避免 App.jsx 顶部继续堆积业务数据");
+assert.ok(!source.includes("const userProfileSkillPrompt = `"), "App.jsx 不应继续内联长篇 Skill prompt 配置");
+assert.ok(source.includes('from "./pages/TagLibraryPage"'), "标签库管理页应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function TagLibraryPage"), "App.jsx 不应继续内联标签库管理页组件");
+assert.ok(source.includes('from "./pages/StrategyInsightPage"'), "策略洞察页应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function StrategyInsightPage"), "App.jsx 不应继续内联策略洞察页组件");
+assert.ok(source.includes('from "./pages/ConversationsPage"'), "会话中心页应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function ConversationsPage"), "App.jsx 不应继续内联会话中心页组件");
+assert.ok(source.includes('from "./pages/CustomersPage"'), "客户中心页应从独立页面模块导入，避免路由引用未定义组件");
+assert.ok(!source.includes("function CustomersPage"), "App.jsx 不应继续内联客户中心页组件");
+assert.ok(source.includes('from "./pages/DataDictionaryPage"'), "数据字典页应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function DataDictionaryPage"), "App.jsx 不应继续内联数据字典页组件");
+assert.ok(source.includes('from "./pages/WecomPage"'), "企微通道页应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function WecomPage"), "App.jsx 不应继续内联企微通道页组件");
+assert.ok(source.includes('from "./pages/SuggestionsPage"'), "待发送建议页应从独立页面模块导入，避免路由引用未定义组件");
+assert.ok(source.includes('from "./pages/HumanizationPage"'), "拟人化设置页应从独立页面模块导入，避免路由引用未定义组件");
+assert.ok(source.includes('from "./pages/SettingsPage"'), "系统管理页应从独立页面模块导入，避免路由引用未定义组件");
+assert.ok(source.includes('from "./pages/DashboardPage"'), "工作台页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function Dashboard("), "App.jsx 不应继续内联工作台组件");
+assert.ok(source.includes('from "./pages/CompanyPage"'), "企业管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function CompanyPage"), "App.jsx 不应继续内联企业管理页组件");
+assert.ok(source.includes('from "./pages/IntelligentAgentPage"'), "角色管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function IntelligentAgentPage"), "App.jsx 不应继续内联角色管理页组件");
+assert.ok(source.includes('from "./pages/StrategyPage"'), "智能体管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function StrategyPage"), "App.jsx 不应继续内联智能体管理页组件");
+assert.ok(!source.includes("function StrategyEditor"), "App.jsx 不应继续内联智能体编排组件");
+assert.ok(source.includes('from "./pages/AISkillPage"'), "Skill管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function AISkillPage"), "App.jsx 不应继续内联 Skill管理页组件");
+assert.ok(source.includes('from "./pages/ToolsPage"'), "工具管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function ToolsPage"), "App.jsx 不应继续内联工具管理页组件");
+assert.ok(source.includes('from "./pages/KnowledgePage"'), "知识库管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function KnowledgePage"), "App.jsx 不应继续内联知识库管理页组件");
+assert.ok(source.includes('from "./pages/SalesPage"'), "企微托管页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function SalesPage"), "App.jsx 不应继续内联企微托管页组件");
+assert.ok(source.includes('from "./pages/MassMessagePage"'), "用户群发页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(!source.includes("function MassMessagePage"), "App.jsx 不应继续内联用户群发页组件");
+assert.ok(!source.includes("function AgentPage"), "App.jsx 不应包含废弃的 AgentPage 死代码");
+assert.ok(!source.includes("function RoleLifecyclePage"), "App.jsx 不应包含废弃的 RoleLifecyclePage 死代码");
+assert.ok(!source.includes("function ActionModal"), "App.jsx 不应包含无调用的 ActionModal 死代码");
+assert.ok(strategyEditorSource.includes('from "../components/CommonTagPicker"'), "通用标签选择器应从独立组件模块导入");
+assert.ok(!source.includes("function CommonTagPickerModal"), "App.jsx 不应继续内联通用标签选择弹窗组件");
+assert.ok(conversationPageSource.includes('from "../components/WecomAvatar"'), "会话中心应导入企微头像通用组件");
+assert.ok(customersPageSource.includes('from "../components/WecomAvatar"'), "客户中心应导入企微头像通用组件");
 assert.ok(
   intelligentAgentModalStartIndex >= 0 && intelligentAgentStageModalStartIndex > intelligentAgentModalStartIndex,
   "页面应包含智能体编辑弹窗组件"
 );
 assert.ok(rolePageStartIndex >= 0 && roleModalStartIndex > rolePageStartIndex, "页面应包含角色管理组件");
 assert.ok(strategyPageStartIndex >= 0 && strategyEditorStartIndex > strategyPageStartIndex, "页面应包含智能体管理列表组件");
-assert.ok(agentEditorStartIndex >= 0 && lifecyclePageStartIndex > agentEditorStartIndex, "页面应包含智能体编辑调试组件");
-assert.ok(aiSkillPageStartIndex >= 0 && toolPageStartIndex > aiSkillPageStartIndex, "页面应包含 Skill 管理组件");
+assert.ok(agentEditorStartIndex >= 0, "页面应包含智能体编辑调试组件");
+assert.ok(aiSkillPageStartIndex >= 0, "页面应包含 Skill 管理组件");
+assert.ok(toolPageStartIndex >= 0, "页面应包含工具管理组件");
 assert.ok(aiSkillColumnsStartIndex >= 0 && aiSkillColumnsEndIndex > aiSkillColumnsStartIndex, "Skill 管理页应包含列表字段配置");
 assert.ok(aiSkillTabsStartIndex >= 0 && aiSkillTabsEndIndex > aiSkillTabsStartIndex, "Skill 管理页应包含编辑页签配置");
-assert.ok(tagLibraryStartIndex >= 0 && massMessageStartIndex > tagLibraryStartIndex, "页面应包含标签库管理组件");
+assert.ok(tagLibraryPageStartIndex >= 0, "页面应包含标签库管理组件");
 assert.ok(aiTagAgentDrawerStartIndex >= 0 && aiTagAgentRecordModalStartIndex > aiTagAgentDrawerStartIndex, "标签库管理页应包含 AI 标签生成管理侧边栏");
 assert.ok(aiAutoTagDrawerStartIndex >= 0 && aiAutoTagRecordModalStartIndex > aiAutoTagDrawerStartIndex, "标签库管理页应包含 AI 自动打标配置侧边栏");
 assert.ok(aiAutoTagRecordColumnsStartIndex >= 0 && aiAutoTagVariableColumnsStartIndex > aiAutoTagRecordColumnsStartIndex, "标签库管理页应包含 AI 打标记录列表字段");
 assert.ok(aiAutoTagRecordModalStartIndex >= 0 && aiAutoTagRecordModalEndIndex > aiAutoTagRecordModalStartIndex, "标签库管理页应包含 AI 打标记录弹窗");
-assert.ok(strategyInsightStartIndex >= 0 && strategyInsightEndIndex > strategyInsightStartIndex, "页面应包含策略洞察组件");
-assert.ok(commonTagPickerStartIndex >= 0 && tagLibraryPageStartIndex > commonTagPickerStartIndex, "页面应包含通用标签选择弹窗组件");
+assert.ok(strategyInsightStartIndex >= 0, "页面应包含策略洞察组件");
+assert.ok(commonTagPickerStartIndex >= 0, "页面应包含通用标签选择弹窗组件");
+assert.ok(conversationPageStartIndex >= 0, "页面应包含会话中心组件");
 assert.ok(sessionFilterPanelStartIndex >= 0 && addComposerItemStartIndex > sessionFilterPanelStartIndex, "会话中心应包含默认筛选区");
 assert.ok(sessionStageTimelineStartIndex >= 0 && sessionConversationListStartIndex > sessionStageTimelineStartIndex, "会话中心应包含课程服务阶段条");
 assert.ok(sessionConversationListStartIndex >= 0 && sessionMainChatStartIndex > sessionConversationListStartIndex, "会话中心应包含左侧用户会话列表");
 assert.ok(sessionMainChatStartIndex >= 0 && sessionMainReturnStartIndex > sessionMainChatStartIndex, "会话中心应包含右侧聊天面板");
-assert.ok(customerStrategyTabStartIndex >= 0 && customerStrategyTaskStartIndex > customerStrategyTabStartIndex, "客户详情应包含销售策略 Tab 内容");
+assert.ok(customerStrategyTabStartIndex >= 0 && customerStrategyTabEndIndex > customerStrategyTabStartIndex, "客户详情应包含销售策略 Tab 内容");
 assert.ok(contentMapStartIndex >= 0 && contentMapEndIndex > contentMapStartIndex, "页面应包含路由内容映射");
+[
+  "Dashboard",
+  "CustomersPage",
+  "CompanyPage",
+  "IntelligentAgentPage",
+  "StrategyPage",
+  "AISkillPage",
+  "ToolsPage",
+  "KnowledgePage",
+  "TagLibraryPage",
+  "DataDictionaryPage",
+  "StrategyInsightPage",
+  "MassMessagePage",
+  "WecomPage",
+  "SalesPage",
+  "HumanizationPage",
+  "ConversationsPage",
+  "SuggestionsPage",
+  "SettingsPage"
+].forEach((componentName) => {
+  assert.ok(
+    sourceWithData.includes(`function ${componentName}`) || source.includes(`import ${componentName} from`),
+    `路由内容映射引用了未定义页面组件：${componentName}`
+  );
+});
 assert.ok(contentMapSource.includes("agentManager: <IntelligentAgentPage />"), "角色管理菜单 agentManager 应渲染原智能体管理页面");
 assert.ok(contentMapSource.includes("strategy: <StrategyPage />"), "智能体管理菜单 strategy 应渲染原 Skill 管理页面");
 assert.ok(contentMapSource.includes("skills: <AISkillPage />"), "Skill 管理菜单 skills 应渲染 Skill 管理页面");
+assert.ok(contentMapSource.includes("dataDictionary: <DataDictionaryPage />"), "数据字典 / 变量配置菜单 dataDictionary 应渲染数据字典页面");
 assert.ok(contentMapSource.includes("strategyInsight: <StrategyInsightPage"), "策略洞察菜单 strategyInsight 应渲染策略洞察页面");
 assert.ok(!customerStrategyTabSource.includes("已写入客户档案"), "客户详情销售策略 Tab 不应展示已写入客户档案标签");
 assert.ok(!customerStrategyTabSource.includes("AI写入标签"), "客户详情销售策略 Tab 不应展示 AI 写入标签模块");
@@ -134,6 +257,7 @@ assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销
   { key: "knowledge", label: "知识库管理" },
   { key: "humanization", label: "拟人化设置" },
   { key: "tagLibrary", label: "标签库管理" },
+  { key: "dataDictionary", label: "数据字典 / 变量配置" },
   { key: "strategyInsight", label: "策略洞察" },
   { key: "massMessage", label: "用户群发" },
   { key: "settings", label: "系统管理" }
@@ -145,6 +269,23 @@ assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销
   assert.ok(itemSource.includes(`label: "${item.label}"`), `左侧导航名称错误：${item.key}`);
   return currentIndex;
 }, -1);
+
+[
+  "function DataDictionaryPage",
+  "数据对象",
+  "字段字典",
+  "AI变量",
+  "变量测试",
+  "{{conversation.recent_user_messages}}",
+  "{{customer_file.need_summary}}",
+  "{{profile.lifecycle_stage}}",
+  "{{tag.current_tags}}",
+  "测试解析",
+  "data-dictionary-page",
+  "variable-test-toolbar"
+].forEach((token) => {
+  assert.ok(dataDictionaryPageSource.includes(token) || styles.includes(token), `数据字典 / 变量配置页面缺少：${token}`);
+});
 
 [
   "策略洞察",
@@ -233,6 +374,14 @@ assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞�
 ].forEach((token) => {
   assert.ok(styles.includes(token), `左侧导航间距样式缺少 ${token}`);
 });
+[
+  "padding: 0 16px;",
+  "padding: 16px 16px 32px;"
+].forEach((token) => {
+  assert.ok(styles.includes(token), `全局页面左右边距应收窄，缺少 ${token}`);
+});
+assert.ok(!styles.includes("padding: 0 32px;"), "页面头部左右边距不应继续使用 32px");
+assert.ok(!styles.includes("padding: 24px 32px 40px;"), "页面内容区左右边距不应继续使用 32px");
 
 [
   "加好友自然日",
@@ -315,7 +464,7 @@ assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞�
   "客户状态检查",
   "阶段结果同步"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `页面缺少 ${token}`);
+  assert.ok(sourceWithData.includes(token), `页面缺少 ${token}`);
 });
 
 [
@@ -327,7 +476,7 @@ assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞�
   "agentScheduleRules",
   "输入该智能体的定时任务描述"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `角色管理或智能体配置页缺少必要内容：${token}`);
+  assert.ok(sourceWithData.includes(token), `角色管理或智能体配置页缺少必要内容：${token}`);
 });
 
 [
@@ -370,7 +519,7 @@ assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞�
   "getKnowledgeBaseKeysFromResources",
   ".agent-stage-knowledge-config"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `角色流程阶段编辑弹窗缺少：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `角色流程阶段编辑弹窗缺少：${token}`);
 });
 
 [
@@ -420,7 +569,7 @@ assert.ok(!source.includes("bindAgents"), "知识库数据结构不应再包含 
 assert.ok(!source.includes("bindSkills"), "知识库数据结构不应再包含 bindSkills");
 assert.ok(!source.includes('name="bindSkills"'), "知识库编辑弹窗不应提供绑定 Skill 字段");
 assert.ok(!source.includes('dataIndex: "bindSkills"'), "知识库列表不应展示绑定 Skill 列");
-assert.ok(source.includes("选择该 Skill 可引用的知识库"), "资源管理 Tab 应说明知识库关联方向");
+assert.ok(sourceWithData.includes("选择该 Skill 可引用的知识库"), "资源管理 Tab 应说明知识库关联方向");
 [
   "buildKnowledgeResourceRows",
   "getKnowledgeBaseKeysFromResources",
@@ -435,7 +584,7 @@ assert.ok(source.includes("选择该 Skill 可引用的知识库"), "资源管�
   "已选资源",
   "确认关联"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `知识库选择弹窗应支持多选关联：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `知识库选择弹窗应支持多选关联：${token}`);
 });
 assert.ok(!source.includes("selectedKey={knowledgePickerKey}"), "Skill 关联知识库不应再使用单选 selectedKey");
 assert.ok(!source.includes("onSelect={setKnowledgePickerKey}"), "Skill 关联知识库不应再使用单选 onSelect");
@@ -489,7 +638,7 @@ assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工
   "when {{customer.intent}} = 高意向",
   "**必须确认试听时间**"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `技能逻辑编辑器格式识别缺少 ${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `技能逻辑编辑器格式识别缺少 ${token}`);
 });
 
 [
@@ -504,6 +653,8 @@ assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工
   "customer-selected-ai-tag",
   "customer-profile-tab",
   "customer-basic-table",
+  "customer-phone-input",
+  "updateCustomerPhone",
   "customer-course-table",
   "sales-strategy-panel",
   "策略智能体输出结果",
@@ -513,21 +664,23 @@ assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工
   "startEditStrategyInsight",
   "saveStrategyInsight",
   "sales-strategy-editor",
-  "个性化定时任务",
-  "confirmedStrategyTaskKeys",
-  "确认加入",
-  "已加入",
-  "已加入该用户当前流程阶段定时任务"
+  "用户对话数据",
+  "用户上课信息",
+  "体验课共 4 节课",
+  "用户发送",
+  "用户接收",
+  "待上课"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `客户资料缺少新版资料结构：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `客户资料缺少新版资料结构：${token}`);
 });
+assert.ok(!sourceWithData.includes("个性化定时任务"), "会话中心客户资料销售策略tab已删除个性化定时任务");
 [
   "个人标签",
   "销售自己手动打的标签",
   "customerTagValues.personal",
   "输入个人标签后回车"
 ].forEach((token) => {
-  assert.ok(!customerStrategyTabSource.includes(token) && !source.slice(source.indexOf("customer-profile-tab"), source.indexOf('key: "course"', source.indexOf("customer-profile-tab"))).includes(token), `客户详情侧边栏不应展示个人标签：${token}`);
+  assert.ok(!customerStrategyTabSource.includes(token) && !conversationPageSource.slice(conversationPageSource.indexOf("customer-profile-tab"), conversationPageSource.indexOf('key: "course"', conversationPageSource.indexOf("customer-profile-tab"))).includes(token), `客户详情侧边栏不应展示个人标签：${token}`);
 });
 assert.ok(!styles.includes(".course-progress-item > span"), "上课情况进度圆点不应使用直接 span 选择器，避免影响 Ant Text 标签");
 
@@ -550,7 +703,7 @@ assert.ok(!styles.includes(".course-progress-item > span"), "上课情况进度�
   "孩子高危风险",
   "体验后未报名"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `标签体系缺少青春同行业务标签：${token}`);
+  assert.ok(sourceWithData.includes(token), `标签体系缺少青春同行业务标签：${token}`);
 });
 
 [
@@ -565,41 +718,33 @@ assert.ok(!styles.includes(".course-progress-item > span"), "上课情况进度�
   "closable",
   "onTagRemove"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `通用标签选择能力缺少：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `通用标签选择能力缺少：${token}`);
 });
 
 [
   "搜索客户、群或消息",
   "sessionFilters.lifecycle",
-  "sessionFilters.scheduleStatus",
-  "sessionFilters.attendanceStatus",
   "CommonTagSelectButton",
   "全部用户",
   "筛选托管",
   "筛选阶段",
-  "筛选排课",
-  "筛选上课",
-  "已排课",
-  "未排课",
-  "已上课",
-  "未上课",
   "已托管",
   "未托管"
 ].forEach((token) => {
   assert.ok(sessionFilterPanelSource.includes(token), `会话中心默认筛选区缺少字段：${token}`);
 });
+assert.ok(!sessionFilterPanelSource.includes("筛选排课"), "会话中心默认筛选区已下线筛选排课");
+assert.ok(!sessionFilterPanelSource.includes("筛选上课"), "会话中心默认筛选区已下线筛选上课");
 [
   "getScheduleStatus",
   "getAttendanceStatus"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `会话中心默认筛选区缺少筛选逻辑：${token}`);
+  assert.ok(conversationPageSource.includes(token), `会话中心默认筛选区缺少筛选逻辑：${token}`);
 });
 assert.ok(
   sessionFilterPanelSource.indexOf("sessionFilters.hostingStatus") < sessionFilterPanelSource.indexOf("sessionFilters.lifecycle") &&
-    sessionFilterPanelSource.indexOf("sessionFilters.lifecycle") < sessionFilterPanelSource.indexOf("sessionFilters.scheduleStatus") &&
-    sessionFilterPanelSource.indexOf("sessionFilters.scheduleStatus") < sessionFilterPanelSource.indexOf("sessionFilters.attendanceStatus") &&
-    sessionFilterPanelSource.indexOf("sessionFilters.attendanceStatus") < sessionFilterPanelSource.indexOf("CommonTagSelectButton"),
-  "会话中心阶段、排课、到课筛选应位于托管状态和标签筛选之间"
+    sessionFilterPanelSource.indexOf("sessionFilters.lifecycle") < sessionFilterPanelSource.indexOf("CommonTagSelectButton"),
+  "会话中心阶段筛选应位于托管状态和标签筛选之间"
 );
 
 [
@@ -662,7 +807,7 @@ assert.ok(
   "chat-stage-segment",
   "chat-header-stage-row"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `会话中心阶段进度缺少：${token}`);
+  assert.ok(conversationPageSource.includes(token) || styles.includes(token), `会话中心阶段进度缺少：${token}`);
 });
 
 [
@@ -704,8 +849,6 @@ assert.ok(!styles.includes(".chat-current-stage-pill"), "会话中心聊天头�
   "搜索客户、群或消息",
   "筛选托管",
   "筛选阶段",
-  "筛选排课",
-  "筛选上课",
   "选择客户标签",
   "客户资料"
 ].forEach((token) => {
@@ -751,6 +894,10 @@ assert.ok(!sessionWorkspaceSource.includes('key: "chat"'), "客户详情抽屉�
   "openTagReviewDetail",
   "renderTagReviewDetailPage",
   "tagReviewDetailColumns",
+  "selectedTagReviewChangeKeys",
+  "batchReviewChangeDecision",
+  "tagReviewBatchActions",
+  "rowSelection",
   "activeTagReviewBatchKey",
   "aiTagReviewBatches",
   "reviewChangeDecision",
@@ -762,6 +909,9 @@ assert.ok(!sessionWorkspaceSource.includes('key: "chat"'), "客户详情抽屉�
   "建议删除",
   "查看详情",
   "审核详情",
+  "已选择",
+  "批量驳回",
+  "批量通过",
   "返回标签库",
   "批次摘要",
   "变更类型",
@@ -1065,7 +1215,7 @@ assert.ok(styles.includes(".ai-auto-tag-trigger-grid") && styles.includes("grid-
   "width: 520",
   "knowledge-base-title",
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `知识库说明应只在标题 hover 时显示全文：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `知识库说明应只在标题 hover 时显示全文：${token}`);
 });
 
 assert.ok(!source.includes("knowledge-base-desc"), "知识库说明文案不应默认展示在列表里");
@@ -1101,7 +1251,7 @@ assert.ok(!source.includes("knowledge-base-desc"), "知识库说明文案不应�
   "19元A类课-课后",
   "SOP会话"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `智能体管理列表缺少 SOP 会话智能体示例：${token}`);
+  assert.ok(sourceWithData.includes(token), `智能体管理列表缺少 SOP 会话智能体示例：${token}`);
 });
 
 assert.ok(!strategyPageSource.includes(">工具配置</Button>"), "智能体管理列表不应再单独展示工具配置操作");
@@ -1265,7 +1415,7 @@ assert.ok(!agentEditorSource.includes('placeholder="选择该智能体可关联�
   "系统提示词",
   "客户档案"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `策略智能体配置缺少：${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `策略智能体配置缺少：${token}`);
 });
 [
   "周期性AI打标",
@@ -1482,7 +1632,7 @@ const agentSkillConfigSource = agentEditorSource.slice(agentSkillConfigStartInde
   "@kb.价格政策与异议处理库",
   "### 改写后回复"
 ].forEach((token) => {
-  assert.ok(source.includes(token), `Skill 管理示例数据缺少：${token}`);
+  assert.ok(sourceWithData.includes(token), `Skill 管理示例数据缺少：${token}`);
 });
 
 [
@@ -1490,7 +1640,7 @@ const agentSkillConfigSource = agentEditorSource.slice(agentSkillConfigStartInde
   "resource-readable-editor",
   "资源说明"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `知识条目管理页布局缺少 ${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `知识条目管理页布局缺少 ${token}`);
 });
 
 assert.ok(!source.includes('title={<PanelTitle title="知识条目"'), "条目管理页标题应使用当前知识库名称，不应固定显示知识条目");
@@ -1503,7 +1653,7 @@ assert.ok(!source.includes('title={<PanelTitle title="知识条目"'), "条目�
   "stage-task-row",
   "execution-modal-content"
 ].forEach((token) => {
-  assert.ok(source.includes(token) || styles.includes(token), `预览调试布局缺少 ${token}`);
+  assert.ok(sourceWithData.includes(token) || styles.includes(token), `预览调试布局缺少 ${token}`);
 });
 
 [
@@ -1516,8 +1666,8 @@ assert.ok(!source.includes('title={<PanelTitle title="知识条目"'), "条目�
   assert.ok(!source.includes(token), `用户预设不应再包含选项字段：${token}`);
 });
 
-assert.ok(source.includes("输入用户信息描述"), "预览调试左侧应保留用户信息描述输入框");
-assert.ok(source.includes("保存用户信息描述"), "用户信息描述输入框下方应提供保存按钮");
+assert.ok(sourceWithData.includes("输入用户信息描述"), "预览调试左侧应保留用户信息描述输入框");
+assert.ok(sourceWithData.includes("保存用户信息描述"), "用户信息描述输入框下方应提供保存按钮");
 
 const metricChangingTokens = [
   "logic-token-heading-1",
