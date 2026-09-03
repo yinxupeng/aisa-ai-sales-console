@@ -38,44 +38,16 @@ import {
   UserOutlined
 } from "@ant-design/icons";
 import { CommonTagPickerModal, CommonTagSelectButton } from "../components/CommonTagPicker";
+import { buildKnowledgeResourceRows } from "../components/KnowledgeResourcePickerModal";
 import {
   aiGeneratedTagValues,
-  knowledgeBases,
   strategies,
   tagGroupsSeed,
   tagRoleOptions
 } from "../data/appData";
 import { PanelTitle } from "../components/PageChrome";
 
-
 const { Paragraph, Text, Title } = Typography;
-
-const buildKnowledgeResourceRows = () => knowledgeBases.flatMap((base) => [
-  {
-    key: `base:${base.key}`,
-    name: base.name,
-    path: `${base.category} / ${base.name}`,
-    relationType: "文件夹",
-    contentType: "目录",
-    status: base.status,
-    desc: base.desc,
-    category: base.category,
-    updatedAt: base.updated,
-    entries: base.entries || []
-  },
-  ...(base.entries || []).map((entry) => ({
-    key: `entry:${entry.key}`,
-    name: entry.title,
-    path: `${base.category} / ${base.name} / ${entry.title}`,
-    relationType: "资源",
-    contentType: entry.media === "文本" ? "text/markdown" : entry.media,
-    knowledgeType: entry.type,
-    status: entry.status,
-    desc: entry.content || `${entry.title}：用于 ${base.name} 场景，回答时需以知识库内容为准，不编造未维护的信息。`,
-    category: base.category,
-    updatedAt: base.updated
-  }))
-]);
 
 
 function TagLibraryPage({ onViewConversation }) {

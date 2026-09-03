@@ -2,14 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button, Descriptions, Modal, Space, Tag, Tooltip, Tree, Typography } from "antd";
 import { FileTextOutlined, FolderOutlined } from "@ant-design/icons";
 import { knowledgeBases } from "../data/appData";
+import { statusTag } from "./PageChrome";
 
 const { Text, Title } = Typography;
-
-function statusTag(status) {
-  if (status === "启用" || status === "已连接" || status === true) return <Tag color="success">启用</Tag>;
-  if (status === "停用" || status === false) return <Tag>停用</Tag>;
-  return <Tag color="processing">{status}</Tag>;
-}
 
 export const buildKnowledgeResourceRows = () => knowledgeBases.flatMap((base) => [
   {
