@@ -196,20 +196,20 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
     if (item.type === "group") return item.name;
     if (item.wechatName) return item.wechatName;
     const nicknameMap = {
-      c1: "Lily (张女士)",
-      c2: "晓燕 (王妈妈)",
-      c3: "建国 (刘先生)",
-      c4: "美华 (赵女士)",
-      c5: "海峰 (孙先生)",
-      c6: "婷婷 (陈妈妈)",
-      "li-demo-1": "雪梅 (许妈妈)",
-      "li-demo-2": "志远 (郭爸爸)",
-      "li-demo-3": "丹丹 (邓妈妈)",
-      "li-demo-4": "淑珍 (潘妈妈)",
-      "li-demo-5": "明辉 (谢爸爸)",
-      "li-demo-6": "慧敏 (蒋妈妈)",
-      "li-demo-7": "文娟 (袁妈妈)",
-      "li-demo-8": "伟强 (梁爸爸)"
+      c1: "Lily",
+      c2: "晓燕",
+      c3: "建国",
+      c4: "美华",
+      c5: "海峰",
+      c6: "婷婷",
+      "li-demo-1": "雪梅",
+      "li-demo-2": "志远",
+      "li-demo-3": "丹丹",
+      "li-demo-4": "淑珍",
+      "li-demo-5": "明辉",
+      "li-demo-6": "慧敏",
+      "li-demo-7": "文娟",
+      "li-demo-8": "伟强"
     };
     return nicknameMap[item.key] || item.name;
   };
@@ -224,7 +224,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
     const messages = item.messages || [];
     const lastMessage = messages[messages.length - 1];
     const text = lastMessage?.text || item.last || "暂无最近沟通";
-    const baseDate = item.addedAt ? dayjs(item.addedAt).format("2026-08-31") : "2026-08-31";
+    const baseDate = item.addedAt ? dayjs(item.addedAt).format("MM-DD") : "08-31";
     const time = lastMessage?.time ? `${baseDate} ${lastMessage.time}:00` : `${baseDate} 19:32:32`;
     const senderRole = lastMessage?.from === "customer"
       ? "用户发送"
