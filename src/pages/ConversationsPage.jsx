@@ -171,13 +171,67 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       nextAt
     };
   };
+  const getCustomerPhone = (item) => {
+    if (item.type === "group") return "";
+    if (item.phone && item.phone !== "-") return item.phone;
+    const phoneMap = {
+      c1: "138****7788",
+      c2: "139****2233",
+      c3: "136****5566",
+      c4: "137****8899",
+      c5: "150****1122",
+      c6: "158****3344",
+      "li-demo-1": "135****6677",
+      "li-demo-2": "186****9988",
+      "li-demo-3": "177****2211",
+      "li-demo-4": "133****4455",
+      "li-demo-5": "159****8833",
+      "li-demo-6": "188****5566",
+      "li-demo-7": "131****7722",
+      "li-demo-8": "152****6611"
+    };
+    return phoneMap[item.key] || "138****8899";
+  };
+  const getWechatNickname = (item) => {
+    if (item.type === "group") return item.name;
+    if (item.wechatName) return item.wechatName;
+    const nicknameMap = {
+      c1: "Lily (张女士)",
+      c2: "晓燕 (王妈妈)",
+      c3: "建国 (刘先生)",
+      c4: "美华 (赵女士)",
+      c5: "海峰 (孙先生)",
+      c6: "婷婷 (陈妈妈)",
+      "li-demo-1": "雪梅 (许妈妈)",
+      "li-demo-2": "志远 (郭爸爸)",
+      "li-demo-3": "丹丹 (邓妈妈)",
+      "li-demo-4": "淑珍 (潘妈妈)",
+      "li-demo-5": "明辉 (谢爸爸)",
+      "li-demo-6": "慧敏 (蒋妈妈)",
+      "li-demo-7": "文娟 (袁妈妈)",
+      "li-demo-8": "伟强 (梁爸爸)"
+    };
+    return nicknameMap[item.key] || item.name;
+  };
+  const getCustomerAddedTimeDisplay = (item) => {
+    if (!item.addedAt) return "8天前添加";
+    const diffDays = dayjs("2026-06-12").diff(dayjs(item.addedAt), "day");
+    if (diffDays === 0) return "今天添加";
+    if (diffDays > 0 && diffDays <= 30) return `${diffDays}天前添加`;
+    return `${dayjs(item.addedAt).format("MM-DD")} 添加`;
+  };
   const getRecentConversationInfo = (item) => {
     const messages = item.messages || [];
     const lastMessage = messages[messages.length - 1];
     const text = lastMessage?.text || item.last || "暂无最近沟通";
-    const baseDate = item.addedAt ? dayjs(item.addedAt).format("MM-DD") : dayjs().format("MM-DD");
-    const time = lastMessage?.time ? `${baseDate} ${lastMessage.time}` : baseDate;
-    return { time, text };
+    const baseDate = item.addedAt ? dayjs(item.addedAt).format("2026-08-31") : "2026-08-31";
+    const time = lastMessage?.time ? `${baseDate} ${lastMessage.time}:00` : `${baseDate} 19:32:32`;
+    const senderRole = lastMessage?.from === "customer"
+      ? "用户发送"
+      : lastMessage?.from === "ai"
+        ? "AI发送"
+        : "员工发送";
+    return { time, text, senderRole };
   };
   const renderServiceStageProgress = (item) => {
     const stage = getCustomerServiceStage(item);
@@ -908,20 +962,36 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
         renderItem={(item) => {
           const insights = getSessionInsights(item);
           const recentConversation = getRecentConversationInfo(item);
+          const customerPhone = getCustomerPhone(item);
+          const wechatNickname = getWechatNickname(item);
+          const addedTimeDisplay = getCustomerAddedTimeDisplay(item);
           const manualTakeover = !getHosted(item) || needsHumanIntervention(item);
           return (
-            <List.Item className={selected.key === item.key ? "conversation-list-item active" : "conversation-list-item"} onClick={() => setSelected(item)}>
+            <List.Item
+              className={selected.key === item.key ? "conversation-list-item active" : "conversation-list-item"}
+              onClick={() => setSelected(item)}
+            >
               <WecomAvatar item={item} />
               <div className="conversation-list-main">
                 <div className="conversation-list-name-row">
-                  <Text ellipsis>{item.name}</Text>
+                  <Text ellipsis strong className="conversation-customer-name">{item.name}</Text>
+                  {customerPhone ? <span className="conversation-customer-phone">{customerPhone}</span> : null}
                   {item.type === "group" ? <Tag color="green">群</Tag> : null}
                   {insights.relationStatus === "已删除企微" ? <Tag color="red" className="system-status-tag">删</Tag> : null}
                 </div>
-                <Tooltip title={`${recentConversation.time} · ${recentConversation.text}`} placement="topLeft">
+                <div className="conversation-list-meta-row">
+                  <span className="conversation-item-nickname" title={wechatNickname}>{wechatNickname}</span>
+                  <span className="conversation-meta-dot">·</span>
+                  <span className="conversation-item-added">{addedTimeDisplay}</span>
+                </div>
+                <Tooltip title={`${recentConversation.time} ${recentConversation.senderRole} · ${recentConversation.text}`} placement="topLeft">
                   <div className="conversation-list-recent">
-                    <Text type="secondary">{recentConversation.time}</Text>
-                    <Text type="secondary" ellipsis>{recentConversation.text}</Text>
+                    <Text ellipsis className="conversation-recent-text">
+                      {recentConversation.text}
+                    </Text>
+                    <span className="conversation-recent-time-sender">
+                      {recentConversation.time} {recentConversation.senderRole}
+                    </span>
                   </div>
                 </Tooltip>
               </div>
