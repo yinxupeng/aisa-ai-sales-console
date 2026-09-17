@@ -1,143 +1,68 @@
 import React, { useState } from "react";
 import {
+  Alert,
   App as AntApp,
+  Badge,
   Button,
   Card,
   Checkbox,
   Col,
   DatePicker,
+  Divider,
   Drawer,
   Form,
   Input,
   Modal,
   Radio,
   Row,
+  Segmented,
   Select,
   Space,
   Statistic,
   Table,
   Tag,
+  Tooltip,
   Typography
 } from "antd";
-import { RobotOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  BarChartOutlined,
+  CheckCircleOutlined,
+  CheckOutlined,
+  CloseCircleOutlined,
+  CloseOutlined,
+  EditOutlined,
+  ExclamationCircleFilled,
+  FireOutlined,
+  HistoryOutlined,
+  LineChartOutlined,
+  RobotOutlined,
+  ThunderboltOutlined,
+  UserOutlined
+} from "@ant-design/icons";
 import { conversations } from "../data/conversations";
+import {
+  buildInsightUserRows,
+  insightRows,
+  strategyEvolutionRecords
+} from "../data/strategyInsights";
 import { CommonTagPickerModal, CommonTagSelectButton } from "../components/CommonTagPicker";
 import { PanelTitle } from "../components/PageChrome";
 
-
 const { Text, Paragraph, Title } = Typography;
 
-
 function StrategyInsightPage({ onViewConversation }) {
-  const { message } = AntApp.useApp();
-  const insightRows = [
-    {
-      key: "insight-1",
-      name: "2026-08-21 用户洞察日报",
-      task: "用户洞察日报",
-      audience: "当前服务用户 / 体验课转化阶段",
-      total: 50,
-      focus: 12,
-      type: "用户洞察日报",
-      generatedAt: "2026-08-21 09:30",
-      status: "待处理",
-      conclusion: "本次共分析 50 名体验课用户，其中 12 名用户表现出较强转化意愿，主要集中在“完整看课超过30分钟”“主动咨询正价课”“表达孩子问题紧迫”三类行为。建议销售在 24 小时内优先人工跟进高意向用户，AI 继续对观望用户做价值引导。",
-      metrics: [
-        { label: "覆盖用户", value: 50, suffix: "人" },
-        { label: "高意向用户", value: 12, suffix: "人" },
-        { label: "风险关注用户", value: 5, suffix: "人" },
-        { label: "建议人工跟进", value: 14, suffix: "人" },
-        { label: "建议AI继续培育", value: 26, suffix: "人" },
-        { label: "已生成定时任务", value: 31, suffix: "条" }
-      ],
-      segments: [
-        { name: "高意向用户", count: 12, percent: "24%", feature: "看课超过30分钟，主动咨询价格、名额或后续方案", basis: "会话命中“怎么报名”“价格多少”“还有名额吗”；标签命中高意向、体验后未报名、关注效果保障。", action: "销售优先人工跟进，围绕体验课反馈确认班型和报名顾虑。", handoff: "分配给销售人工跟进，写入用户侧边栏销售策略，并生成明早二次触达任务。", color: "red" },
-        { name: "观望培育用户", count: 26, percent: "52%", feature: "完成部分课程，有孩子问题描述，但尚未明确购买意愿", basis: "看课时长 10-30 分钟，表达孩子问题但没有咨询价格或报名路径。", action: "由AI继续发送案例、课程价值和家长课片段，降低决策压力。", handoff: "加入观望培育人群，可后续进入用户群发任务。", color: "orange" },
-        { name: "风险关注用户", count: 5, percent: "10%", feature: "亲子冲突高、孩子状态风险、家长情绪波动明显", basis: "标签命中亲子冲突高、孩子状态风险、家长高焦虑，且会话中出现明显无助表达。", action: "提醒人工谨慎介入，先共情和收集事实，不直接推动成交。", handoff: "进入人工重点关注清单，限制AI自动强触达。", color: "purple" }
-      ],
-      actionResults: [
-        { key: "result-1", item: "AI标签", count: "38个", target: "客户标签", review: "部分需要" },
-        { key: "result-2", item: "个人销售策略", count: "12条", target: "客户档案-销售策略", review: "不需要" },
-        { key: "result-3", item: "个性化提示词", count: "12条", target: "会话智能体上下文", review: "需要审核" },
-        { key: "result-4", item: "定时任务", count: "31条", target: "流程阶段定时任务", review: "需要确认" }
-      ],
-      customers: [
-        { key: "c1", name: "张妈妈", level: "A", tags: ["高意向（AI）", "体验后未报名", "关注效果保障"], reason: "看课52分钟，主动询问班型，已购买398但未确认正价课", action: "今晚发送体验课复盘，明早人工确认班型", status: "待跟进" },
-        { key: "li-demo-6", name: "周女士", level: "S", tags: ["高意向（AI）", "待付款", "需要家人商量"], reason: "看课74分钟，已进入待付款状态，但最近一次回复提到需要和家人确认", action: "销售今天 18:00 前人工跟进，重点处理决策人异议", status: "处理中" },
-        { key: "li-demo-5", name: "郑妈妈", level: "C", tags: ["风险关注（AI）", "亲子冲突高", "已删除企微"], reason: "看课不足10分钟且已删除企微，亲子冲突高，不适合继续自动触达", action: "停止AI触达，转人工评估是否通过其他渠道温和联系", status: "待处理" }
-      ]
-    },
-    {
-      key: "insight-2",
-      name: "2026-08-20 用户洞察日报",
-      task: "用户洞察日报",
-      audience: "当前服务用户 / 亲子冲突关注人群",
-      total: 38,
-      focus: 9,
-      type: "用户洞察日报",
-      generatedAt: "2026-08-20 18:00",
-      status: "已处理",
-      conclusion: "本周高冲突用户主要集中在休学、手机成瘾和拒绝沟通场景。9 名用户需要人工重点关注，其中 3 名用户不建议继续使用强转化话术，应先进入家长情绪承接和问题澄清流程。",
-      metrics: [
-        { label: "覆盖用户", value: 38, suffix: "人" },
-        { label: "需要人工介入", value: 9, suffix: "人" },
-        { label: "适合课程培育", value: 18, suffix: "人" },
-        { label: "低响应用户", value: 11, suffix: "人" },
-        { label: "高风险提醒", value: 3, suffix: "条" },
-        { label: "已写入策略", value: 9, suffix: "条" }
-      ],
-      segments: [
-        { name: "需要人工介入", count: 9, percent: "24%", feature: "家长情绪强烈，孩子问题描述复杂，AI 不宜独立推进", basis: "多轮会话出现冲突升级、失控、无助等表达，且标签组允许AI写入风险预警标签。", action: "主管分配销售人工跟进，先做风险确认和服务边界说明。", handoff: "生成会话中心提醒，暂停自动催单类话术。", color: "red" },
-        { name: "适合课程培育", count: 18, percent: "47%", feature: "家长认可问题存在，但仍在观望课程价值", basis: "家长开始接受心理因素，但对服务周期、孩子配合度仍有疑虑。", action: "推送家长课片段和同类案例，避免高频催单。", handoff: "进入AI培育流程，定期更新个人销售策略。", color: "blue" },
-        { name: "低响应用户", count: 11, percent: "29%", feature: "近7天仅少量互动，未形成明确诉求", basis: "会话响应低、未完整看课、没有明确表达报名或咨询动作。", action: "降低触达频率，等待课程节点或直播活动再唤醒。", handoff: "加入低响应观察人群。", color: "default" }
-      ],
-      actionResults: [
-        { key: "result-1", item: "AI标签", count: "21个", target: "客户标签", review: "高风险需确认" },
-        { key: "result-2", item: "个人销售策略", count: "9条", target: "客户档案-销售策略", review: "不需要" },
-        { key: "result-3", item: "人工提醒", count: "9条", target: "会话中心提醒", review: "需要处理" },
-        { key: "result-4", item: "触达限制", count: "3条", target: "会话智能体上下文", review: "需要审核" }
-      ],
-      customers: [
-        { key: "risk-1", name: "李女士", level: "B", tags: ["亲子冲突高（AI）", "孩子拒绝沟通", "家长高焦虑"], reason: "连续三次提到孩子不沟通和家庭冲突升级", action: "人工先确认安全边界，再邀请参加家长沟通课", status: "待处理" },
-        { key: "risk-2", name: "陈爸爸", level: "B", tags: ["手机成瘾（AI）", "父母教育理念不一致"], reason: "父母对处理方式分歧明显，孩子手机使用问题反复出现", action: "发送父母共识建立内容，不直接推正价课", status: "已跟进" }
-      ]
-    },
-    {
-      key: "insight-3",
-      name: "2026-08-19 用户洞察日报",
-      task: "用户洞察日报",
-      audience: "当前服务用户 / 体验后未报名人群",
-      total: 86,
-      focus: 21,
-      type: "用户洞察日报",
-      generatedAt: "2026-08-19 20:10",
-      status: "待处理",
-      conclusion: "体验后未报名用户主要分为价格顾虑、等待家人决策、未理解课程价值三类。21 名用户仍有转化机会，其中已完整看课且表达认可的用户应优先进入人工跟进。",
-      metrics: [
-        { label: "覆盖用户", value: 86, suffix: "人" },
-        { label: "仍有机会", value: 21, suffix: "人" },
-        { label: "价格顾虑", value: 18, suffix: "人" },
-        { label: "等待决策", value: 21, suffix: "人" },
-        { label: "价值未建立", value: 31, suffix: "人" },
-        { label: "建议群发", value: 39, suffix: "人" }
-      ],
-      segments: [
-        { name: "价格顾虑用户", count: 18, percent: "21%", feature: "认可课程但反复询价或询问优惠", basis: "会话中多次出现价格、优惠、少报课时等表达。", action: "销售用课程规划和服务价值解释价格，不直接降价。", handoff: "生成价值解释话术和人工跟进任务。", color: "orange" },
-        { name: "等待决策用户", count: 21, percent: "24%", feature: "需要和家人商量，或等待孩子反馈", basis: "会话表达“商量一下”“问问孩子”“晚点决定”，未明确拒绝。", action: "生成二次跟进任务，补充孩子课堂反馈和家长决策材料。", handoff: "归入等待决策人群，后续可发送体验课复盘材料。", color: "blue" },
-        { name: "价值未建立用户", count: 31, percent: "36%", feature: "看课少、问题描述浅、对服务理解不足", basis: "看课时长不足10分钟或会话缺少明确痛点。", action: "AI继续培育，不进入高频人工销售跟进。", handoff: "进入长期培育池，等待直播或课程节点唤醒。", color: "default" }
-      ],
-      actionResults: [
-        { key: "result-1", item: "AI标签", count: "64个", target: "客户标签", review: "部分需要" },
-        { key: "result-2", item: "销售策略", count: "21条", target: "客户档案-销售策略", review: "不需要" },
-        { key: "result-3", item: "群发人群", count: "39人", target: "用户群发草稿", review: "需要确认" },
-        { key: "result-4", item: "定时任务", count: "46条", target: "流程阶段定时任务", review: "需要确认" }
-      ],
-      customers: [
-        { key: "review-1", name: "王妈妈", level: "A", tags: ["体验后未报名", "关注效果保障", "需要案例验证"], reason: "体验课后认可老师，但担心孩子是否能坚持", action: "发送同类孩子变化案例，约人工复盘", status: "待跟进" },
-        { key: "review-2", name: "赵女士", level: "B", tags: ["价格敏感", "需要家人商量"], reason: "反复询问优惠和课时组合，尚未明确拒绝", action: "销售解释服务内容和分阶段方案", status: "待处理" }
-      ]
-    }
-  ];
+  const { message, modal } = AntApp.useApp();
+  const [activeMainTab, setActiveMainTab] = useState("evolution");
+  const [evolutionRecords, setEvolutionRecords] = useState(strategyEvolutionRecords);
+  const [selectedEvolution, setSelectedEvolution] = useState(null);
+  const [evolutionDrawerOpen, setEvolutionDrawerOpen] = useState(false);
+  const [isEditingPrompt, setIsEditingPrompt] = useState(false);
+  const [editedPrompt, setEditedPrompt] = useState("");
+  const [evolutionKeyword, setEvolutionKeyword] = useState("");
+  const [evolutionStageFilter, setEvolutionStageFilter] = useState("全部阶段");
+  const [evolutionStatusFilter, setEvolutionStatusFilter] = useState("全部状态");
+
   const [selectedInsight, setSelectedInsight] = useState(null);
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
   const [insightUserList, setInsightUserList] = useState(null);
@@ -148,6 +73,57 @@ function StrategyInsightPage({ onViewConversation }) {
   const [insightAudienceTags, setInsightAudienceTags] = useState(["体验课用户", "体验后未报名"]);
   const statusColorMap = { 待处理: "warning", 处理中: "processing", 已处理: "success", 已跟进: "success", 待跟进: "warning" };
   const insightConversationPool = conversations.filter((item) => item.type === "single");
+
+  const openEvolutionDetail = (record) => {
+    setSelectedEvolution(record);
+    setEditedPrompt(record.afterRule.promptSnippet);
+    setIsEditingPrompt(false);
+    setEvolutionDrawerOpen(true);
+  };
+
+  const handleApproveEvolution = (record) => {
+    setEvolutionRecords((prev) =>
+      prev.map((item) => (item.key === record.key ? { ...item, status: "已生效" } : item))
+    );
+    if (selectedEvolution?.key === record.key) {
+      setSelectedEvolution((prev) => ({ ...prev, status: "已生效" }));
+    }
+    message.success(`已通过并增量热更新至【${record.agentName} · ${record.stage}】生效规则库`);
+  };
+
+  const handleRejectEvolution = (record) => {
+    setEvolutionRecords((prev) =>
+      prev.map((item) => (item.key === record.key ? { ...item, status: "已驳回" } : item))
+    );
+    if (selectedEvolution?.key === record.key) {
+      setSelectedEvolution((prev) => ({ ...prev, status: "已驳回" }));
+    }
+    message.info("已驳回该策略优化建议");
+  };
+
+  const handleSaveEditedPrompt = () => {
+    if (!selectedEvolution) return;
+    setEvolutionRecords((prev) =>
+      prev.map((item) =>
+        item.key === selectedEvolution.key
+          ? { ...item, afterRule: { ...item.afterRule, promptSnippet: editedPrompt } }
+          : item
+      )
+    );
+    setSelectedEvolution((prev) => ({
+      ...prev,
+      afterRule: { ...prev.afterRule, promptSnippet: editedPrompt }
+    }));
+    setIsEditingPrompt(false);
+    message.success("策略 Prompt 规则已完成微调更新");
+  };
+
+  const handleTriggerEvolutionMining = () => {
+    message.loading({ content: "正在调度后台分析近24小时 328 场真实会话与成败归因...", key: "mining", duration: 1.5 });
+    setTimeout(() => {
+      message.success({ content: "策略复盘分析完成！未发现新的高频掉单漏洞，当前策略体系稳定运行中", key: "mining" });
+    }, 1500);
+  };
   const insightGenerateInitialValues = {
     insightType: "用户洞察日报",
     audienceType: "当前服务用户",
@@ -189,33 +165,12 @@ function StrategyInsightPage({ onViewConversation }) {
     setInsightGenerateModalOpen(false);
     message.success("已提交AI生成洞察任务，生成后进入洞察列表");
   };
-  const buildInsightUserRows = (insight, source) => {
-    const seedCustomers = insight.customers || [];
-    const targetCount = source.count || seedCustomers.length || insight.focus || 0;
-    return Array.from({ length: targetCount }, (_, index) => {
-      const sourceCustomer = seedCustomers[index % Math.max(seedCustomers.length, 1)] || {};
-      const conversation = insightConversationPool.find((item) => item.key === sourceCustomer.key || item.name === sourceCustomer.name) || insightConversationPool[index % insightConversationPool.length];
-      return {
-        key: `${source.key}-${index}`,
-        name: sourceCustomer.name || conversation?.name || `客户${index + 1}`,
-        level: sourceCustomer.level || (index % 5 === 0 ? "S" : index % 3 === 0 ? "A" : "B"),
-        lifecycle: conversation?.lifecycle || "体验课跟进",
-        tags: sourceCustomer.tags || ["高意向（AI）", "体验后未报名"],
-        reason: sourceCustomer.reason || source.reason || "命中该指标对应的人群条件",
-        action: sourceCustomer.action || source.action || "按策略洞察建议继续跟进",
-        owner: conversation?.owner || "李销售",
-        status: sourceCustomer.status || "待跟进",
-        accountKey: conversation?.accountKey,
-        conversationKey: conversation?.key
-      };
-    });
-  };
   const openInsightUserList = (source) => {
     if (!selectedInsight) return;
     setInsightUserList({
       title: source.title,
       count: source.count,
-      rows: buildInsightUserRows(selectedInsight, source)
+      rows: buildInsightUserRows(selectedInsight, source, insightConversationPool)
     });
   };
   const openInsightCustomerChat = (record) => {
@@ -295,25 +250,533 @@ function StrategyInsightPage({ onViewConversation }) {
       {source.count}{source.suffix || "人"}
     </Button>
   );
+  const filteredEvolutionRecords = evolutionRecords.filter((item) => {
+    const matchKeyword =
+      !evolutionKeyword ||
+      item.name.includes(evolutionKeyword) ||
+      item.agentName.includes(evolutionKeyword) ||
+      item.summary.includes(evolutionKeyword);
+    const matchStage = evolutionStageFilter === "全部阶段" || item.stage === evolutionStageFilter;
+    const matchStatus = evolutionStatusFilter === "全部状态" || item.status === evolutionStatusFilter;
+    return matchKeyword && matchStage && matchStatus;
+  });
+
+  const pendingEvolutionCount = evolutionRecords.filter((r) => r.status === "待审核").length;
+  const approvedEvolutionCount = evolutionRecords.filter((r) => r.status === "已生效").length;
+
+  const evolutionColumns = [
+    {
+      title: "策略提案名称",
+      dataIndex: "name",
+      width: 260,
+      render: (value, record) => (
+        <div>
+          <Space size={6} style={{ marginBottom: 4 }}>
+            <Text strong style={{ fontSize: 14 }}>{value}</Text>
+            <Tag color={record.category === "新增策略" ? "green" : record.category === "优化规则" ? "blue" : "orange"}>
+              {record.category}
+            </Tag>
+          </Space>
+          <div style={{ color: "#667085", fontSize: 12, lineHeight: 1.4 }}>
+            {record.summary}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "归属智能体 & 阶段",
+      dataIndex: "agentName",
+      width: 200,
+      render: (value, record) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{value}</div>
+          <Tag color="cyan" style={{ marginTop: 4 }}>{record.stage}</Tag>
+        </div>
+      )
+    },
+    {
+      title: "挖掘学习样本",
+      dataIndex: "sampleCount",
+      width: 170,
+      render: (value, record) => (
+        <div>
+          <div><Text strong>{value}</Text> 场真实会话</div>
+          <div style={{ fontSize: 12, color: "#8c8c8c" }}>
+            <span style={{ color: "#52c41a" }}>成单 {record.winCount}</span> / <span style={{ color: "#ff4d4f" }}>掉单 {record.lossCount}</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "预估成单提升",
+      dataIndex: "projectedLift",
+      width: 120,
+      align: "center",
+      render: (value) => (
+        <Tag color="success" style={{ fontWeight: 600, fontSize: 13, padding: "2px 8px" }}>
+          {value}
+        </Tag>
+      )
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: 100,
+      render: (value) => {
+        const color = value === "已生效" ? "success" : value === "待审核" ? "warning" : "default";
+        return <Badge status={color} text={value} />;
+      }
+    },
+    {
+      title: "生成时间",
+      dataIndex: "generatedAt",
+      width: 140,
+      render: (value) => <span style={{ color: "#8c8c8c", fontSize: 12 }}>{value}</span>
+    },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 180,
+      render: (_, record) => (
+        <Space size={6} className="table-action-group">
+          <Button type="link" size="small" onClick={() => openEvolutionDetail(record)}>
+            查看对比
+          </Button>
+          {record.status === "待审核" && (
+            <>
+              <Button
+                type="link"
+                size="small"
+                style={{ color: "#52c41a" }}
+                onClick={() => handleApproveEvolution(record)}
+              >
+                通过
+              </Button>
+              <Button
+                type="link"
+                size="small"
+                danger
+                onClick={() => handleRejectEvolution(record)}
+              >
+                驳回
+              </Button>
+            </>
+          )}
+        </Space>
+      )
+    }
+  ];
+
   return (
     <>
       <Space direction="vertical" size={16} className="page-stack strategy-insight-page">
-        <Row gutter={[16, 16]}>
-          <Col xs={12} lg={6}><Card><Statistic title="今日洞察" value={3} /></Card></Col>
-          <Col xs={12} lg={6}><Card><Statistic title="覆盖用户" value={174} suffix="人" /></Card></Col>
-          <Col xs={12} lg={6}><Card><Statistic title="重点用户" value={42} suffix="人" /></Card></Col>
-          <Col xs={12} lg={6}><Card><Statistic title="待处理" value={2} /></Card></Col>
-        </Row>
-        <Card title={<PanelTitle title="洞察列表" desc="展示策略智能体每天面向当前服务用户生成的用户洞察日报。" extra={<Button type="primary" icon={<RobotOutlined />} onClick={openInsightGenerateModal}>AI生成洞察</Button>} />}>
-          <Space className="toolbar" wrap>
-            <Input.Search placeholder="搜索日报名称或分析人群" allowClear className="strategy-search-input" />
-            <Select defaultValue="全部状态" options={["全部状态", "待处理", "处理中", "已处理"].map((value) => ({ value }))} />
-            <Button type="primary">搜索</Button>
-            <Button>重置</Button>
-          </Space>
-          <Table className="admin-table strategy-insight-table" rowKey="key" columns={columns} dataSource={insightRows} pagination={false} scroll={{ x: 1180 }} />
-        </Card>
+        <div className="strategy-top-tab-wrapper">
+          <Segmented
+            value={activeMainTab}
+            onChange={setActiveMainTab}
+            className="strategy-main-segmented"
+            options={[
+              {
+                value: "evolution",
+                label: (
+                  <Space size={6} style={{ padding: "4px 8px" }}>
+                    <ThunderboltOutlined style={{ color: "#fa8c16", fontSize: 15 }} />
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>AI 策略进化审核</span>
+                    {pendingEvolutionCount > 0 && (
+                      <Badge count={pendingEvolutionCount} style={{ backgroundColor: "#ff4d4f", marginLeft: 4 }} />
+                    )}
+                  </Space>
+                )
+              },
+              {
+                value: "dailyReport",
+                label: (
+                  <Space size={6} style={{ padding: "4px 8px" }}>
+                    <LineChartOutlined style={{ color: "#1677ff", fontSize: 15 }} />
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>销售日报与数据洞察</span>
+                  </Space>
+                )
+              }
+            ]}
+          />
+        </div>
+
+        {activeMainTab === "evolution" ? (
+          <>
+            <Row gutter={[16, 16]}>
+              <Col xs={12} lg={6}>
+                <Card>
+                  <Statistic
+                    title="待审核策略建议"
+                    value={pendingEvolutionCount}
+                    suffix="条"
+                    valueStyle={{ color: pendingEvolutionCount > 0 ? "#fa8c16" : "#3f8600", fontWeight: 700 }}
+                    prefix={<ThunderboltOutlined />}
+                  />
+                </Card>
+              </Col>
+              <Col xs={12} lg={6}>
+                <Card>
+                  <Statistic
+                    title="累计挖掘进化策略"
+                    value={evolutionRecords.length}
+                    suffix="条"
+                    valueStyle={{ fontWeight: 700 }}
+                    prefix={<RobotOutlined />}
+                  />
+                </Card>
+              </Col>
+              <Col xs={12} lg={6}>
+                <Card>
+                  <Statistic
+                    title="综合成单胜率预估提升"
+                    value={35}
+                    precision={0}
+                    prefix="+"
+                    suffix="%"
+                    valueStyle={{ color: "#52c41a", fontWeight: 700 }}
+                  />
+                </Card>
+              </Col>
+              <Col xs={12} lg={6}>
+                <Card>
+                  <Statistic
+                    title="已热更生效中"
+                    value={approvedEvolutionCount}
+                    suffix="条"
+                    valueStyle={{ color: "#1677ff", fontWeight: 700 }}
+                    prefix={<CheckCircleOutlined />}
+                  />
+                </Card>
+              </Col>
+            </Row>
+            <Card
+              title={
+                <PanelTitle
+                  title="AI 策略进化建议清单"
+                  desc="AI 销售系统每日全自动回溯真实成败会话，萃取销冠攻防话术并生成优化规则，经主管审核后一键增量热更至智能体生效。"
+                  extra={
+                    <Button
+                      type="primary"
+                      icon={<ThunderboltOutlined />}
+                      onClick={handleTriggerEvolutionMining}
+                    >
+                      发起 AI 策略复盘挖掘
+                    </Button>
+                  }
+                />
+              }
+            >
+              <Space className="toolbar" wrap>
+                <Input.Search
+                  placeholder="搜索策略名称、智能体或摘要"
+                  allowClear
+                  value={evolutionKeyword}
+                  onChange={(e) => setEvolutionKeyword(e.target.value)}
+                  style={{ width: 260 }}
+                />
+                <Select
+                  value={evolutionStageFilter}
+                  onChange={setEvolutionStageFilter}
+                  options={["全部阶段", "正价课转化阶段", "决策确认阶段", "体验课交付阶段", "破冰加微阶段"].map((v) => ({ value: v, label: v }))}
+                  style={{ width: 150 }}
+                />
+                <Select
+                  value={evolutionStatusFilter}
+                  onChange={setEvolutionStatusFilter}
+                  options={["全部状态", "待审核", "已生效", "已驳回"].map((v) => ({ value: v, label: v }))}
+                  style={{ width: 120 }}
+                />
+                <Button
+                  onClick={() => {
+                    setEvolutionKeyword("");
+                    setEvolutionStageFilter("全部阶段");
+                    setEvolutionStatusFilter("全部状态");
+                  }}
+                >
+                  重置
+                </Button>
+              </Space>
+              <Table
+                className="admin-table strategy-insight-table"
+                rowKey="key"
+                columns={evolutionColumns}
+                dataSource={filteredEvolutionRecords}
+                pagination={false}
+                scroll={{ x: 1200 }}
+              />
+            </Card>
+          </>
+        ) : (
+          <>
+            <Row gutter={[16, 16]}>
+              <Col xs={12} lg={6}><Card><Statistic title="今日洞察" value={3} /></Card></Col>
+              <Col xs={12} lg={6}><Card><Statistic title="覆盖用户" value={174} suffix="人" /></Card></Col>
+              <Col xs={12} lg={6}><Card><Statistic title="重点用户" value={42} suffix="人" /></Card></Col>
+              <Col xs={12} lg={6}><Card><Statistic title="待处理" value={2} /></Card></Col>
+            </Row>
+            <Card title={<PanelTitle title="洞察列表" desc="展示策略智能体每天面向当前服务用户生成的用户洞察日报。" extra={<Button type="primary" icon={<RobotOutlined />} onClick={openInsightGenerateModal}>AI生成洞察</Button>} />}>
+              <Space className="toolbar" wrap>
+                <Input.Search placeholder="搜索日报名称或分析人群" allowClear className="strategy-search-input" />
+                <Select defaultValue="全部状态" options={["全部状态", "待处理", "处理中", "已处理"].map((value) => ({ value }))} />
+                <Button type="primary">搜索</Button>
+                <Button>重置</Button>
+              </Space>
+              <Table className="admin-table strategy-insight-table" rowKey="key" columns={columns} dataSource={insightRows} pagination={false} scroll={{ x: 1180 }} />
+            </Card>
+          </>
+        )}
       </Space>
+
+      <Drawer
+        title={
+          selectedEvolution ? (
+            <Space size={8}>
+              <ThunderboltOutlined style={{ color: "#fa8c16" }} />
+              <span>策略自主进化详情：{selectedEvolution.name}</span>
+            </Space>
+          ) : "策略自主进化详情"
+        }
+        open={evolutionDrawerOpen}
+        onClose={() => setEvolutionDrawerOpen(false)}
+        width={1060}
+        className="strategy-evolution-drawer"
+        extra={
+          selectedEvolution ? (
+            <Space size={8}>
+              <Badge
+                status={selectedEvolution.status === "已生效" ? "success" : selectedEvolution.status === "待审核" ? "warning" : "default"}
+                text={selectedEvolution.status}
+              />
+              {selectedEvolution.status === "待审核" && (
+                <>
+                  <Button danger onClick={() => handleRejectEvolution(selectedEvolution)}>驳回建议</Button>
+                  <Button
+                    type="primary"
+                    icon={<ThunderboltOutlined />}
+                    onClick={() => handleApproveEvolution(selectedEvolution)}
+                  >
+                    审核通过并热更新至智能体
+                  </Button>
+                </>
+              )}
+              {selectedEvolution.status === "已生效" && (
+                <Tag color="success">已热更新至执行规则库</Tag>
+              )}
+              {selectedEvolution.status === "已驳回" && (
+                <Tag color="default">已驳回</Tag>
+              )}
+            </Space>
+          ) : null
+        }
+      >
+        {selectedEvolution && (
+          <div className="strategy-evolution-drawer-content">
+            <Alert
+              type="info"
+              showIcon
+              icon={<RobotOutlined />}
+              message={
+                <div style={{ lineHeight: 1.6 }}>
+                  <b>AI 自主进化引擎洞察：</b>基于近 24 小时 <b>{selectedEvolution.sampleCount}</b> 场真实会话比对（成单组 <b>{selectedEvolution.winCount}</b> 场 vs 掉单组 <b>{selectedEvolution.lossCount}</b> 场），提炼出此策略。
+                  审核通过后将即刻增量热更新至【<b>{selectedEvolution.agentName}</b> · <b>{selectedEvolution.stage}</b>】，自主销售机器人立即应用新话术。
+                </div>
+              }
+              style={{ marginBottom: 16 }}
+            />
+
+            <div className="strategy-evolution-diff-section">
+              <div className="insight-section-title" style={{ marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span><b>1. 策略规则与 Prompt 差异对比 (Before vs After)</b></span>
+                <Tag color="orange" style={{ fontWeight: 600 }}>预估转化胜率提升 {selectedEvolution.projectedLift}</Tag>
+              </div>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Card
+                    size="small"
+                    className="strategy-diff-card before"
+                    title={
+                      <Space size={6}>
+                        <CloseCircleOutlined style={{ color: "#ff4d4f" }} />
+                        <span style={{ color: "#cf1322", fontWeight: 600 }}>{selectedEvolution.beforeRule.title}</span>
+                      </Space>
+                    }
+                  >
+                    <div className="strategy-diff-diagnosis">
+                      <Text type="secondary" style={{ display: "block", marginBottom: 6, fontWeight: 500 }}>
+                        【掉单根因诊断】
+                      </Text>
+                      <div className="strategy-diagnosis-box loss">
+                        {selectedEvolution.beforeRule.diagnosis}
+                      </div>
+                    </div>
+                    <div>
+                      <Text type="secondary" style={{ display: "block", marginBottom: 6, fontWeight: 500 }}>
+                        【原执行 Prompt 规则】
+                      </Text>
+                      <pre className="strategy-prompt-pre before-pre">
+                        {selectedEvolution.beforeRule.promptSnippet}
+                      </pre>
+                    </div>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card
+                    size="small"
+                    className="strategy-diff-card after"
+                    title={
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Space size={6}>
+                          <CheckCircleOutlined style={{ color: "#52c41a" }} />
+                          <span style={{ color: "#389e0d", fontWeight: 600 }}>{selectedEvolution.afterRule.title}</span>
+                        </Space>
+                        {!isEditingPrompt ? (
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => setIsEditingPrompt(true)}
+                          >
+                            微调 Prompt
+                          </Button>
+                        ) : (
+                          <Space size={4}>
+                            <Button size="small" onClick={() => setIsEditingPrompt(false)}>取消</Button>
+                            <Button type="primary" size="small" onClick={handleSaveEditedPrompt}>保存修改</Button>
+                          </Space>
+                        )}
+                      </div>
+                    }
+                  >
+                    <div className="strategy-diff-diagnosis">
+                      <Text type="secondary" style={{ display: "block", marginBottom: 6, fontWeight: 500 }}>
+                        【销冠打法突破亮点】
+                      </Text>
+                      <div className="strategy-diagnosis-box win">
+                        {selectedEvolution.afterRule.highlights}
+                      </div>
+                    </div>
+                    <div>
+                      <Text type="secondary" style={{ display: "block", marginBottom: 6, fontWeight: 500 }}>
+                        【建议热更新 Prompt 规则】
+                      </Text>
+                      {isEditingPrompt ? (
+                        <Input.TextArea
+                          rows={7}
+                          value={editedPrompt}
+                          onChange={(e) => setEditedPrompt(e.target.value)}
+                          className="strategy-prompt-textarea"
+                        />
+                      ) : (
+                        <pre className="strategy-prompt-pre after-pre">
+                          {selectedEvolution.afterRule.promptSnippet}
+                        </pre>
+                      )}
+                    </div>
+                  </Card>
+                </Col>
+              </Row>
+            </div>
+
+            <div className="strategy-evidence-section" style={{ marginTop: 20 }}>
+              <div className="insight-section-title" style={{ marginBottom: 12 }}>
+                <b>2. 真实会话归因佐证 (成败样本直观交锋)</b>
+                <span style={{ color: "#8c8c8c", fontSize: 12, marginLeft: 8 }}>
+                  （真实企微私聊留存记录，点击可联动至左侧完整会话流）
+                </span>
+              </div>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Card
+                    size="small"
+                    className="strategy-case-box win"
+                    title={
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Space size={6}>
+                          <Tag color="success">成单组标杆</Tag>
+                          <Text strong>{selectedEvolution.evidence.winCase.customer}</Text>
+                        </Space>
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={() => {
+                            setEvolutionDrawerOpen(false);
+                            onViewConversation?.({
+                              key: selectedEvolution.evidence.winCase.conversationKey,
+                              accountKey: selectedEvolution.evidence.winCase.accountKey
+                            });
+                          }}
+                        >
+                          查看原会话 &gt;
+                        </Button>
+                      </div>
+                    }
+                  >
+                    <div className="strategy-case-desc win">
+                      {selectedEvolution.evidence.winCase.description}
+                    </div>
+                    <div className="strategy-dialogue-flow">
+                      {selectedEvolution.evidence.winCase.dialogue.map((msg, idx) => (
+                        <div key={idx} className={`strategy-bubble-row ${msg.sender}`}>
+                          <div className="strategy-bubble-sender">
+                            {msg.sender === "ai" ? <Tag color="blue">销冠AI</Tag> : <Tag>客户</Tag>}
+                          </div>
+                          <div className={`strategy-bubble ${msg.sender}`}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card
+                    size="small"
+                    className="strategy-case-box loss"
+                    title={
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Space size={6}>
+                          <Tag color="error">掉单组痛点</Tag>
+                          <Text strong>{selectedEvolution.evidence.lossCase.customer}</Text>
+                        </Space>
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={() => {
+                            setEvolutionDrawerOpen(false);
+                            onViewConversation?.({
+                              key: selectedEvolution.evidence.lossCase.conversationKey,
+                              accountKey: selectedEvolution.evidence.lossCase.accountKey
+                            });
+                          }}
+                        >
+                          查看原会话 &gt;
+                        </Button>
+                      </div>
+                    }
+                  >
+                    <div className="strategy-case-desc loss">
+                      {selectedEvolution.evidence.lossCase.description}
+                    </div>
+                    <div className="strategy-dialogue-flow">
+                      {selectedEvolution.evidence.lossCase.dialogue.map((msg, idx) => (
+                        <div key={idx} className={`strategy-bubble-row ${msg.sender}`}>
+                          <div className="strategy-bubble-sender">
+                            {msg.sender === "ai" ? <Tag color="default">老版AI</Tag> : <Tag>客户</Tag>}
+                          </div>
+                          <div className={`strategy-bubble ${msg.sender}`}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </Col>
+              </Row>
+            </div>
+          </div>
+        )}
+      </Drawer>
       <Modal
         title="AI生成用户洞察日报"
         open={insightGenerateModalOpen}
@@ -458,7 +921,7 @@ function StrategyInsightPage({ onViewConversation }) {
             </section>
             <section className="insight-detail-section insight-customer-section">
               <div className="insight-section-title">重点用户清单</div>
-              <Table size="small" className="admin-table" rowKey="key" columns={customerColumns} dataSource={buildInsightUserRows(selectedInsight, { key: "focus-table", title: "重点用户", count: selectedInsight.customers.length })} pagination={false} scroll={{ x: 1420 }} />
+              <Table size="small" className="admin-table" rowKey="key" columns={customerColumns} dataSource={buildInsightUserRows(selectedInsight, { key: "focus-table", title: "重点用户", count: selectedInsight.customers.length }, insightConversationPool)} pagination={false} scroll={{ x: 1420 }} />
             </section>
           </div>
         ) : null}

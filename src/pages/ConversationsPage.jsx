@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Col,
-  Descriptions,
   Divider,
   Drawer,
   Form,
@@ -64,7 +63,14 @@ const { Text, Title, Paragraph } = Typography;
 
 
 
-function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustomerDrawerToken = 0, visibleWecomKeys = managedWecomAccounts.map((item) => item.key), onActiveWecomChange }) {
+function ConversationsPage({
+  activeWecom,
+  activeConversationKey,
+  autoOpenCustomerDrawerToken = 0,
+  visibleWecomKeys = managedWecomAccounts.map((item) => item.key),
+  conversationViewMode = "card",
+  onActiveWecomChange
+}) {
   const { message } = AntApp.useApp();
   const visibleConversations = conversations.filter((item) => visibleWecomKeys.includes(item.accountKey));
   const accountConversations = visibleConversations.filter((item) => item.accountKey === activeWecom);
@@ -235,19 +241,19 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
   };
   const renderServiceStageProgress = (item) => {
     const stage = getCustomerServiceStage(item);
+    const currentStageName = customerServiceStages[stage.currentIndex] || stage.currentName;
+    const currentAttendance = getCourseStageAttendance(currentStageName, stage.currentIndex, item, item.key === selected?.key ? activeCourseOrder : null);
+    const serviceStage = {
+      ...stage,
+      currentName: currentStageName,
+      enteredAt: currentAttendance.stageStartAt,
+      nextAt: currentAttendance.stageEndAt
+    };
     return (
       <Popover
         trigger="hover"
         placement="topLeft"
-        content={
-          <div className="service-stage-popover">
-            <div><Text type="secondary">当前服务阶段</Text><Text>{stage.currentName}</Text></div>
-            <div><Text type="secondary">阶段进度</Text><Text>{stage.currentNumber}/{stage.total}</Text></div>
-            <div><Text type="secondary">进入时间</Text><Text>{stage.enteredAt}</Text></div>
-            <div><Text type="secondary">下一阶段</Text><Text>{stage.nextName}</Text></div>
-            <div><Text type="secondary">预计进入</Text><Text>{stage.nextAt}</Text></div>
-          </div>
-        }
+        content={currentStageName.includes("节课") ? renderCourseStagePopoverContent(currentStageName, stage.currentIndex, currentAttendance) : renderStagePopoverContent(serviceStage)}
       >
         <div className="service-stage-progress" aria-label={`阶段进度 ${stage.currentNumber}/${stage.total}`}>
           {customerServiceStages.map((stageName, index) => (
@@ -335,6 +341,11 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       setCustomerDrawerOpen(true);
     }
   }, [autoOpenCustomerDrawerToken, activeConversationKey, selected?.key]);
+  useEffect(() => {
+    if (conversationViewMode !== "list" && customerDrawerTab === "chatHistory") {
+      setCustomerDrawerTab("profile");
+    }
+  }, [conversationViewMode, customerDrawerTab]);
   const confirmHostingChange = (checked) => {
     Modal.confirm({
       title: checked ? "确认开启AI托管？" : "确认关闭AI托管？",
@@ -361,7 +372,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
   };
   const openCustomerDetail = (item, tabKey = "profile") => {
     setSelected(item);
-    setCustomerDrawerTab(tabKey === "chat" ? "profile" : tabKey);
+    setCustomerDrawerTab(tabKey === "chat" ? "chatHistory" : tabKey);
     setCustomerDrawerOpen(true);
   };
   const openSessionTagPicker = (field) => {
@@ -554,17 +565,6 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
     }));
   })();
   const activeCourseOrder = customerCourseOrders.find((order) => order.key === selectedCourseOrderKey) || customerCourseOrders[0];
-  const courseSummaryItems = activeCourseOrder
-    ? [
-        { key: "product", label: "课程名称", children: activeCourseOrder.product },
-        { key: "type", label: "课程类型", children: activeCourseOrder.type },
-        { key: "progress", label: "课节进度", children: `${activeCourseOrder.completedLessons}/${activeCourseOrder.totalLessons}` },
-        { key: "current", label: "当前课节", children: activeCourseOrder.currentLesson },
-        { key: "latest", label: "最近上课", children: activeCourseOrder.latestLessonAt },
-        { key: "teacher", label: "负责老师", children: activeCourseOrder.teacher },
-        { key: "advisor", label: "课程顾问", children: activeCourseOrder.advisor }
-      ]
-    : [];
   const conversationMetrics = {
     sent: Math.max(393, (selected.messages || []).filter((item) => item.from === "customer").length * 76 + selected.unread * 23),
     received: Math.max(351, (selected.messages || []).filter((item) => item.from === "ai").length * 88 + 175)
@@ -790,8 +790,8 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
     const parsed = dayjs(value);
     return parsed.isValid() ? parsed.format("MM-DD HH:mm") : value;
   };
-  const getServiceStageTimeRange = (index) => {
-    const baseTime = selected.addedAt ? dayjs(selected.addedAt) : dayjs("2026-08-23 23:06");
+  const getServiceStageTimeRange = (index, targetItem = selected) => {
+    const baseTime = targetItem?.addedAt ? dayjs(targetItem.addedAt) : dayjs("2026-08-23 23:06");
     const start = baseTime.add(index, "day");
     const end = baseTime.add(index + 1, "day");
     return {
@@ -800,12 +800,13 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       shortRange: `${start.format("MM.DD")}-${end.format("MM.DD")}`
     };
   };
-  const getCourseStageAttendance = (stageName, index) => {
-    const serviceTime = getServiceStageTimeRange(index);
+  const getCourseStageAttendance = (stageName, index, targetItem = selected, targetCourseOrder = activeCourseOrder) => {
+    const targetStageIndex = targetItem?.lifecycleStage || 0;
+    const serviceTime = getServiceStageTimeRange(index, targetItem);
     if (!stageName.includes("节课")) {
       return {
         type: "service",
-        label: index < currentStageIndex ? "已完成" : index === currentStageIndex ? "当前阶段" : "未开始",
+        label: index < targetStageIndex ? "已完成" : index === targetStageIndex ? "当前阶段" : "未开始",
         icon: null,
         plannedAt: serviceTime.startAt,
         finishedAt: "—",
@@ -818,7 +819,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       };
     }
     const lessonIndex = index - 1;
-    const lesson = activeCourseOrder?.lessons?.[lessonIndex];
+    const lesson = targetCourseOrder?.lessons?.[lessonIndex];
     const isAttended = lesson?.status === "已上课" || (lesson?.finishedAt && lesson.finishedAt !== "—");
     const isScheduled = !isAttended && lesson && !["待排课", "待预约"].includes(lesson.status) && lesson.planAt && !["—", "待确认"].includes(lesson.planAt);
     const plannedDate = formatStageDate(lesson?.planAt);
@@ -1022,6 +1023,133 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       </div>
     </div>
   );
+  const renderConversationTable = () => {
+    const columns = [
+      {
+        title: "客户信息",
+        key: "customerInfo",
+        fixed: "left",
+        width: 260,
+        render: (_, item) => {
+          const insights = getSessionInsights(item);
+          const customerPhone = getCustomerPhone(item);
+          const wechatNickname = getWechatNickname(item);
+          const addedTimeDisplay = getCustomerAddedTimeDisplay(item);
+          return (
+            <div className="conversation-table-customer">
+              <WecomAvatar item={item} />
+              <div className="conversation-table-customer-main">
+                <div className="conversation-table-name-row">
+                  <Text strong ellipsis>{item.name}</Text>
+                  {customerPhone ? <span>{customerPhone}</span> : null}
+                  {item.type === "group" ? <Tag color="green">群</Tag> : null}
+                  {insights.relationStatus === "已删除企微" ? <Tag color="red" className="system-status-tag">删</Tag> : null}
+                </div>
+                <Text type="secondary" ellipsis>{wechatNickname} · {addedTimeDisplay}</Text>
+              </div>
+            </div>
+          );
+        }
+      },
+      {
+        title: "最近消息",
+        key: "recentMessage",
+        width: 320,
+        render: (_, item) => {
+          const recentConversation = getRecentConversationInfo(item);
+          return (
+            <Tooltip title={`${recentConversation.time} ${recentConversation.senderRole} · ${recentConversation.text}`} placement="topLeft">
+              <div className="conversation-table-recent">
+                <Text ellipsis>{recentConversation.text}</Text>
+                <span>{recentConversation.time} {recentConversation.senderRole}</span>
+              </div>
+            </Tooltip>
+          );
+        }
+      },
+      {
+        title: "托管状态",
+        key: "hostingStatus",
+        width: 120,
+        render: (_, item) => (
+          <Switch
+            size="small"
+            checked={getHosted(item)}
+            checkedChildren="开"
+            unCheckedChildren="关"
+            onClick={(checked, event) => event.stopPropagation()}
+            onChange={(checked) => confirmListHostingChange(item, checked)}
+          />
+        )
+      },
+      {
+        title: "阶段进度",
+        key: "stageProgress",
+        width: 190,
+        render: (_, item) => renderServiceStageProgress(item)
+      },
+      {
+        title: "标签",
+        key: "tags",
+        width: 220,
+        render: (_, item) => (
+          <div className="conversation-table-tags">
+            {(item.tags || []).slice(0, 3).map((tag) => (
+              <Tag key={tag}>{getTagDisplayLabel(tag)}</Tag>
+            ))}
+            {(item.tags || []).length > 3 ? <Tag>+{item.tags.length - 3}</Tag> : null}
+          </div>
+        )
+      },
+      {
+        title: "操作",
+        key: "actions",
+        fixed: "right",
+        width: 210,
+        render: (_, item) => (
+          <Space size={0} className="conversation-table-actions" onClick={(event) => event.stopPropagation()}>
+            <Button type="link" size="small" onClick={() => openCustomerDetail(item, "chat")}>聊天</Button>
+            <Button type="link" size="small" onClick={() => openCustomerDetail(item, "profile")}>资料</Button>
+            <Button type="link" size="small" onClick={() => openCustomerDetail(item, "course")}>课程</Button>
+            <Button type="link" size="small" onClick={() => openCustomerDetail(item, "strategy")}>策略</Button>
+            <Button type="link" size="small" onClick={() => openCustomerDetail(item, "lifecycle")}>计划</Button>
+          </Space>
+        )
+      }
+    ];
+    return (
+      <div className="conversation-table-wrap">
+        <Table
+          className="conversation-table"
+          rowKey="key"
+          size="middle"
+          columns={columns}
+          dataSource={paginatedConversations}
+          pagination={false}
+          scroll={{ x: 1320, y: "calc(100vh - 265px)" }}
+          rowClassName={(item) => selected.key === item.key ? "conversation-table-row active" : "conversation-table-row"}
+          onRow={(item) => ({
+            onClick: () => setSelected(item)
+          })}
+          locale={{ emptyText: "当前企微暂无同步会话" }}
+        />
+        <div className="conversation-list-pagination">
+          <Pagination
+            size="small"
+            current={effectiveSessionPage}
+            pageSize={sessionPageSize}
+            total={filteredConversations.length}
+            pageSizeOptions={["10", "20", "50"]}
+            showSizeChanger
+            onChange={(page, pageSize) => {
+              setSessionPage(page);
+              setSessionPageSize(pageSize);
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
   const renderMainChatPanel = () => {
     const insights = getSessionInsights(selected);
     const scheduleStatus = getScheduleStatus(insights);
@@ -1056,7 +1184,7 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
         </div>
         <div className="wecom-message-area">
           {(selected.messages || []).map((message, index) => (
-            <div key={`${message.time}-${index}`} className={`wecom-message ${message.from}`}>
+            <div className={`wecom-message ${message.from}`} key={`${message.time}-${index}`}>
               {message.from === "system" ? (
                 <Text type="secondary">{message.text}</Text>
               ) : (
@@ -1102,15 +1230,70 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
       </section>
     );
   };
+  const renderDrawerChatHistory = () => (
+    <section className="drawer-chat-history-panel">
+      <div className="wecom-message-area">
+        {(selected.messages || []).map((message, index) => (
+          <div className={`wecom-message ${message.from}`} key={`drawer-${message.time}-${index}`}>
+            {message.from === "system" ? (
+              <Text type="secondary">{message.text}</Text>
+            ) : (
+              <>
+                <WecomAvatar item={message.from === "customer" ? selected : { avatar: selected.owner.slice(0, 1), avatarImage: "./images/矩形 6.png", avatarColors: ["#c7d2fe", "#4f46e5"] }} size={36} />
+                <div>
+                  {selected.type === "group" || message.sender ? <Text type="secondary" className="message-sender">{message.sender || selected.name}</Text> : null}
+                  <div className="message-bubble">{message.text}</div>
+                  {message.from === "ai" ? <Tag className="ai-visible-tag" color="processing">AI回复</Tag> : null}
+                  <Text type="secondary" className="message-time">{message.time}</Text>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="chat-composer">
+        <Input.TextArea
+          key={`${selected.key}-drawer-manual`}
+          value={manualReply}
+          rows={4}
+          placeholder="输入人工回复内容（可粘贴图片发送）"
+          onChange={(event) => setManualReply(event.target.value)}
+        />
+        {composerItems.length ? (
+          <div className="composer-attachments">
+            {composerItems.map((item) => (
+              <Tag key={item.id} closable onClose={(event) => { event.preventDefault(); removeComposerItem(item.id); }}>
+                {item.label}
+              </Tag>
+            ))}
+          </div>
+        ) : null}
+        <div className="composer-actions">
+          <div className="composer-toolbar">
+            <Tooltip title="发送表情"><Button shape="circle" icon={<SmileOutlined />} onClick={() => addComposerItem("emoji")} /></Tooltip>
+            <Tooltip title="发送图片"><Button shape="circle" icon={<PictureOutlined />} onClick={() => addComposerItem("image")} /></Tooltip>
+            <Tooltip title="发送文件"><Button shape="circle" icon={<PaperClipOutlined />} onClick={() => addComposerItem("file")} /></Tooltip>
+          </div>
+          <Button type="primary" icon={<SendOutlined />} onClick={sendManualReply}>发送</Button>
+        </div>
+      </div>
+    </section>
+  );
   return (
     <>
       <div className="wecom-workbench">
         {renderWecomAccountList()}
         <aside className="wecom-session-list">
           {renderSessionFilterPanel()}
-          <div className="session-chat-layout">
-            {renderConversationList()}
-            {renderMainChatPanel()}
+          <div className={`session-chat-layout ${conversationViewMode === "list" ? "list-mode" : "card-mode"}`}>
+            {conversationViewMode === "card" ? (
+              <>
+                {renderConversationList()}
+                {renderMainChatPanel()}
+              </>
+            ) : (
+              renderConversationTable()
+            )}
           </div>
         </aside>
       </div>
@@ -1218,6 +1401,13 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
             activeKey={customerDrawerTab}
             onChange={setCustomerDrawerTab}
             items={[
+              ...(conversationViewMode === "list" ? [
+                {
+                  key: "chatHistory",
+                  label: "聊天记录",
+                  children: renderDrawerChatHistory()
+                }
+              ] : []),
               {
                 key: "profile",
                 label: "用户信息",
@@ -1319,31 +1509,19 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
                     {activeCourseOrder ? (
                       <>
                         <section className="customer-profile-section">
-                          <div className="customer-section-head">
-                            <Text>当前订单课程概览</Text>
-                            <Text type="secondary">{activeCourseOrder.completedLessons}/{activeCourseOrder.totalLessons} 节</Text>
-                          </div>
-                          <Descriptions className="customer-course-summary" size="small" column={2} bordered items={courseSummaryItems} />
-                        </section>
-                        <section className="customer-profile-section">
-                          <div className="customer-section-head">
-                            <Text>课节进度</Text>
-                            <Text type="secondary">{activeCourseOrder.product}</Text>
+                          <div className="sales-strategy-section-head">
+                            <div className="sales-strategy-section-title">用户上课信息</div>
+                            <span className="trial-lessons-total-tag">体验课共 4 节课</span>
                           </div>
                           <Table
-                            className="customer-course-table customer-lesson-table"
-                            size="small"
-                            rowKey="key"
+                            className="trial-lessons-table"
+                            rowKey="index"
+                            columns={trialLessonColumns}
+                            dataSource={trialLessons}
                             pagination={false}
-                            dataSource={activeCourseOrder.lessons}
-                            columns={[
-                              { title: "#", dataIndex: "index", width: 44 },
-                              { title: "课节名称", dataIndex: "name", ellipsis: true },
-                              { title: "状态", dataIndex: "status", width: 84, render: (value) => <Tag color={value === "已上课" ? "success" : value === "待上课" ? "processing" : "default"}>{value}</Tag> },
-                              { title: "计划上课", dataIndex: "planAt", width: 130 },
-                              { title: "完成时间", dataIndex: "finishedAt", width: 130 },
-                              { title: "看课时长", dataIndex: "duration", width: 82 }
-                            ]}
+                            size="small"
+                            bordered
+                            scroll={{ x: 440 }}
                           />
                         </section>
                       </>
@@ -1375,24 +1553,6 @@ function ConversationsPage({ activeWecom, activeConversationKey, autoOpenCustome
                           </span>
                         </div>
                       </div>
-                    </section>
-
-                    {/* 2. 用户上课信息 */}
-                    <section className="sales-strategy-section">
-                      <div className="sales-strategy-section-head">
-                        <div className="sales-strategy-section-title">用户上课信息</div>
-                        <span className="trial-lessons-total-tag">体验课共 4 节课</span>
-                      </div>
-                      <Table
-                        className="trial-lessons-table"
-                        rowKey="index"
-                        columns={trialLessonColumns}
-                        dataSource={trialLessons}
-                        pagination={false}
-                        size="small"
-                        bordered
-                        scroll={{ x: 440 }}
-                      />
                     </section>
 
                     {/* 策略智能体输出结果 */}

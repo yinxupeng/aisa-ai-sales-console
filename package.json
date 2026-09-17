@@ -8,7 +8,8 @@
     "dev": "python3 -m http.server 8010",
     "preview": "python3 -m http.server 8010",
     "test": "node scripts/verify-skill-orchestration.mjs",
-    "test:runtime": "node scripts/verify-runtime.mjs"
+    "test:runtime": "node scripts/verify-runtime.mjs",
+    "test:ai-seats": "node scripts/verify-ai-seats.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.5",

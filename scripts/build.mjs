@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 
 await build({
-  entryPoints: ["src/main.jsx"],
+  entryPoints: { main: "src/main.jsx", platform: "src/platform/main.tsx" },
   bundle: true,
   format: "iife",
   target: "es2017",
@@ -10,7 +10,7 @@ await build({
     "process.env.NODE_ENV": "\"production\""
   },
   outdir: "assets",
-  entryNames: "main",
+  entryNames: "[name]",
   loader: {
     ".js": "jsx"
   }

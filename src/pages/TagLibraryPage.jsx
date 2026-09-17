@@ -13,6 +13,8 @@ import {
   Input,
   InputNumber,
   Modal,
+  Popover,
+  Progress,
   Radio,
   Row,
   Select,
@@ -30,9 +32,11 @@ import {
   ArrowLeftOutlined,
   ClockCircleOutlined,
   EditOutlined,
+  ExclamationCircleFilled,
   FileSearchOutlined,
   PlusOutlined,
   RobotOutlined,
+  SyncOutlined,
   TagsOutlined,
   UploadOutlined,
   UserOutlined
@@ -395,11 +399,35 @@ function TagLibraryPage({ onViewConversation }) {
   const activeAutoTagDataSource = autoTagVisibleDataSourceConfigs.find((item) => item.key === activeAutoTagDataSourceKey);
   const aiTagReviewBatches = [
     {
+      key: "tag-review-batch-20260914-1700",
+      name: "2026-09-14 17:00 AI生成批次",
+      generatedAt: "2026-09-14 17:00",
+      trigger: "手动生成",
+      status: "生成中",
+      progress: 68,
+      dataScope: "企业知识库、智能体提示词、用户沟通数据",
+      summary: { newTags: 0, modified: 0, deleted: 0 },
+      changes: []
+    },
+    {
+      key: "tag-review-batch-20260908-1400",
+      name: "2026-09-08 14:00 AI生成批次",
+      generatedAt: "2026-09-08 14:00",
+      trigger: "手动生成",
+      status: "失败",
+      progress: 42,
+      failReason: "企业知识库向量召回超时：所选企业对话数据量较大（超10万条），解析服务响应超时，请重试或缩减语料范围。",
+      dataScope: "企业知识库、用户沟通数据",
+      summary: { newTags: 0, modified: 0, deleted: 0 },
+      changes: []
+    },
+    {
       key: "tag-review-batch-20260826",
       name: "2026-08-26 09:00 AI生成批次",
       generatedAt: "2026-08-26 09:00",
       trigger: "定时生成",
       status: "待审核",
+      progress: 100,
       dataScope: "企业知识库、智能体提示词、用户沟通数据、客户档案、用户业务数据、现有标签数据",
       summary: { newTags: 3, modified: 2, deleted: 1 },
       changes: [
@@ -462,6 +490,7 @@ function TagLibraryPage({ onViewConversation }) {
       generatedAt: "2026-08-19 09:00",
       trigger: "手动生成",
       status: "已通过",
+      progress: 100,
       dataScope: "用户沟通数据、客户档案、现有标签数据",
       summary: { newTags: 2, modified: 1, deleted: 0 },
       changes: []
@@ -471,16 +500,103 @@ function TagLibraryPage({ onViewConversation }) {
   const tagReviewDetailBatch = aiTagReviewBatches.find((item) => item.key === tagReviewDetailBatchKey);
   const pendingReviewCount = aiTagReviewBatches.filter((item) => item.status === "待审核").length;
   const tagReviewBatchColumns = [
-    { title: "AI生成批次", dataIndex: "name", width: 190 },
+    { title: "AI生成批次", dataIndex: "name", width: 200 },
     { title: "生成方式", dataIndex: "trigger", width: 86 },
     {
       title: "待审核变更",
       dataIndex: "summary",
-      width: 190,
-      render: (summary) => `新增${summary.newTags} / 修改${summary.modified} / 删除${summary.deleted}`
+      width: 170,
+      render: (summary, record) => {
+        if (record.status === "生成中") return <Text type="secondary">正在分析生成中...</Text>;
+        if (record.status === "失败") return <Text type="secondary">-</Text>;
+        return `新增${summary.newTags} / 修改${summary.modified} / 删除${summary.deleted}`;
+      }
     },
-    { title: "状态", dataIndex: "status", width: 86, render: (status) => <Tag color={status === "待审核" ? "processing" : "success"}>{status}</Tag> },
-    { title: "操作", width: 90, render: (_, record) => <Button type="link" size="small" onClick={() => openTagReviewDetail(record)}>查看详情</Button> }
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: 100,
+      render: (status, record) => {
+        if (status === "生成中") {
+          return <Tag icon={<SyncOutlined spin />} color="processing">生成中</Tag>;
+        }
+        if (status === "失败") {
+          return (
+            <Space size={4} align="center">
+              <Tag color="error" style={{ margin: 0 }}>失败</Tag>
+              <Popover
+                title={<Space size={6}><ExclamationCircleFilled style={{ color: "#ff4d4f" }} /><span>失败原因</span></Space>}
+                content={
+                  <div style={{ maxWidth: 280, fontSize: 13, lineHeight: 1.6 }} onClick={(e) => e.stopPropagation()}>
+                    <div style={{ color: "#262626", marginBottom: 6 }}>{record.failReason || "数据分析生成异常"}</div>
+                    <Text type="secondary" style={{ fontSize: 12 }}>可检查知识库状态或缩短分析时间跨度后重新生成。</Text>
+                  </div>
+                }
+                trigger="click"
+              >
+                <Tooltip title="点击查看失败原因">
+                  <span onClick={(e) => e.stopPropagation()} style={{ display: "inline-flex", cursor: "pointer", verticalAlign: "middle" }}>
+                    <ExclamationCircleFilled style={{ color: "#ff4d4f", fontSize: 14 }} />
+                  </span>
+                </Tooltip>
+              </Popover>
+            </Space>
+          );
+        }
+        return <Tag color={status === "待审核" ? "processing" : "success"}>{status}</Tag>;
+      }
+    },
+    {
+      title: "进度",
+      dataIndex: "progress",
+      width: 130,
+      render: (progress, record) => {
+        const percent = record.status === "待审核" || record.status === "已通过" ? 100 : (progress || 0);
+        const progressStatus = record.status === "失败" ? "exception" : record.status === "生成中" ? "active" : "success";
+        const percentColor = record.status === "失败" ? "#ff4d4f" : record.status === "生成中" ? "#1677ff" : "#52c41a";
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, width: 110 }}>
+            <Progress
+              percent={percent}
+              size="small"
+              status={progressStatus}
+              showInfo={false}
+              strokeColor={record.status === "待审核" || record.status === "已通过" ? "#52c41a" : undefined}
+              style={{ flex: 1, margin: 0 }}
+            />
+            <Text style={{ fontSize: 12, color: percentColor, minWidth: 32, textAlign: "right", fontWeight: record.status === "生成中" ? 600 : 400 }}>
+              {percent}%
+            </Text>
+          </div>
+        );
+      }
+    },
+    {
+      title: "操作",
+      width: 90,
+      render: (_, record) => {
+        if (record.status === "生成中") {
+          return <Button type="link" size="small" disabled>查看详情</Button>;
+        }
+        if (record.status === "失败") {
+          return (
+            <Popover
+              title={<Space size={6}><ExclamationCircleFilled style={{ color: "#ff4d4f" }} /><span>失败原因</span></Space>}
+              content={
+                <div style={{ maxWidth: 280, fontSize: 13, lineHeight: 1.6 }} onClick={(e) => e.stopPropagation()}>
+                  <div style={{ color: "#262626", marginBottom: 6 }}>{record.failReason || "数据分析生成异常"}</div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>可检查知识库状态或缩短分析时间跨度后重新生成。</Text>
+                </div>
+              }
+              trigger="click"
+            >
+              <Button type="link" size="small" danger onClick={(e) => e.stopPropagation()}>失败原因</Button>
+            </Popover>
+          );
+        }
+        return <Button type="link" size="small" onClick={() => openTagReviewDetail(record)}>查看详情</Button>;
+      }
+    }
   ];
   const aiAutoTagRecords = [
     {
@@ -1133,7 +1249,7 @@ function TagLibraryPage({ onViewConversation }) {
         open={tagReviewModalOpen}
         onCancel={() => setTagReviewModalOpen(false)}
         footer={<Button onClick={() => setTagReviewModalOpen(false)}>关闭</Button>}
-        width={860}
+        width={900}
         className="tag-review-record-modal"
       >
         <Table

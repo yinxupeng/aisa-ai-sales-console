@@ -23,14 +23,20 @@ const aiSkillPageSource = fs.readFileSync(new URL("../src/pages/AISkillPage.jsx"
 const toolsPageSource = fs.readFileSync(new URL("../src/pages/ToolsPage.jsx", import.meta.url), "utf8");
 const knowledgePageSource = fs.readFileSync(new URL("../src/pages/KnowledgePage.jsx", import.meta.url), "utf8");
 const salesPageSource = fs.readFileSync(new URL("../src/pages/SalesPage.jsx", import.meta.url), "utf8");
+const wecomChannelPageSource = fs.readFileSync(new URL("../src/pages/WecomChannelPage.jsx", import.meta.url), "utf8");
+const wecomAccountPageSource = fs.readFileSync(new URL("../src/pages/WecomAccountPage.jsx", import.meta.url), "utf8");
 const massMessagePageSource = fs.readFileSync(new URL("../src/pages/MassMessagePage.jsx", import.meta.url), "utf8");
 const companyPageSource = fs.readFileSync(new URL("../src/pages/CompanyPage.jsx", import.meta.url), "utf8");
 const knowledgePickerSource = fs.readFileSync(new URL("../src/components/KnowledgeResourcePickerModal.jsx", import.meta.url), "utf8");
 const skillLogicRichEditorSource = fs.readFileSync(new URL("../src/components/SkillLogicRichEditor.jsx", import.meta.url), "utf8");
+const strategyInsightDataSource = fs.existsSync(new URL("../src/data/strategyInsights.js", import.meta.url))
+  ? fs.readFileSync(new URL("../src/data/strategyInsights.js", import.meta.url), "utf8")
+  : "";
 const sourceWithData = [
   source,
   appDataSource,
   conversationDataSource,
+  strategyInsightDataSource,
   tagLibrarySource,
   strategyInsightSource,
   conversationPageSource,
@@ -50,6 +56,8 @@ const sourceWithData = [
   toolsPageSource,
   knowledgePageSource,
   salesPageSource,
+  wecomChannelPageSource,
+  wecomAccountPageSource,
   massMessagePageSource,
   companyPageSource,
   knowledgePickerSource,
@@ -57,6 +65,8 @@ const sourceWithData = [
 ].join("\n");
 const styles = fs.readFileSync(new URL("../src/app.css", import.meta.url), "utf8");
 const packageJson = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+const expectedCourseStages = ["A类课前", "A类第一节课", "A类第二节课", "A类第三节课", "A类第四节课", "A类第五节课", "A类课后"];
+const expectedInteractionBuckets = ["5条以下", "5-10条", "10-20条", "20-30条", "30-40条", "40-50条", "50条以上"];
 
 assert.ok(!fs.existsSync(new URL("../script.js", import.meta.url)), "根目录旧版 script.js 已无入口引用，应移除");
 assert.ok(!fs.existsSync(new URL("../styles.css", import.meta.url)), "根目录旧版 styles.css 已无入口引用，应移除");
@@ -121,21 +131,231 @@ const sessionFilterPanelStartIndex = conversationPageSource.indexOf("const rende
 const addComposerItemStartIndex = conversationPageSource.indexOf("const addComposerItem =", sessionFilterPanelStartIndex);
 const sessionFilterPanelSource = conversationPageSource.slice(sessionFilterPanelStartIndex, addComposerItemStartIndex);
 const sessionStageTimelineStartIndex = conversationPageSource.indexOf("const renderSelectedStageTimeline = () =>");
+const serviceStageProgressStartIndex = conversationPageSource.indexOf("const renderServiceStageProgress =");
+const matchesQuickFilterStartIndex = conversationPageSource.indexOf("const matchesQuickFilter =", serviceStageProgressStartIndex);
+const serviceStageProgressSource = serviceStageProgressStartIndex >= 0 && matchesQuickFilterStartIndex > serviceStageProgressStartIndex
+  ? conversationPageSource.slice(serviceStageProgressStartIndex, matchesQuickFilterStartIndex)
+  : "";
 const sessionConversationListStartIndex = conversationPageSource.indexOf("const renderConversationList = () =>");
 const sessionMainChatStartIndex = conversationPageSource.indexOf("const renderMainChatPanel = () =>");
-const sessionMainReturnStartIndex = conversationPageSource.indexOf("<div className=\"session-chat-layout\">", sessionMainChatStartIndex);
+const sessionMainReturnStartIndex = conversationPageSource.indexOf("session-chat-layout", sessionMainChatStartIndex);
 const sessionWorkspaceSource = conversationPageSource.slice(sessionStageTimelineStartIndex, conversationPageSource.indexOf("<Drawer", sessionMainReturnStartIndex));
 const customerStrategyTabStartIndex = conversationPageSource.indexOf("<div className=\"sales-strategy-panel\">");
 const customerStrategyTabEndIndex = conversationPageSource.indexOf('key: "lifecycle"', customerStrategyTabStartIndex);
 const customerStrategyTabSource = conversationPageSource.slice(customerStrategyTabStartIndex, customerStrategyTabEndIndex);
+const customerCourseTabStartIndex = conversationPageSource.indexOf('key: "course"');
+const customerCourseTabEndIndex = conversationPageSource.indexOf('key: "strategy"', customerCourseTabStartIndex);
+const customerCourseTabSource = conversationPageSource.slice(customerCourseTabStartIndex, customerCourseTabEndIndex);
 const contentMapStartIndex = source.indexOf("const content = useMemo(() => ({");
 const contentMapEndIndex = source.indexOf("  })[route]", contentMapStartIndex);
 const contentMapSource = source.slice(contentMapStartIndex, contentMapEndIndex);
 const dataDictionaryPageStartIndex = dataDictionarySource.indexOf("function DataDictionaryPage");
 const dataDictionaryPageSource = dataDictionarySource;
+const personalDescriptionModalStartIndex = wecomAccountPageSource.indexOf('title="个性化描述"');
+const personalDescriptionModalSource = personalDescriptionModalStartIndex >= 0
+  ? wecomAccountPageSource.slice(personalDescriptionModalStartIndex)
+  : "";
 
 assert.ok(effectiveIndex >= 0, "智能体编排应包含生效条件配置");
 assert.ok(scheduleIndex > effectiveIndex, "策略任务配置应展示在生效条件配置下方");
+expectedCourseStages.forEach((stageName) => {
+  assert.ok(conversationDataSource.includes(`"${stageName}"`), `会话阶段名称应包含图3课程阶段：${stageName}`);
+});
+["了解阶段", "定义用户", "提升认知", "催单阶段", "完单阶段"].forEach((stageName) => {
+  assert.ok(!conversationDataSource.includes(`title: "${stageName}"`), `生命周期客户分布不应再使用旧阶段：${stageName}`);
+  assert.ok(!conversationDataSource.includes(`lifecycle: "${stageName}"`), `会话筛选阶段不应再使用旧阶段：${stageName}`);
+});
+assert.ok(dashboardPageSource.includes("互动屏次分布"), "工作台右下角图表应改为互动屏次分布");
+assert.ok(dashboardPageSource.includes("统计用户发出信息条数对应的人数分布。"), "互动屏次分布应说明按用户发出信息条数统计");
+expectedInteractionBuckets.forEach((bucketName) => {
+  assert.ok(dashboardPageSource.includes(`"${bucketName}"`), `互动屏次分布横轴缺少分桶：${bucketName}`);
+});
+[
+  "selectedInteractionBucket",
+  "openInteractionBucket",
+  "interactionUserColumns",
+  "interactionUserRows",
+  "回复条数",
+  "最近回复内容",
+  "最近回复时间",
+  "onRow",
+  "openInteractionCustomerChat"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `互动屏次分布缺少点击下钻能力：${token}`);
+});
+["回复平均间隔分布", "统计AI托管会话的平均回复间隔。", "30秒内", "30-60秒", "1-5分钟", "5小时以上"].forEach((token) => {
+  assert.ok(!dashboardPageSource.includes(token), `工作台右下角图表不应再展示回复间隔文案：${token}`);
+});
+[
+  "托管企微数",
+  "托管用户数",
+  "当前AI接待中",
+  "需人工介入",
+  "超时未处理",
+  "AI参与订单金额",
+  "转化订单数"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台顶部核心指标缺少新口径：${token}`);
+});
+["托管微信数", "总客户数", "正在聊天客户", "AI参与订单数"].forEach((token) => {
+  assert.ok(!dashboardPageSource.includes(token), `工作台顶部核心指标不应再使用旧口径：${token}`);
+});
+[
+  "Tooltip",
+  "QuestionCircleOutlined",
+  "紧急：10分钟，投诉/负面/要求真人",
+  "高：30分钟，高意向、报名付款",
+  "中：1小时，价格异议、效果顾虑",
+  "低：24小时，沉默唤醒、普通跟进"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `超时未处理指标缺少 SLA 悬浮说明：${token}`);
+});
+[
+  "人工介入队列",
+  "Segmented",
+  "interventionQueueFilter",
+  "interventionQueueFilterOptions",
+  "getInterventionQueueFilterCount",
+  "filteredInterventionRows",
+  "matchInterventionQueueFilter",
+  "用户",
+  "所属企微",
+  "期次",
+  "当前阶段",
+  "介入原因",
+  "意向",
+  "等待时长",
+  "负责人",
+  "继续AI托管",
+  "managedWecomAccounts",
+  "interventionQueueRows",
+  "handleContinueAiHosting"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台人工介入队列缺少字段或操作：${token}`);
+});
+[
+  "全部",
+  "高意向",
+  "超时未处理",
+  "价格异议",
+  "情绪/投诉风险",
+  "报名付款相关",
+  "AI无法判断",
+  "用户要求真人"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(`"${token}"`), `人工介入队列筛选缺少选项：${token}`);
+});
+[
+  "队列筛选",
+  "intervention-filter-label",
+  "intervention-filter-count",
+  ".intervention-queue-filter .ant-segmented-item-selected",
+  ".intervention-filter-count"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token) || styles.includes(token), `人工介入队列筛选样式不够明显：${token}`);
+});
+assert.ok(!dashboardPageSource.includes("人工介入预警"), "工作台第二块应改为人工介入队列，不再使用人工介入预警标题");
+[
+  "dashboardWecomFilter",
+  "dashboardPeriodFilter",
+  "dashboardFilterConversations",
+  "dashboardTrialPeriod"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台每个模块应支持按企微号和期次筛选：${token}`);
+});
+[
+  "dashboard-header-filters",
+  "企微号",
+  "期次",
+  "全部企微",
+  "全部期次"
+].forEach((token) => {
+  assert.ok(source.includes(token), `工作台筛选控件应放在顶部标题栏：${token}`);
+});
+[
+  ".dashboard-header-filters",
+  ".dashboard-filter-item",
+  ".dashboard-filter-label"
+].forEach((token) => {
+  assert.ok(source.includes(token) || styles.includes(token), `工作台顶部筛选条缺少清晰样式：${token}`);
+});
+assert.ok(
+  source.indexOf('className="dashboard-header-filters"') >= 0 &&
+    source.indexOf("!platform ? <Tag") > source.indexOf('className="dashboard-header-filters"'),
+  "工作台筛选条应放在顶部标题栏右侧、账号操作区之前"
+);
+[
+  "体验课期次看板",
+  "trialPeriodRows",
+  "trialPeriodColumns",
+  "selectedTrialPeriod",
+  "openTrialPeriod",
+  "openTrialPeriodCustomerChat",
+  "startTime",
+  "currentStage",
+  "当前阶段",
+  "需人工",
+  "高意向",
+  "沉默",
+  "已转正价课",
+  "转化率"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台体验课期次看板缺少字段或下钻能力：${token}`);
+});
+assert.ok(!dashboardPageSource.includes("stageProgress"), "同一期次用户开课时间和阶段一致，期次看板不应再展示期次内阶段分布");
+assert.ok(!dashboardPageSource.includes("renderTrialStageProgress"), "同一期次只需展示当前阶段，不应渲染多阶段进度条");
+assert.ok(
+  dashboardPageSource.indexOf('title="人工介入队列"') >= 0 &&
+    dashboardPageSource.indexOf('title="体验课期次看板"') > dashboardPageSource.indexOf('title="人工介入队列"') &&
+    dashboardPageSource.indexOf('title="阶段用户分布"') > dashboardPageSource.indexOf('title="体验课期次看板"'),
+  "体验课期次看板应作为第三块，位于人工介入队列下方、阶段用户分布上方"
+);
+[
+  "阶段用户分布",
+  "stageDistributionRows",
+  "stageDistributionColumns",
+  "selectedStageDistribution",
+  "openStageDistribution",
+  "openStageDistributionCustomerChat",
+  "dashboard-analysis-row",
+  "dashboard-analysis-col",
+  "stage-distribution-card",
+  "intention-action-card",
+  "intention-strategy-section-card",
+  "阶段人数",
+  "需人工介入人数",
+  "高意向人数",
+  "阶段用户"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台阶段用户分布缺少字段或下钻能力：${token}`);
+});
+assert.ok(!dashboardPageSource.includes('title: "沉默人数"'), "阶段用户分布表格不应再展示沉默人数列");
+[
+  "阶段漏斗分析",
+  "funnelStageMockStats",
+  "阶段转化率"
+].forEach((token) => {
+  assert.ok(!dashboardPageSource.includes(token), `工作台阶段用户分布不应再保留漏斗口径：${token}`);
+});
+assert.ok(
+  dashboardPageSource.indexOf('title="体验课期次看板"') >= 0 &&
+    dashboardPageSource.indexOf('className="dashboard-analysis-row"') > dashboardPageSource.indexOf('title="体验课期次看板"') &&
+    dashboardPageSource.indexOf('title="意向分布"') > dashboardPageSource.indexOf('title="阶段用户分布"'),
+  "阶段用户分布和意向分布应在体验课期次看板下方左右排列"
+);
+[
+  ".dashboard-analysis-row",
+  ".dashboard-analysis-col",
+  ".dashboard-analysis-col > .ant-card",
+  ".stage-distribution-table .ant-table-cell",
+  ".dashboard-analysis-row .intention-distribution-row",
+  ".dashboard-analysis-row .intention-row-metrics",
+  "white-space: nowrap"
+].forEach((token) => {
+  assert.ok(styles.includes(token), `工作台左右分析模块应独立同高且列表紧凑不折行：${token}`);
+});
+assert.ok(!dashboardPageSource.includes("生命周期客户分布"), "工作台不应再展示生命周期客户分布模块");
+assert.ok(!dashboardPageSource.includes("lifecycleDistribution"), "删除生命周期客户分布后不应保留对应统计变量");
 assert.ok(menuStartIndex >= 0 && menuEndIndex > menuStartIndex, "页面应包含左侧导航配置");
 assert.ok(source.includes('from "./data/conversations"'), "会话 mock 数据应从独立模块导入，避免 App.jsx 持续膨胀");
 assert.ok(!source.includes("const rawConversations = ["), "App.jsx 不应继续内联会话 mock 数据");
@@ -172,6 +392,9 @@ assert.ok(!source.includes("function ToolsPage"), "App.jsx 不应继续内联工
 assert.ok(source.includes('from "./pages/KnowledgePage"'), "知识库管理页面应从独立页面模块导入，降低 App.jsx 单文件成本");
 assert.ok(!source.includes("function KnowledgePage"), "App.jsx 不应继续内联知识库管理页组件");
 assert.ok(source.includes('from "./pages/SalesPage"'), "企微托管页面应从独立页面模块导入，降低 App.jsx 单文件成本");
+assert.ok(source.includes('from "./pages/WecomChannelPage"'), "句子通道页面应从独立页面模块导入");
+assert.ok(source.includes('from "./pages/WecomAccountPage"'), "企微账号列表页面应从独立页面模块导入");
+assert.ok(!source.includes('from "./pages/AiSeatPage"'), "AI席位管理不应再作为独立页面导入，应并入企微账号管理");
 assert.ok(!source.includes("function SalesPage"), "App.jsx 不应继续内联企微托管页组件");
 assert.ok(source.includes('from "./pages/MassMessagePage"'), "用户群发页面应从独立页面模块导入，降低 App.jsx 单文件成本");
 assert.ok(!source.includes("function MassMessagePage"), "App.jsx 不应继续内联用户群发页组件");
@@ -199,6 +422,38 @@ assert.ok(aiAutoTagDrawerStartIndex >= 0 && aiAutoTagRecordModalStartIndex > aiA
 assert.ok(aiAutoTagRecordColumnsStartIndex >= 0 && aiAutoTagVariableColumnsStartIndex > aiAutoTagRecordColumnsStartIndex, "标签库管理页应包含 AI 打标记录列表字段");
 assert.ok(aiAutoTagRecordModalStartIndex >= 0 && aiAutoTagRecordModalEndIndex > aiAutoTagRecordModalStartIndex, "标签库管理页应包含 AI 打标记录弹窗");
 assert.ok(strategyInsightStartIndex >= 0, "页面应包含策略洞察组件");
+assert.ok(strategyInsightDataSource.includes("export const insightRows"), "策略洞察日报数据应抽到共享数据模块，供策略洞察和工作台复用");
+assert.ok(strategyInsightDataSource.includes("export function buildInsightUserRows"), "策略洞察名单构造逻辑应抽到共享模块，保证工作台保留原交互");
+assert.ok(strategyInsightSource.includes('from "../data/strategyInsights"'), "策略洞察页应复用共享洞察日报数据和名单构造逻辑");
+assert.ok(dashboardPageSource.includes('from "../data/strategyInsights"'), "工作台应复用策略洞察详情中的日报数据");
+assert.ok(
+  dashboardPageSource.indexOf('metricCards.map') >= 0 &&
+    dashboardPageSource.indexOf('title="人工介入队列"') > dashboardPageSource.indexOf('metricCards.map') &&
+    dashboardPageSource.indexOf('title="意向分布"') > dashboardPageSource.indexOf('title="人工介入队列"'),
+  "工作台核心指标下方应优先展示独立整行人工介入队列，再展示意向分布"
+);
+[
+  "意向分布",
+  "intentionDistributionRows",
+  "intention-action-layout",
+  "intention-distribution-panel",
+  "intention-progress-track",
+  "intention-strategy-section-card",
+  "人机协同动作",
+  "AI动作",
+  "人工动作",
+  "当前风险",
+  "转化订单",
+  "生成跟进任务",
+  "加入群发人群",
+  "openInsightUserList"
+].forEach((token) => {
+  assert.ok(dashboardPageSource.includes(token), `工作台意向分布和人机协同动作缺少运营决策能力：${token}`);
+});
+["人群整体结论", "人群分层"].forEach((token) => {
+  assert.ok(!dashboardPageSource.includes(token), `工作台不应继续使用报告型洞察结构：${token}`);
+});
+assert.ok(styles.includes(".intention-action-layout"), "工作台意向分布模块应有独立样式控制布局");
 assert.ok(commonTagPickerStartIndex >= 0, "页面应包含通用标签选择弹窗组件");
 assert.ok(conversationPageStartIndex >= 0, "页面应包含会话中心组件");
 assert.ok(sessionFilterPanelStartIndex >= 0 && addComposerItemStartIndex > sessionFilterPanelStartIndex, "会话中心应包含默认筛选区");
@@ -222,6 +477,8 @@ assert.ok(contentMapStartIndex >= 0 && contentMapEndIndex > contentMapStartIndex
   "MassMessagePage",
   "WecomPage",
   "SalesPage",
+  "WecomChannelPage",
+  "WecomAccountPage",
   "HumanizationPage",
   "ConversationsPage",
   "SuggestionsPage",
@@ -249,6 +506,8 @@ assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销
   { key: "dashboard", label: "工作台" },
   { key: "conversations", label: "会话中心" },
   { key: "sales", label: "企微托管" },
+  { key: "wecomChannel", label: "通道配置" },
+  { key: "wecomAccounts", label: "企微账号管理" },
   { key: "agentGroup", label: "智能体" },
   { key: "agentManager", label: "角色管理" },
   { key: "strategy", label: "智能体管理" },
@@ -269,6 +528,51 @@ assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销
   assert.ok(itemSource.includes(`label: "${item.label}"`), `左侧导航名称错误：${item.key}`);
   return currentIndex;
 }, -1);
+
+assert.ok(menuSource.includes('key: "sales"') && menuSource.includes("children"), "企微托管应作为二级菜单父级展示");
+assert.ok(contentMapSource.includes("wecomChannel: <WecomChannelPage"), "通道配置路由应渲染 WecomChannelPage");
+assert.ok(contentMapSource.includes("wecomAccounts: <WecomAccountPage"), "企微账号列表路由应渲染 WecomAccountPage");
+assert.ok(!menuSource.includes('key: "aiSeats"'), "企微托管下不应再展示独立 AI席位管理子菜单");
+assert.ok(!contentMapSource.includes("aiSeats: <AiSeatPage"), "AI席位管理不应再渲染独立页面");
+assert.ok(appDataSource.includes('"wecomChannel"') && appDataSource.includes('"wecomAccounts"'), "平台和企业管理员应拥有企微托管二级菜单权限");
+[
+  "员工 / 企微账号",
+  "所属部门",
+  "账号角色",
+  "智能体",
+  "登录账号",
+  "AI托管",
+  "个性化描述",
+  "批量开通AI",
+  "批量关闭AI"
+].forEach((token) => {
+  assert.ok(wecomAccountPageSource.includes(token), `企微账号管理页缺少账号或席位能力：${token}`);
+});
+assert.ok(wecomAccountPageSource.includes("Switch"), "企微账号管理页应在 AI托管 列内使用开关操作");
+assert.ok(!wecomAccountPageSource.includes("<Tag color={aiSeatView.color}>{aiSeatView.label}</Tag>"), "AI托管列不应再展示已开通/未开通文案标签");
+assert.ok(!wecomAccountPageSource.includes(">开通AI</Button>"), "操作列不应再展示开通AI按钮");
+assert.ok(!wecomAccountPageSource.includes(">关闭AI</Button>"), "操作列不应再展示关闭AI按钮");
+assert.ok(!wecomAccountPageSource.includes('title: "需人工介入"'), "企微账号管理列表不应展示需人工介入列");
+assert.ok(wecomAccountPageSource.includes("compact-admin-table"), "企微账号管理列表应使用紧凑表格样式");
+[
+  "专属信息描述",
+  "handleSavePersonalDescription"
+].forEach((token) => {
+  assert.ok(wecomAccountPageSource.includes(token), `企微账号管理页缺少 AI 配置能力：${token}`);
+});
+assert.ok(!wecomAccountPageSource.includes("AI账号"), "企微账号管理列表不应再使用 AI账号 文案");
+assert.ok(!wecomAccountPageSource.includes("AI设置"), "企微账号管理列表不应再使用 AI设置 文案");
+assert.ok(!personalDescriptionModalSource.includes("选择智能体"), "个性化描述弹窗不应再包含智能体选择");
+assert.ok(!personalDescriptionModalSource.includes("选择账号"), "个性化描述弹窗不应再包含账号选择");
+assert.ok(!wecomAccountPageSource.includes("角色描述"), "企微账号管理列表不应再使用角色描述文案");
+assert.ok(
+  wecomAccountPageSource.indexOf('title: "在线状态"') > wecomAccountPageSource.indexOf('title: "托管客户数"') &&
+    wecomAccountPageSource.indexOf('title: "句子通道"') > wecomAccountPageSource.indexOf('title: "在线状态"'),
+  "在线状态和句子通道应放在列表字段末尾"
+);
+assert.ok(appDataSource.includes("department") && appDataSource.includes("accountRole"), "同步企微账号 mock 数据应包含所属部门和账号角色");
+assert.ok(!wecomAccountPageSource.includes("业务角色"), "企微账号管理列表不应再使用业务角色文案");
+assert.ok(wecomAccountPageSource.includes("全部智能体"), "企微账号管理筛选应使用智能体口径");
 
 [
   "function DataDictionaryPage",
@@ -344,7 +648,7 @@ assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销
   "查看会话",
   "创建跟进任务"
 ].forEach((token) => {
-  assert.ok(strategyInsightSource.includes(token) || styles.includes(token), `策略洞察页面缺少：${token}`);
+  assert.ok(strategyInsightSource.includes(token) || strategyInsightDataSource.includes(token) || styles.includes(token), `策略洞察页面缺少：${token}`);
 });
 
 assert.ok(!strategyInsightSource.includes(">生成日报</Button>"), "策略洞察页按钮应改为 AI生成洞察");
@@ -665,13 +969,28 @@ assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工
   "saveStrategyInsight",
   "sales-strategy-editor",
   "用户对话数据",
-  "用户上课信息",
-  "体验课共 4 节课",
   "用户发送",
   "用户接收",
   "待上课"
 ].forEach((token) => {
   assert.ok(sourceWithData.includes(token) || styles.includes(token), `客户资料缺少新版资料结构：${token}`);
+});
+[
+  "用户上课信息",
+  "体验课共 4 节课",
+  "trialLessons",
+  "trialLessonColumns",
+  "trial-lessons-table"
+].forEach((token) => {
+  assert.ok(customerCourseTabSource.includes(token), `客户详情课程信息 Tab 应展示用户上课信息：${token}`);
+  assert.ok(!customerStrategyTabSource.includes(token), `客户详情销售策略 Tab 不应再展示用户上课信息：${token}`);
+});
+[
+  "当前订单课程概览",
+  "customer-course-summary",
+  "customer-lesson-table"
+].forEach((token) => {
+  assert.ok(!customerCourseTabSource.includes(token), `客户详情课程信息 Tab 不应再展示重复课程概览/课节进度：${token}`);
 });
 assert.ok(!sourceWithData.includes("个性化定时任务"), "会话中心客户资料销售策略tab已删除个性化定时任务");
 [
@@ -781,7 +1100,6 @@ assert.ok(
 
 [
   "customerServiceStages",
-  "当前服务阶段",
   "getCustomerServiceStage",
   "getCourseStageAttendance",
   "formatStageDate",
@@ -836,6 +1154,62 @@ assert.ok(
 ].forEach((token) => {
   assert.ok(styles.includes(token), `会话中心应包含聊天工作台样式：${token}`);
 });
+[
+  "conversationViewMode",
+  "卡片模式",
+  "列表模式",
+  "onConversationViewModeChange",
+  "conversation-view-switch",
+  "AppstoreOutlined",
+  "BarsOutlined"
+].forEach((token) => {
+  assert.ok(source.includes(token) || conversationPageSource.includes(token) || styles.includes(token), `会话中心顶部视图切换缺少：${token}`);
+});
+assert.ok(!sessionFilterPanelSource.includes("conversation-view-switch"), "展示方式切换应放在顶部导航，不应放在会话筛选区");
+[
+  "renderConversationTable",
+  "conversation-table",
+  "客户信息",
+  "最近消息",
+  "托管状态",
+  "阶段进度",
+  "标签",
+  "操作"
+].forEach((token) => {
+  assert.ok(conversationPageSource.includes(token) || styles.includes(token), `会话中心列表视图缺少：${token}`);
+});
+assert.ok(!conversationPageSource.includes("renderListModeDetailSidebar"), "列表模式不应常驻右侧详情侧栏，应复用客户详情抽屉");
+assert.ok(!styles.includes(".list-detail-sidebar"), "列表模式不应保留常驻右侧详情侧栏样式");
+[
+  "renderCourseStagePopoverContent",
+  "renderStagePopoverContent",
+  "getCourseStageAttendance",
+  "currentStageName",
+  "currentAttendance"
+].forEach((token) => {
+  assert.ok(serviceStageProgressSource.includes(token), `列表模式阶段进度浮层应复用卡片模式详情字段：${token}`);
+});
+[
+  "当前服务阶段",
+  "进入时间",
+  "下一阶段",
+  "预计进入"
+].forEach((token) => {
+  assert.ok(!serviceStageProgressSource.includes(token), `列表模式阶段进度浮层不应使用简化字段：${token}`);
+});
+assert.ok(
+  conversationPageSource.indexOf('key: "chatHistory"') >= 0 &&
+    conversationPageSource.indexOf('key: "chatHistory"') < conversationPageSource.indexOf('key: "profile"'),
+  "列表模式客户详情抽屉应将聊天记录 Tab 放在第一个位置"
+);
+[
+  ".conversation-view-switch",
+  ".conversation-table-wrap",
+  ".conversation-table",
+  ".drawer-chat-history-panel"
+].forEach((token) => {
+  assert.ok(styles.includes(token), `会话中心列表视图缺少样式：${token}`);
+});
 assert.ok(!sessionWorkspaceSource.includes("chat-current-stage-pill"), "会话中心聊天头部不应重复展示当前阶段胶囊");
 assert.ok(!styles.includes(".chat-current-stage-pill"), "会话中心聊天头部不应保留当前阶段胶囊样式");
 [
@@ -871,7 +1245,9 @@ assert.ok(!styles.includes(".chat-current-stage-pill"), "会话中心聊天头�
   assert.ok(!sessionFilterPanelSource.includes(token), `会话中心默认筛选区不应展示筛选标题：${token}`);
 });
 
-assert.ok(!sessionWorkspaceSource.includes('key: "chat"'), "客户详情抽屉不应再包含聊天内容 Tab");
+const customerDrawerSource = conversationPageSource.slice(conversationPageSource.indexOf('title={`${selected.name} · 客户详情`}'));
+assert.ok(!customerDrawerSource.includes('key: "chat"'), "客户详情抽屉不应新增名为聊天的 Tab，应使用聊天记录");
+assert.ok(customerDrawerSource.includes('label: "聊天记录"'), "列表模式客户详情抽屉应新增聊天记录 Tab");
 
 [
   "客户状态",

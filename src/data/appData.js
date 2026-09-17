@@ -953,9 +953,49 @@ export const knowledgeBases = [
   }
 ];
 
+export const aiSalesSeatLicense = {
+  productName: "智能销售 AI 席位",
+  total: 20,
+  expiresAt: "2027-06-30",
+  contractNo: "AIS-2026-XH-001"
+};
+
+const syncedSalesAccountSeeds = [
+  { key: "sale1", name: "沈海龙", role: "销售", department: "销售一部", accountRole: "管理者", phone: "13800008881", wecom: "16888576164354", wecomId: "19", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, aiSeatOpenedAt: "2026-07-01", sendMode: "人工确认", skills: ["19元A类课-课前", "19元A类课-第一课"], customerTotal: 6, hostedCustomers: 6, manualCustomers: 0, sentToday: 18, abnormal: 0, syncedAt: "14:20", dedicatedInfo: "" },
+  { key: "sale2", name: "技术部-测试机-13311384812", role: "销售", department: "技术测试组", accountRole: "普通员工", phone: "13311384812", wecom: "16888581166708", wecomId: "00", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, aiSeatOpenedAt: "2026-07-01", sendMode: "自动发送", skills: ["19元A类课-第四课", "19元A类课-课后"], customerTotal: 2, hostedCustomers: 2, manualCustomers: 0, sentToday: 26, abnormal: 0, syncedAt: "14:18", dedicatedInfo: "" }
+];
+
 export const salesAccounts = [
-  { key: "sale1", name: "沈海龙", role: "销售", phone: "13800008881", wecom: "16888576164354", wecomId: "19", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, sendMode: "人工确认", skills: ["19元A类课-课前", "19元A类课-第一课"], customerTotal: 6, hostedCustomers: 6, manualCustomers: 0, sentToday: 18, abnormal: 0, syncedAt: "14:20", dedicatedInfo: "" },
-  { key: "sale2", name: "技术部-测试机-13311384812", role: "销售", phone: "13311384812", wecom: "16888581166708", wecomId: "00", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, sendMode: "自动发送", skills: ["19元A类课-第四课", "19元A类课-课后"], customerTotal: 2, hostedCustomers: 2, manualCustomers: 0, sentToday: 26, abnormal: 0, syncedAt: "14:18", dedicatedInfo: "" }
+  ...syncedSalesAccountSeeds,
+  ...Array.from({ length: 28 }, (_, index) => {
+    const number = index + 3;
+    const aiSeatEnabled = number <= 10;
+    return {
+      key: `sale${number}`,
+      name: `销售企微${String(number).padStart(2, "0")}`,
+      role: number % 7 === 0 ? "班主任" : number % 5 === 0 ? "市场" : "销售",
+      department: number % 5 === 0 ? "市场部" : number % 3 === 0 ? "销售二部" : "销售一部",
+      accountRole: number % 8 === 0 ? "管理者" : "普通员工",
+      phone: `1380000${String(8800 + number).slice(-4)}`,
+      wecom: `168885${String(700000 + number * 37)}`,
+      wecomId: String(number).padStart(2, "0"),
+      channel: "句子通道已连接",
+      online: number % 6 !== 0,
+      assignedUser: "",
+      hosted: aiSeatEnabled,
+      aiSeatEnabled,
+      aiSeatOpenedAt: aiSeatEnabled ? "2026-07-01" : "",
+      sendMode: number % 2 === 0 ? "人工确认" : "自动发送",
+      skills: [],
+      customerTotal: 2 + (number % 8),
+      hostedCustomers: aiSeatEnabled ? 1 + (number % 5) : 0,
+      manualCustomers: number % 7 === 0 ? 1 : 0,
+      sentToday: aiSeatEnabled ? 8 + number : 0,
+      abnormal: 0,
+      syncedAt: number % 4 === 0 ? "14:18" : "14:20",
+      dedicatedInfo: ""
+    };
+  })
 ];
 
 export const managedWecomAccounts = [
@@ -1386,7 +1426,7 @@ export const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -1406,7 +1446,7 @@ export const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
+    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };

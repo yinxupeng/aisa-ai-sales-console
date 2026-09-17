@@ -10,6 +10,8 @@ import { renderToString } from 'react-dom/server';
 import DashboardPage from './src/pages/DashboardPage.jsx';
 import ConversationsPage from './src/pages/ConversationsPage.jsx';
 import SalesPage from './src/pages/SalesPage.jsx';
+import WecomChannelPage from './src/pages/WecomChannelPage.jsx';
+import WecomAccountPage from './src/pages/WecomAccountPage.jsx';
 import IntelligentAgentPage from './src/pages/IntelligentAgentPage.jsx';
 import StrategyPage from './src/pages/StrategyPage.jsx';
 import StrategyEditor from './src/pages/StrategyEditor.jsx';
@@ -28,7 +30,7 @@ import WecomPage from './src/pages/WecomPage.jsx';
 import SuggestionsPage from './src/pages/SuggestionsPage.jsx';
 import { strategies } from './src/data/appData.js';
 
-globalThis.window = { matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {} }) };
+globalThis.window = { location: { search: '' }, matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {} }) };
 
 const pages = [
   ['DashboardPage', React.createElement(DashboardPage, { setRoute: () => {}, conversationsData: [] })],
@@ -46,8 +48,11 @@ const pages = [
   ['MassMessagePage', React.createElement(MassMessagePage)],
   ['WecomPage', React.createElement(WecomPage)],
   ['SalesPage', React.createElement(SalesPage)],
+  ['WecomChannelPage', React.createElement(WecomChannelPage)],
+  ['WecomAccountPage', React.createElement(WecomAccountPage)],
   ['HumanizationPage', React.createElement(HumanizationPage)],
   ['ConversationsPage', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], onActiveWecomChange: () => {} })],
+  ['ConversationsPageListMode', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], conversationViewMode: 'list', onActiveWecomChange: () => {} })],
   ['SuggestionsPage', React.createElement(SuggestionsPage)],
   ['SettingsPage', React.createElement(SettingsPage, { platform: true })]
 ];
@@ -60,7 +65,7 @@ for (const [name, el] of pages) {
     process.exit(1);
   }
 }
-console.log('ALL 19 PAGES RENDERED CLEANLY (0 WHITE SCREEN / 0 REFERENCE ERROR)');
+console.log(\`ALL \${pages.length} PAGE CASES RENDERED CLEANLY (0 WHITE SCREEN / 0 REFERENCE ERROR)\`);
 `;
 
 await build({

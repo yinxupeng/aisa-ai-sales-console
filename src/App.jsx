@@ -10,6 +10,7 @@ import {
   Input,
   Layout,
   Menu,
+  Radio,
   Select,
   Space,
   Tag,
@@ -17,8 +18,11 @@ import {
   Typography
 } from "antd";
 import {
+  AppstoreOutlined,
   BarChartOutlined,
+  BarsOutlined,
   BookOutlined,
+  CloudSyncOutlined,
   CommentOutlined,
   DashboardOutlined,
   FileSearchOutlined,
@@ -54,6 +58,10 @@ import SettingsPage from "./pages/SettingsPage";
 import CustomersPage from "./pages/CustomersPage";
 import CompanyPage from "./pages/CompanyPage";
 import WecomPage from "./pages/WecomPage";
+import WecomChannelPage from "./pages/WecomChannelPage";
+import WecomAccountPage from "./pages/WecomAccountPage";
+import EnterpriseLogin from "./shared/EnterpriseLogin";
+import { selectedEnterpriseId, usePlatformData } from "./shared/platformStore";
 import SuggestionsPage from "./pages/SuggestionsPage";
 
 const { Header, Sider, Content } = Layout;
@@ -62,7 +70,15 @@ const { Paragraph, Title, Text } = Typography;
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
-  { key: "sales", icon: <TeamOutlined />, label: "企微托管" },
+  {
+    key: "sales",
+    icon: <TeamOutlined />,
+    label: "企微托管",
+    children: [
+      { key: "wecomChannel", icon: <CloudSyncOutlined />, label: "通道配置" },
+      { key: "wecomAccounts", icon: <TeamOutlined />, label: "企微账号管理" }
+    ]
+  },
   {
     key: "agentGroup",
     icon: <RobotOutlined />,
@@ -147,7 +163,8 @@ function Login({ onLogin }) {
 }
 
 function AppShell({ user, onLogout }) {
-  const initialRoute = location.hash?.replace("#", "") || "dashboard";
+  const rawInitialRoute = location.hash?.replace("#", "") || "dashboard";
+  const initialRoute = ["sales", "aiSeats"].includes(rawInitialRoute) ? "wecomAccounts" : rawInitialRoute;
   const allowedMenuItems = getAllowedMenuItems(menuItems, user.menuKeys);
   const allowedLeafMenuItems = flattenMenuItems(allowedMenuItems).filter((item) => !item.children);
   const allowedPageTitle = Object.fromEntries(allowedLeafMenuItems.map((item) => [item.key, item.label]));
@@ -159,6 +176,9 @@ function AppShell({ user, onLogout }) {
   const [activeWecom, setActiveWecom] = useState(userWecomAccounts[0]?.key || managedWecomAccounts[0].key);
   const [activeConversationKey, setActiveConversationKey] = useState("");
   const [autoOpenCustomerDrawerToken, setAutoOpenCustomerDrawerToken] = useState(0);
+  const [conversationViewMode, setConversationViewMode] = useState("card");
+  const [dashboardWecomFilter, setDashboardWecomFilter] = useState("all");
+  const [dashboardPeriodFilter, setDashboardPeriodFilter] = useState("all");
   const platform = user.role === "platform_admin";
   const showOrgSwitch = user.role !== "employee";
   const scopedWecomAccounts = userWecomAccounts.filter((item) => activeOrg === "all" || item.department === activeOrg || item.employee === activeOrg);
@@ -169,6 +189,17 @@ function AppShell({ user, onLogout }) {
     { value: "all", label: user.role === "platform_admin" ? "组织架构 / 全部企业员工" : "组织架构 / 本企业员工" },
     ...Array.from(new Set(userWecomAccounts.map((item) => item.department))).map((value) => ({ value, label: `部门 / ${value}` })),
     ...userWecomAccounts.map((item) => ({ value: item.employee, label: `${item.department} / ${item.employee}` }))
+  ];
+  const dashboardWecomOptions = [
+    { value: "all", label: "全部企微" },
+    ...visibleWecomAccounts.map((item) => ({ value: item.key, label: item.label }))
+  ];
+  const dashboardPeriodOptions = [
+    { value: "all", label: "全部期次" },
+    { value: "06月10日 A类体验课第1期", label: "06月10日 A类体验课第1期" },
+    { value: "06月12日 A类体验课第2期", label: "06月12日 A类体验课第2期" },
+    { value: "06月15日 A类体验课第3期", label: "06月15日 A类体验课第3期" },
+    { value: "06月18日 A类体验课第4期", label: "06月18日 A类体验课第4期" }
   ];
 
   useEffect(() => {
@@ -202,7 +233,15 @@ function AppShell({ user, onLogout }) {
   };
 
   const content = useMemo(() => ({
-    dashboard: <DashboardPage setRoute={setRoute} conversationsData={scopedConversations} />,
+    dashboard: (
+      <DashboardPage
+        setRoute={setRoute}
+        onViewConversation={handleViewConversation}
+        conversationsData={scopedConversations}
+        dashboardWecomFilter={dashboardWecomFilter}
+        dashboardPeriodFilter={dashboardPeriodFilter}
+      />
+    ),
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
     agentManager: <IntelligentAgentPage />,
@@ -216,6 +255,8 @@ function AppShell({ user, onLogout }) {
     massMessage: <MassMessagePage />,
     wecom: <WecomPage />,
     sales: <SalesPage />,
+    wecomChannel: <WecomChannelPage />,
+    wecomAccounts: <WecomAccountPage />,
     humanization: <HumanizationPage />,
     conversations: (
       <ConversationsPage
@@ -223,6 +264,8 @@ function AppShell({ user, onLogout }) {
         activeConversationKey={activeConversationKey}
         autoOpenCustomerDrawerToken={autoOpenCustomerDrawerToken}
         visibleWecomKeys={visibleWecomKeys}
+        conversationViewMode={conversationViewMode}
+        onConversationViewModeChange={setConversationViewMode}
         onActiveWecomChange={(key) => {
           setActiveWecom(key);
           setActiveConversationKey("");
@@ -231,7 +274,7 @@ function AppShell({ user, onLogout }) {
     ),
     suggestions: <SuggestionsPage />,
     settings: <SettingsPage platform={platform} />
-  })[route], [route, platform, activeWecom, activeConversationKey, autoOpenCustomerDrawerToken, visibleWecomKeys.join("|")]);
+  })[route], [route, platform, activeWecom, activeConversationKey, autoOpenCustomerDrawerToken, visibleWecomKeys.join("|"), conversationViewMode, dashboardWecomFilter, dashboardPeriodFilter]);
 
   return (
     <Layout className="app-layout">
@@ -240,7 +283,7 @@ function AppShell({ user, onLogout }) {
           <div className="brand-mark"><RobotOutlined /></div>
           {!collapsed ? <Title level={4}>Sabuddy</Title> : null}
         </div>
-        <Menu theme="light" mode="inline" selectedKeys={[route]} defaultOpenKeys={["agentGroup", "userOpsGroup"]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
+        <Menu theme="light" mode="inline" selectedKeys={[route]} defaultOpenKeys={["sales", "agentGroup", "userOpsGroup"]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
         <Tooltip title={collapsed ? "展开导航" : "收起导航"} placement={collapsed ? "right" : "top"}>
           <Button
             className="sider-collapse-button"
@@ -276,6 +319,43 @@ function AppShell({ user, onLogout }) {
             </div>
           </Space>
           <Space className="header-actions" wrap>
+            {route === "dashboard" ? (
+              <div className="dashboard-header-filters">
+                <Space size={8} className="dashboard-filter-item">
+                  <Text className="dashboard-filter-label">企微号</Text>
+                  <Select
+                    size="middle"
+                    value={dashboardWecomFilter}
+                    onChange={setDashboardWecomFilter}
+                    options={dashboardWecomOptions}
+                    popupMatchSelectWidth={false}
+                  />
+                </Space>
+                <Space size={8} className="dashboard-filter-item">
+                  <Text className="dashboard-filter-label">期次</Text>
+                  <Select
+                    size="middle"
+                    value={dashboardPeriodFilter}
+                    onChange={setDashboardPeriodFilter}
+                    options={dashboardPeriodOptions}
+                    popupMatchSelectWidth={false}
+                  />
+                </Space>
+              </div>
+            ) : null}
+            {route === "conversations" ? (
+              <div className="conversation-view-switch">
+                <Text type="secondary">展示方式</Text>
+                <Radio.Group
+                  value={conversationViewMode}
+                  buttonStyle="solid"
+                  onChange={(event) => setConversationViewMode(event.target.value)}
+                >
+                  <Radio.Button value="card"><AppstoreOutlined /> 卡片模式</Radio.Button>
+                  <Radio.Button value="list"><BarsOutlined /> 列表模式</Radio.Button>
+                </Radio.Group>
+              </div>
+            ) : null}
             {!platform ? <Tag color="blue">{user.company}</Tag> : null}
             <Button shape="round" icon={<Avatar size={24}>{user.badge}</Avatar>}>{user.name}</Button>
             <Button onClick={onLogout}>退出</Button>
@@ -298,17 +378,23 @@ function AppShell({ user, onLogout }) {
 }
 
 export default function App() {
-  const storedAccount = localStorage.getItem("sales-ai-auth-account");
+  const platformData = usePlatformData();
+  const scopedEnterprise = new URLSearchParams(location.search).has("enterprise");
+  const enterprise = platformData.enterprises.find((item) => item.id === selectedEnterpriseId());
+  const enterpriseSessionKey = `sabuddy-enterprise-session-${selectedEnterpriseId()}`;
+  const storedAccount = scopedEnterprise ? (sessionStorage.getItem(enterpriseSessionKey) ? "3" : null) : localStorage.getItem("sales-ai-auth-account");
   const [user, setUser] = useState(loginAccounts[storedAccount] || null);
   const handleLogin = (account) => {
     const accountKey = loginAccounts[String(account).trim()] ? String(account).trim() : "1";
     const nextUser = loginAccounts[accountKey];
-    localStorage.setItem("sales-ai-auth-account", accountKey);
+    if (scopedEnterprise) sessionStorage.setItem(enterpriseSessionKey, "active");
+    else localStorage.setItem("sales-ai-auth-account", accountKey);
     localStorage.removeItem("sales-ai-auth-role");
     setUser(nextUser);
   };
   const handleLogout = () => {
-    localStorage.removeItem("sales-ai-auth-account");
+    if (scopedEnterprise) sessionStorage.removeItem(enterpriseSessionKey);
+    else localStorage.removeItem("sales-ai-auth-account");
     localStorage.removeItem("sales-ai-auth-role");
     setUser(null);
   };
@@ -316,7 +402,7 @@ export default function App() {
   return (
     <ConfigProvider theme={{ token: { borderRadius: 8, colorPrimary: "#1b63d9", fontFamily: 'Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif' } }}>
       <AntApp>
-        {user ? <AppShell user={user} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />}
+        {scopedEnterprise && !enterprise ? <div style={{padding:48}}><Title level={3}>企业不存在</Title><a href="./portal.html">返回演示入口</a></div> : user ? <AppShell user={scopedEnterprise ? {...loginAccounts["3"], company:enterprise.name, name:enterprise.adminName} : user} onLogout={handleLogout} /> : scopedEnterprise ? <EnterpriseLogin company={enterprise} onLogin={()=>handleLogin("3")} /> : <Login onLogin={handleLogin} />}
       </AntApp>
     </ConfigProvider>
   );
