@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   App as AntApp,
+  Avatar,
   Badge,
   Button,
   Card,
@@ -9,6 +10,7 @@ import {
   Input,
   InputNumber,
   Modal,
+  Pagination,
   Row,
   Select,
   Space,
@@ -21,7 +23,8 @@ import {
 import {
   ArrowLeftOutlined,
   CheckCircleOutlined,
-  PlusOutlined
+  PlusOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import {
   agents,
@@ -38,6 +41,7 @@ import {
   getKnowledgeBaseKeysFromResources
 } from "../components/KnowledgeResourcePickerModal";
 import { PanelTitle } from "../components/PageChrome";
+import { ROLE_CATALOG_DATA, filterRoles, getRolePage, industryOptions, rolePageSize } from "../data/roleCatalog";
 
 
 const { Text, Title } = Typography;
@@ -79,11 +83,13 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
     taskEffectiveAmount: index + 1,
     taskEffectiveUnit: "分钟"
   });
-  const buildInitialRows = () => agents.map((item, index) => ({
+  const buildInitialRows = () => [...agents.map((item, index) => ({
     key: `ia-${item.key}`,
     name: `${item.name}智能体`,
     roleName: item.name,
     positioning: item.type,
+    industry: "教育培训",
+    avatar: `assets/role-avatars/role-${index + 16}.png`,
     description: item.roleDescription,
     humanizationStrategy: "",
     knowledgeBaseKeys: knowledgeBases.slice(0, Math.min(3, index + 2)).map((base) => base.key),
@@ -102,15 +108,51 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
       skills: [getDefaultStageSkill(stageIndex)].filter(Boolean),
       enabled: true
     }))
-  }));
+  })), ...ROLE_CATALOG_DATA.map((item, index) => ({
+    key: `ia-${item.key}`,
+    name: `${item.name}智能体`,
+    roleName: item.name,
+    positioning: item.type,
+    industry: item.industry,
+    avatar: item.avatar,
+    description: item.roleDescription,
+    humanizationStrategy: "",
+    knowledgeBaseKeys: knowledgeBases.slice(0, (index % 3) + 1).map((base) => base.key),
+    agentScheduleRules: [createAgentScheduleRule(0), createAgentScheduleRule(1)],
+    boundWecomKeys: managedWecomAccounts.slice(0, index % 3).map((account) => account.key),
+    enabled: item.status === "启用",
+    version: "v1",
+    modelConfig: createDefaultModelConfig(),
+    prompt: createDefaultPrompt(item),
+    toolKeys: agentTools.filter((tool) => tool.enabled).slice(0, 2).map((tool) => tool.key),
+    stages: lifecycleStages.slice(0, 3 + (index % 3)).map((stage, stageIndex) => ({
+      key: `ia-${item.key}-stage-${stageIndex + 1}`,
+      name: stage.title,
+      order: stageIndex + 1,
+      description: stage.desc,
+      skills: [getDefaultStageSkill(stageIndex)].filter(Boolean),
+      enabled: true
+    }))
+  }))];
   const [rows, setRows] = useState(buildInitialRows);
   const [editingAgent, setEditingAgent] = useState(null);
   const [configAgent, setConfigAgent] = useState(null);
   const [editingStage, setEditingStage] = useState(null);
   const [collapsedStageKeys, setCollapsedStageKeys] = useState([]);
+  const [industryFilter, setIndustryFilter] = useState("全部行业");
+  const [keyword, setKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const skillOptions = strategies.map((item) => ({ value: item.name, label: item.name }));
   const roleOptions = agents.map((item) => ({ value: item.name, label: `${item.name}（${item.type}）` }));
   const currentConfigAgent = configAgent ? rows.find((item) => item.key === configAgent.key) || configAgent : null;
+  const filteredRows = useMemo(() => filterRoles(rows, industryFilter, keyword), [rows, industryFilter, keyword]);
+  const pagedRows = useMemo(() => getRolePage(filteredRows, currentPage), [filteredRows, currentPage]);
+
+  useEffect(() => setCurrentPage(1), [industryFilter, keyword]);
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredRows.length / rolePageSize));
+    if (currentPage > maxPage) setCurrentPage(maxPage);
+  }, [currentPage, filteredRows.length]);
 
   const syncRow = (agentKey, updater) => {
     setRows((items) => items.map((item) => item.key === agentKey ? updater(item) : item));
@@ -123,6 +165,8 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
       ...values,
       roleName: editingAgent?.roleName || role?.name || values.name || "自定义",
       positioning: values.positioning || role?.type || "-",
+      industry: values.industry || editingAgent?.industry || role?.industry || "教育培训",
+      avatar: editingAgent?.avatar || "assets/role-avatars/role-1.png",
       description: values.description || role?.roleDescription || "",
       enabled: editingAgent?.enabled ?? true,
       knowledgeBaseKeys: editingAgent?.knowledgeBaseKeys || knowledgeBases.slice(0, 2).map((base) => base.key),
@@ -258,6 +302,40 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
     }
   ];
 
+  const renderRoleCard = (record) => (
+    <Col xs={24} sm={12} xl={8} xxl={6} key={record.key}>
+      <Card className="role-profile-card" bordered={false}>
+        <div className="role-profile-head">
+          <Avatar className="role-profile-avatar" src={record.avatar} shape="square" size={56}>
+            {(record.roleName || "角").slice(0, 1)}
+          </Avatar>
+          <div className="role-profile-title">
+            <div className="role-profile-name-row">
+              <Typography.Title level={5} ellipsis={{ tooltip: record.roleName }}>{record.roleName}</Typography.Title>
+              <Badge status={record.enabled ? "success" : "default"} text={record.enabled ? "启用" : "停用"} />
+            </div>
+            <Space size={6} wrap>
+              <Tag className="role-industry-tag">{record.industry || "教育培训"}</Tag>
+              <Text type="secondary">{record.positioning}</Text>
+            </Space>
+          </div>
+        </div>
+        <Typography.Paragraph className="role-profile-desc" ellipsis={{ rows: 2, tooltip: record.description }}>
+          {record.description}
+        </Typography.Paragraph>
+        <div className="role-profile-meta">
+          <div><Text type="secondary">服务流程</Text><strong>{record.stages?.length || 0} 个阶段</strong></div>
+          <div><Text type="secondary">已配企微</Text><strong>{record.boundWecomKeys?.length || 0} 个</strong></div>
+        </div>
+        <div className="role-profile-actions">
+          <Button type="link" onClick={() => setEditingAgent(record)}>编辑</Button>
+          <Button type="link" onClick={() => setConfigAgent(record)}>流程配置</Button>
+          <Button type="link" danger onClick={() => Modal.confirm({ title: "删除智能体", content: `确认删除 ${record.name}？`, okText: "删除", okButtonProps: { danger: true }, cancelText: "取消", onOk: () => setRows((items) => items.filter((item) => item.key !== record.key)) })}>删除</Button>
+        </div>
+      </Card>
+    </Col>
+  );
+
   if (currentConfigAgent) {
     const skillTabExtra = <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingStage({ agent: currentConfigAgent, stage: null })}>添加阶段</Button>;
     const roleFlowContent = (
@@ -359,7 +437,40 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
           />
         }
       >
-        <Table className="admin-table intelligent-agent-table role-table" rowKey="key" columns={columns} dataSource={rows} pagination={false} scroll={{ x: 1120 }} />
+        <div className="role-filterbar">
+          <Select
+            className="role-industry-filter"
+            value={industryFilter}
+            options={industryOptions.map((value) => ({ value, label: value }))}
+            onChange={setIndustryFilter}
+          />
+          <Input
+            className="role-keyword-search"
+            allowClear
+            prefix={<SearchOutlined />}
+            placeholder="搜索角色名称、定位或说明"
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+          />
+          <Text type="secondary" className="role-result-count">共 {filteredRows.length} 个角色</Text>
+        </div>
+        {pagedRows.length ? (
+          <Row className="role-grid" gutter={[18, 18]}>
+            {pagedRows.map(renderRoleCard)}
+          </Row>
+        ) : (
+          <div className="role-empty-state">没有匹配的角色，换个行业或关键词试试。</div>
+        )}
+        <div className="role-pagination-wrap">
+          <Pagination
+            current={currentPage}
+            pageSize={rolePageSize}
+            total={filteredRows.length}
+            showSizeChanger={false}
+            showTotal={(total, range) => `${range[0]}-${range[1]} / 共 ${total} 个`}
+            onChange={setCurrentPage}
+          />
+        </div>
       </Card>
       <IntelligentAgentModal agent={editingAgent} onClose={() => setEditingAgent(null)} onSave={saveAgent} />
     </Space>
@@ -374,6 +485,7 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
       form.setFieldsValue({
         name: agent.name?.replace(/智能体$/, "") || "",
         positioning: agent.positioning || "",
+        industry: agent.industry || "教育培训",
         description: agent.description || "",
         humanizationStrategy: agent.humanizationStrategy
       });
@@ -393,6 +505,9 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
       <Form form={form} className="intelligent-agent-edit-form" layout="vertical" onFinish={onSave}>
         <Form.Item label="智能体名称" name="name" rules={[{ required: true, message: "请输入智能体名称" }]}>
           <Input placeholder="请输入智能体名称" />
+        </Form.Item>
+        <Form.Item label="行业分类" name="industry" rules={[{ required: true, message: "请选择行业分类" }]}>
+          <Select options={industryOptions.filter((value) => value !== "全部行业").map((value) => ({ value, label: value }))} placeholder="请选择行业分类" />
         </Form.Item>
         <Form.Item label="定位" name="positioning" tooltip="说明智能体承担的业务定位与沟通边界" rules={[{ required: true, message: "请输入定位" }]}>
           <Input placeholder="请输入智能体定位，例如：线索获取" />

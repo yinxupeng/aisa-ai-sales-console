@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
   Card,
   Col,
-  Divider,
   Form,
   Input,
   Modal,
+  Pagination,
   Row,
   Select,
   Space,
   Switch,
   Table,
+  Tag,
   Typography
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { agentTools } from "../data/appData";
+import { INDUSTRY_TOOL_DATA, capabilityIndustryOptions, capabilityPageSize, filterCapabilities, getCapabilityPage } from "../data/industryCapabilityData";
 import { PanelTitle } from "../components/PageChrome";
 
 
@@ -24,10 +26,15 @@ const { Text, Title } = Typography;
 
 function ToolsPage() {
   const [form] = Form.useForm();
-  const [toolRows, setToolRows] = useState(agentTools);
+  const [toolRows, setToolRows] = useState(() => [
+    ...agentTools.map((item) => ({ ...item, industry: "教育培训" })),
+    ...INDUSTRY_TOOL_DATA
+  ]);
   const [editingTool, setEditingTool] = useState(null);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("全部状态");
+  const [industry, setIndustry] = useState("全部行业");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (editingTool) {
@@ -36,12 +43,16 @@ function ToolsPage() {
     }
   }, [editingTool, form]);
 
-  const filteredRows = toolRows.filter((item) => {
-    const keywordText = keyword.trim().toLowerCase();
-    const matchesKeyword = !keywordText || [item.name, item.description, item.prompt].some((value) => String(value).toLowerCase().includes(keywordText));
+  const filteredRows = useMemo(() => filterCapabilities(toolRows, industry, keyword).filter((item) => {
     const matchesStatus = status === "全部状态" || (status === "启用" ? item.enabled : !item.enabled);
-    return matchesKeyword && matchesStatus;
-  });
+    return matchesStatus;
+  }), [toolRows, industry, keyword, status]);
+  const pagedRows = useMemo(() => getCapabilityPage(filteredRows, currentPage), [filteredRows, currentPage]);
+  useEffect(() => setCurrentPage(1), [industry, keyword, status]);
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredRows.length / capabilityPageSize));
+    if (currentPage > maxPage) setCurrentPage(maxPage);
+  }, [currentPage, filteredRows.length]);
 
   const openCreateModal = () => {
     setEditingTool({
@@ -50,6 +61,7 @@ function ToolsPage() {
       name: "",
       description: "",
       prompt: "",
+      industry: "教育培训",
       enabled: true,
       updatedAt: new Date().toISOString().slice(0, 19)
     });
@@ -76,6 +88,7 @@ function ToolsPage() {
   const columns = [
     { title: "ID", dataIndex: "id", width: 90 },
     { title: "工具名称", dataIndex: "name", width: 220 },
+    { title: "行业", dataIndex: "industry", width: 110, render: (value) => <Tag color="cyan">{value || "教育培训"}</Tag> },
     { title: "描述", dataIndex: "description", ellipsis: true },
     {
       title: "启用",
@@ -117,7 +130,12 @@ function ToolsPage() {
           <Row gutter={[24, 16]} align="middle" className="tool-filter-row">
             <Col xs={24} md={10} xl={6}>
               <Form.Item label="关键词" className="filter-form-item">
-                <Input placeholder="请输入" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+                <Input prefix={<SearchOutlined />} placeholder="请输入" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={10} xl={6}>
+              <Form.Item label="行业" className="filter-form-item">
+                <Select value={industry} onChange={setIndustry} options={capabilityIndustryOptions.map((value) => ({ value, label: value === "全部行业" ? "请选择" : value }))} />
               </Form.Item>
             </Col>
             <Col xs={24} md={10} xl={6}>
@@ -125,11 +143,10 @@ function ToolsPage() {
                 <Select value={status} onChange={setStatus} options={["全部状态", "启用", "停用"].map((value) => ({ value, label: value === "全部状态" ? "请选择" : value }))} />
               </Form.Item>
             </Col>
-            <Col xs={24} xl={12} className="tool-filter-actions">
-              <Divider type="vertical" className="tool-filter-divider" />
+            <Col xs={24} xl={6} className="tool-filter-actions">
               <Space>
                 <Button type="primary">查询</Button>
-                <Button onClick={() => { setKeyword(""); setStatus("全部状态"); }}>重置</Button>
+                <Button onClick={() => { setKeyword(""); setIndustry("全部行业"); setStatus("全部状态"); }}>重置</Button>
               </Space>
             </Col>
           </Row>
@@ -139,10 +156,11 @@ function ToolsPage() {
             className="admin-table tool-table"
             rowKey="key"
             columns={columns}
-            dataSource={filteredRows}
-            pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
-            scroll={{ x: 1160 }}
+            dataSource={pagedRows}
+            pagination={false}
+            scroll={{ x: 1270 }}
           />
+          <div className="strategy-pagination-wrap"><Pagination current={currentPage} pageSize={capabilityPageSize} total={filteredRows.length} showSizeChanger={false} showTotal={(total, range) => `${range[0]}-${range[1]} / 共 ${total} 个`} onChange={setCurrentPage} /></div>
         </Card>
       </Space>
       <Modal
@@ -157,6 +175,9 @@ function ToolsPage() {
         <Form form={form} layout="horizontal" labelCol={{ xs: 24, sm: 4 }} wrapperCol={{ xs: 24, sm: 20 }} onFinish={handleSave}>
           <Form.Item label="工具名称" name="name" rules={[{ required: true, message: "请输入工具名称" }]}>
             <Input placeholder="请输入工具名称" />
+          </Form.Item>
+          <Form.Item label="行业分类" name="industry" rules={[{ required: true, message: "请选择行业分类" }]}>
+            <Select options={capabilityIndustryOptions.filter((value) => value !== "全部行业").map((value) => ({ value }))} />
           </Form.Item>
           <Form.Item label="工具描述" name="description" rules={[{ required: true, message: "请输入工具描述" }]}>
             <Input.TextArea rows={3} placeholder="请输入工具描述" />

@@ -700,7 +700,7 @@ body {
 }
 
 .tool-filter-row {
-  min-height: 78px;
+  min-height: 64px;
 }
 
 .filter-form-item {
@@ -715,9 +715,7 @@ body {
 }
 
 .tool-filter-divider {
-  height: 54px;
-  margin-right: 28px;
-  border-inline-start-color: #d8dee9;
+  display: none;
 }
 
 .tool-table .ant-table-tbody > tr > td {
@@ -877,6 +875,256 @@ body {
 
 .role-list-card .ant-card-body {
   padding: 0 28px 26px;
+}
+
+.role-filterbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 22px;
+}
+
+.role-industry-filter {
+  width: 156px;
+}
+
+.role-keyword-search {
+  width: min(320px, 100%);
+}
+
+.role-result-count {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.role-grid {
+  margin-inline: 0 !important;
+}
+
+.role-profile-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  box-shadow: 0 8px 24px rgba(34, 64, 112, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.role-profile-card:hover {
+  border-color: #cbdcff;
+  box-shadow: 0 14px 30px rgba(48, 102, 214, 0.13);
+  transform: translateY(-2px);
+}
+
+.role-profile-card .ant-card-body {
+  display: flex;
+  min-height: 250px;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.role-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.role-profile-avatar {
+  flex: 0 0 auto;
+  border: 1px solid #e4ebf8;
+  box-shadow: 0 5px 12px rgba(42, 75, 130, 0.1);
+}
+
+.role-profile-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.role-profile-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.role-profile-name-row .ant-typography {
+  min-width: 0;
+  margin: 0;
+  color: #1e2a41;
+  font-size: 16px;
+}
+
+.role-profile-name-row .ant-badge-status-text {
+  color: #8490a3;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.role-industry-tag.ant-tag {
+  margin-inline-end: 0;
+  border: 0;
+  border-radius: 5px;
+  background: #edf3ff;
+  color: #3d70ce;
+  font-size: 11px;
+  line-height: 22px;
+}
+
+.role-profile-desc.ant-typography {
+  min-height: 44px;
+  margin: 20px 0 16px;
+  color: #69778e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.role-profile-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 13px 0;
+  border-top: 1px solid #edf1f6;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.role-profile-meta div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-profile-meta div + div {
+  padding-left: 12px;
+  border-left: 1px solid #edf1f6;
+}
+
+.role-profile-meta .ant-typography {
+  font-size: 11px;
+}
+
+.role-profile-meta strong {
+  color: #33415b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.role-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 13px;
+}
+
+.role-profile-actions .ant-btn-link {
+  padding: 0 4px;
+  font-size: 12px;
+}
+
+.role-pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 24px;
+}
+
+.role-empty-state {
+  padding: 72px 0;
+  color: #8c98aa;
+  text-align: center;
+}
+
+.strategy-pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 22px;
+}
+
+.strategy-filter-toolbar > .ant-typography {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.knowledge-filterbar,
+.humanization-filterbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px 18px;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.knowledge-filterbar .ant-select,
+.humanization-filterbar .ant-select {
+  width: 170px;
+}
+
+.knowledge-filterbar .ant-input,
+.humanization-filterbar .ant-input {
+  width: min(320px, 100%);
+}
+
+.knowledge-filterbar .ant-typography,
+.humanization-filterbar .ant-typography {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.humanization-filterbar {
+  padding: 0 0 18px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 680px) {
+  .knowledge-filterbar,
+  .humanization-filterbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding-inline: 0;
+  }
+
+  .knowledge-filterbar .ant-select,
+  .humanization-filterbar .ant-select,
+  .knowledge-filterbar .ant-input,
+  .humanization-filterbar .ant-input {
+    width: 100%;
+  }
+
+  .knowledge-filterbar .ant-typography,
+  .humanization-filterbar .ant-typography {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .strategy-pagination-wrap {
+    justify-content: center;
+  }
+
+  .strategy-filter-toolbar > .ant-typography {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .role-filterbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .role-industry-filter,
+  .role-keyword-search {
+    width: 100%;
+  }
+
+  .role-result-count {
+    margin-left: 0;
+  }
+
+  .role-pagination-wrap {
+    justify-content: center;
+  }
 }
 
 .role-table .ant-table {

@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Button, Card, Form, Input, InputNumber, Modal, Slider, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, { useState, useMemo, useEffect } from "react";
+import { Button, Card, Form, Input, InputNumber, Modal, Pagination, Select, Slider, Space, Switch, Table, Tag, Tooltip, Typography } from "antd";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { PanelTitle, statusTag } from "../components/PageChrome";
+import { INDUSTRY_HUMANIZATION_DATA } from "../data/knowledgeHumanizationData";
+import { capabilityIndustryOptions, capabilityPageSize, getCapabilityPage } from "../data/industryCapabilityData";
 
 
 const { Text, Title } = Typography;
@@ -12,7 +14,7 @@ function HumanizationPage() {
   const [form] = Form.useForm();
   const [editing, setEditing] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [humanizationRows, setHumanizationRows] = useState([
+  const [humanizationRows, setHumanizationRows] = useState(() => [...[
     {
       key: "h1",
       title: "测试风格",
@@ -35,13 +37,28 @@ function HumanizationPage() {
       prompt: "1. 像真人微信私聊，大白话，短句为主。 2. 默认短回复，控制在 30-50 字。 3. 用户问一个问题先回答一个点，不要一次性堆太多信息。",
       agentRoleId: "sales"
     }
-  ]);
+  ].map((item) => ({ ...item, industry: "教育培训" })), ...INDUSTRY_HUMANIZATION_DATA]);
+  const [industryFilter, setIndustryFilter] = useState("全部行业");
+  const [keyword, setKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const filteredRows = useMemo(() => humanizationRows.filter((row) => {
+    const matchesIndustry = industryFilter === "全部行业" || row.industry === industryFilter;
+    const searchable = `${row.title} ${row.prompt} ${row.industry || ""}`.toLowerCase();
+    return matchesIndustry && (!keyword.trim() || searchable.includes(keyword.trim().toLowerCase()));
+  }), [humanizationRows, industryFilter, keyword]);
+  const pagedRows = useMemo(() => getCapabilityPage(filteredRows, currentPage), [filteredRows, currentPage]);
+  useEffect(() => setCurrentPage(1), [industryFilter, keyword]);
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredRows.length / capabilityPageSize));
+    if (currentPage > maxPage) setCurrentPage(maxPage);
+  }, [currentPage, filteredRows.length]);
   const waitFirst = Form.useWatch("waitFirst", form);
   const waitSecond = Form.useWatch("waitSecond", form);
   const waitThird = Form.useWatch("waitThird", form);
 
   const getModalValues = (record) => ({
     title: record?.title || "",
+    industry: record?.industry || "教育培训",
     prompt: record?.prompt || "",
     waitFirst: record?.antiGrabWaits?.[0] ?? 3,
     waitSecond: record?.antiGrabWaits?.[1] ?? 1,
@@ -63,6 +80,7 @@ function HumanizationPage() {
     const nextRow = {
       key: editing?.key || `h-${Date.now()}`,
       title: values.title,
+      industry: values.industry || "教育培训",
       enabled: values.enabled,
       antiGrabWaits: [values.waitFirst, values.waitSecond, values.waitThird],
       splitEnabled: values.splitEnabled,
@@ -83,6 +101,7 @@ function HumanizationPage() {
 
   const columns = [
     { title: "标题", dataIndex: "title", width: 160, render: (value) => <Text>{value}</Text> },
+    { title: "行业", dataIndex: "industry", width: 110, render: (value) => <Tag color="cyan">{value || "教育培训"}</Tag> },
     { title: "启用", dataIndex: "enabled", width: 96, render: statusTag },
     { title: "防抢答", dataIndex: "antiGrabWaits", width: 130, render: (value) => <Text>{`[${value.join(",")}]`}</Text> },
     { title: "拆分长回复", dataIndex: "splitEnabled", width: 150, render: (value) => statusTag(value) },
@@ -136,14 +155,20 @@ function HumanizationPage() {
           />
         )}
       >
+        <div className="humanization-filterbar">
+          <Select value={industryFilter} options={capabilityIndustryOptions.map((value) => ({ value }))} onChange={setIndustryFilter} />
+          <Input prefix={<SearchOutlined />} placeholder="搜索配置名称或提示词" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+          <Text type="secondary">共 {filteredRows.length} 条配置</Text>
+        </div>
         <Table
           className="admin-table humanization-table"
           rowKey="key"
           columns={columns}
-          dataSource={humanizationRows}
+          dataSource={pagedRows}
           pagination={false}
-          scroll={{ x: 980 }}
+          scroll={{ x: 1090 }}
         />
+        <div className="strategy-pagination-wrap"><Pagination current={currentPage} pageSize={capabilityPageSize} total={filteredRows.length} showSizeChanger={false} showTotal={(total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`} onChange={setCurrentPage} /></div>
       </Card>
 
       <Modal
@@ -163,6 +188,9 @@ function HumanizationPage() {
         <Form form={form} className="humanization-form" layout="horizontal" labelCol={{ span: 5 }} wrapperCol={{ span: 18 }} requiredMark={false} colon={false}>
           <Form.Item label="标题" name="title" rules={[{ required: true, message: "请输入标题" }]}>
             <Input placeholder="例如：销售风格" />
+          </Form.Item>
+          <Form.Item label="行业分类" name="industry">
+            <Select options={capabilityIndustryOptions.filter((value) => value !== "全部行业").map((value) => ({ value }))} />
           </Form.Item>
           <Form.Item label="提示词" name="prompt" rules={[{ required: true, message: "请输入提示词" }]}>
             <Input.TextArea className="humanization-prompt-input" rows={7} placeholder="请输入 AI 回复风格、语气、短句规则和禁用表达" />

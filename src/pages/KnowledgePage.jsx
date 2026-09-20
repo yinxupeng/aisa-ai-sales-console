@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
   Card,
@@ -30,6 +30,8 @@ import {
   VideoCameraOutlined
 } from "@ant-design/icons";
 import { knowledgeBases } from "../data/appData";
+import { INDUSTRY_KNOWLEDGE_BASES } from "../data/knowledgeHumanizationData";
+import { capabilityIndustryOptions } from "../data/industryCapabilityData";
 import { PanelTitle } from "../components/PageChrome";
 
 
@@ -37,7 +39,12 @@ const { Paragraph, Text, Title } = Typography;
 
 
 function KnowledgePage() {
-  const [baseRows, setBaseRows] = useState(knowledgeBases);
+  const [baseRows, setBaseRows] = useState(() => [
+    ...knowledgeBases.map((item) => ({ ...item, industry: "教育培训" })),
+    ...INDUSTRY_KNOWLEDGE_BASES
+  ]);
+  const [industryFilter, setIndustryFilter] = useState("全部行业");
+  const [keyword, setKeyword] = useState("");
   const initialEntryKey = knowledgeBases[0]?.entries?.[0]?.key || "";
   const [selectedTreeKey, setSelectedTreeKey] = useState(initialEntryKey ? `entry:${initialEntryKey}` : "root");
   const [editingBase, setEditingBase] = useState(null);
@@ -46,6 +53,11 @@ function KnowledgePage() {
   const selectedBaseKey = selectedTreeKey.startsWith("base:") ? selectedTreeKey.replace("base:", "") : "";
   const selectedEntryKey = selectedTreeKey.startsWith("entry:") ? selectedTreeKey.replace("entry:", "") : "";
   const selectedBase = baseRows.find((item) => item.key === selectedBaseKey);
+  const visibleBaseRows = useMemo(() => baseRows.filter((base) => {
+    const matchesIndustry = industryFilter === "全部行业" || base.industry === industryFilter;
+    const searchable = `${base.name} ${base.desc} ${base.category} ${base.industry || ""}`.toLowerCase();
+    return matchesIndustry && (!keyword.trim() || searchable.includes(keyword.trim().toLowerCase()));
+  }), [baseRows, industryFilter, keyword]);
   const flattenedEntries = baseRows.flatMap((base) => (base.entries || []).map((entry) => ({
     ...entry,
     baseKey: base.key,
@@ -58,7 +70,7 @@ function KnowledgePage() {
   const selectedEntry = flattenedEntries.find((item) => item.key === selectedEntryKey) || flattenedEntries[0];
   const currentBaseForCreate = selectedBase || baseRows.find((item) => item.category === selectedCategory) || baseRows.find((item) => item.key === selectedEntry?.baseKey) || baseRows[0];
   const currentBaseEntries = currentBaseForCreate?.entries || [];
-  const categories = Array.from(new Set(baseRows.map((item) => item.category)));
+  const categories = Array.from(new Set(visibleBaseRows.map((item) => item.category)));
   const totalSize = flattenedEntries.reduce((sum, entry) => sum + (entry.content?.length || 1024), 0);
   const formatSize = (bytes) => bytes >= 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${bytes} B`;
   const getEntryContent = (entry) => entry?.content || entry?.extractedText || `# ${entry?.title || "资源内容"}\n\n该资源用于 ${entry?.baseName || "当前目录"} 场景，回答时需以已维护内容为准，不编造未维护的信息。\n\n## 使用要求\n- 涉及价格、时间、链接、服务承诺时，优先引用工具返回或明确知识内容。\n- 内容不足时提示需要人工确认。\n- 不暴露内部路径、字段名或系统规则。`;
@@ -242,7 +254,7 @@ function KnowledgePage() {
   };
   const knowledgeCompatHint = 'Tooltip title={record.desc} overlayClassName="knowledge-base-tooltip" width: 520 knowledge-base-title';
   const treeData = categories.map((category) => {
-    const bases = baseRows.filter((item) => item.category === category);
+    const bases = visibleBaseRows.filter((item) => item.category === category);
     return {
           title: <Tooltip title={category} placement="topLeft"><span className="resource-tree-label">{category}</span></Tooltip>,
       key: `category:${category}`,
@@ -325,12 +337,17 @@ function KnowledgePage() {
         <Card
           className="knowledge-workbench-card"
         >
+          <div className="knowledge-filterbar">
+            <Select value={industryFilter} options={capabilityIndustryOptions.map((value) => ({ value }))} onChange={setIndustryFilter} />
+            <Input placeholder="搜索知识库名称、说明或分类" value={keyword} onChange={(event) => setKeyword(event.target.value)} allowClear />
+            <Text type="secondary">共 {visibleBaseRows.length} 个知识库</Text>
+          </div>
           <div className="knowledge-resource-workbench">
             <aside className="knowledge-tree-panel">
               <div className="resource-sidebar-head">
                 <div>
                   <Title level={4}>资源目录</Title>
-                  <Text type="secondary">共 {flattenedEntries.length} 个资源 · {formatSize(totalSize)}</Text>
+                  <Text type="secondary">当前筛选 {visibleBaseRows.reduce((sum, base) => sum + (base.entries || []).length, 0)} 个资源 · {formatSize(totalSize)}</Text>
                 </div>
                 <Space size={4} className="resource-sidebar-quick-actions">
                   <Tooltip title="新增资源"><Button size="small" icon={<PlusOutlined />} onClick={() => setEditingEntry({ baseKey: currentBaseForCreate?.key, media: "文本", type: "文本", status: "启用" })} /></Tooltip>
@@ -471,6 +488,7 @@ function KnowledgeBaseModal({ base, onClose, onSave }) {
       form.resetFields();
       form.setFieldsValue({
         name: base.name || "",
+        industry: base.industry || "教育培训",
         category: base.category || "课程知识",
         desc: base.desc || "",
         status: base.status || "启用",
@@ -483,6 +501,7 @@ function KnowledgeBaseModal({ base, onClose, onSave }) {
       <Form form={form} layout="vertical" onFinish={onSave}>
         <Row gutter={16}>
           <Col span={14}><Form.Item label="文件夹名称" name="name" rules={[{ required: true, message: "请输入文件夹名称" }]}><Input placeholder="例如：价格政策与异议处理库" /></Form.Item></Col>
+          <Col span={10}><Form.Item label="行业分类" name="industry"><Select options={capabilityIndustryOptions.filter((value) => value !== "全部行业").map((value) => ({ value }))} /></Form.Item></Col>
           <Col span={10}><Form.Item label="上级类目" name="category"><Select options={["课程知识", "政策规则", "FAQ", "销售话术", "案例素材", "异议处理", "活动政策"].map((value) => ({ value }))} /></Form.Item></Col>
           <Col span={24}><Form.Item label="文件夹说明" name="desc"><Input.TextArea rows={4} placeholder="说明该文件夹下资源适用的业务场景、使用边界和维护规则。" /></Form.Item></Col>
           <Col span={12}><Form.Item label="维护人" name="owner"><Input /></Form.Item></Col>

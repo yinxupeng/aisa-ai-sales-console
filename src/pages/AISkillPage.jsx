@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Button,
   Card,
@@ -6,6 +6,7 @@ import {
   Form,
   Input,
   Modal,
+  Pagination,
   Row,
   Select,
   Space,
@@ -20,9 +21,11 @@ import {
   ArrowLeftOutlined,
   CheckCircleOutlined,
   PlusOutlined,
-  ToolOutlined
+  ToolOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import { aiSkills, agentTools } from "../data/appData";
+import { INDUSTRY_SKILL_DATA, capabilityIndustryOptions, capabilityPageSize, filterCapabilities, getCapabilityPage } from "../data/industryCapabilityData";
 import {
   KnowledgeResourcePickerModal,
   buildKnowledgeResourceRows,
@@ -37,7 +40,10 @@ const { Paragraph, Text, Title } = Typography;
 
 
 function AISkillPage() {
-  const [rows, setRows] = useState(aiSkills);
+  const [rows, setRows] = useState(() => [...aiSkills.map((item) => ({ ...item, industry: "教育培训" })), ...INDUSTRY_SKILL_DATA]);
+  const [industryFilter, setIndustryFilter] = useState("全部行业");
+  const [keyword, setKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [configSkill, setConfigSkill] = useState(null);
   const [knowledgePickerOpen, setKnowledgePickerOpen] = useState(false);
   const [knowledgePickerKeys, setKnowledgePickerKeys] = useState([]);
@@ -55,6 +61,13 @@ function AISkillPage() {
     outputType: "结构化档案",
     outputTargets: ["智能体内部"]
   };
+  const filteredRows = useMemo(() => filterCapabilities(rows, industryFilter, keyword), [rows, industryFilter, keyword]);
+  const pagedRows = useMemo(() => getCapabilityPage(filteredRows, currentPage), [filteredRows, currentPage]);
+  useEffect(() => setCurrentPage(1), [industryFilter, keyword]);
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredRows.length / capabilityPageSize));
+    if (currentPage > maxPage) setCurrentPage(maxPage);
+  }, [currentPage, filteredRows.length]);
   const normalizeSkillConfig = (skill) => ({
     ...skillDefaultConfig,
     ...skill,
@@ -65,6 +78,7 @@ function AISkillPage() {
     key: "",
     name: "",
     description: "",
+    industry: "教育培训",
     type: "信息总结",
     scenario: "",
     trigger: "",
@@ -104,6 +118,7 @@ function AISkillPage() {
   const columns = [
     { title: "Skill名称", dataIndex: "name", width: 140 },
     { title: "Skill描述", dataIndex: "description", width: 300, render: (value) => <Paragraph className="ai-skill-description-cell">{value}</Paragraph> },
+    { title: "行业", dataIndex: "industry", width: 100, render: (value) => <Tag color="cyan">{value || "教育培训"}</Tag> },
     { title: "类型", dataIndex: "type", width: 78, render: (value) => <Tag color="blue">{value}</Tag> },
     { title: "已绑定智能体", dataIndex: "boundAgents", width: 150, render: (items = []) => <Space wrap size={[4, 4]}>{items.map((item) => <Tag key={item}>{item}</Tag>)}</Space> },
     { title: "更新时间", dataIndex: "updatedAt", width: 128 },
@@ -248,6 +263,7 @@ function AISkillPage() {
                   >
                     <Row gutter={16}>
                       <Col span={12}><Form.Item label="Skill名称" name="name" rules={[{ required: true, message: "请输入Skill名称" }]}><Input placeholder="例如：定时总结用户基本信息" /></Form.Item></Col>
+                      <Col span={12}><Form.Item label="行业分类" name="industry"><Select options={capabilityIndustryOptions.filter((value) => value !== "全部行业").map((value) => ({ value }))} /></Form.Item></Col>
                       <Col span={12}><Form.Item label="能力类型" name="type"><Select options={skillEditTypeOptions} /></Form.Item></Col>
                       <Col span={12}><Form.Item label="输出类型" name="outputType"><Select options={skillOutputTypeOptions} placeholder="选择 Skill 默认输出类型" /></Form.Item></Col>
                       <Col span={12}><Form.Item label="默认输出去向" name="outputTargets"><Select mode="multiple" options={skillOutputTargetOptions} placeholder="选择默认输出去向" /></Form.Item></Col>
@@ -370,15 +386,18 @@ function AISkillPage() {
       <Card>
         <div className="toolbar compact-card-toolbar">
           <Space wrap>
+            <Select value={industryFilter} options={capabilityIndustryOptions.map((value) => ({ value }))} onChange={setIndustryFilter} />
             <Select defaultValue="全部能力类型" options={skillTypeOptions} />
             <Select defaultValue="全部状态" options={statusOptions} />
-            <Input placeholder="搜索Skill名称或描述" allowClear className="strategy-search-input" />
+            <Input prefix={<SearchOutlined />} placeholder="搜索Skill名称或描述" allowClear className="strategy-search-input" value={keyword} onChange={(event) => setKeyword(event.target.value)} />
             <Button type="primary">搜索</Button>
-            <Button>重置</Button>
+            <Button onClick={() => { setIndustryFilter("全部行业"); setKeyword(""); }}>重置</Button>
+            <Text type="secondary">共 {filteredRows.length} 个 Skill</Text>
           </Space>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setConfigSkill(createDraft())}>新增Skill</Button>
         </div>
-        <Table className="admin-table ai-skill-table" rowKey="key" columns={columns} dataSource={rows} pagination={false} scroll={{ x: 994 }} />
+        <Table className="admin-table ai-skill-table" rowKey="key" columns={columns} dataSource={pagedRows} pagination={false} scroll={{ x: 1094 }} />
+        <div className="strategy-pagination-wrap"><Pagination current={currentPage} pageSize={capabilityPageSize} total={filteredRows.length} showSizeChanger={false} showTotal={(total, range) => `${range[0]}-${range[1]} / 共 ${total} 个`} onChange={setCurrentPage} /></div>
       </Card>
     </Space>
   );
