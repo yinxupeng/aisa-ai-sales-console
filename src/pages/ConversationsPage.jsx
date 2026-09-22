@@ -30,6 +30,7 @@ import {
 } from "antd";
 import {
   AlertOutlined,
+  ArrowLeftOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloudSyncOutlined,
@@ -88,6 +89,7 @@ function ConversationsPage({
   const [sessionKeyword, setSessionKeyword] = useState("");
   const [quickFilter, setQuickFilter] = useState("全部");
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [mobileConversationOpen, setMobileConversationOpen] = useState(Boolean(activeConversationKey));
   const [sessionPage, setSessionPage] = useState(1);
   const [sessionPageSize, setSessionPageSize] = useState(10);
   const [tagPickerState, setTagPickerState] = useState({ open: false, field: "tags", title: "选择客户标签", selected: [], keyword: "", rule: "满足任一" });
@@ -407,7 +409,25 @@ function ConversationsPage({
     const firstConversation = visibleConversations.find((item) => item.accountKey === account.key) || null;
     onActiveWecomChange?.(account.key);
     setSelected(firstConversation);
+    setMobileConversationOpen(false);
   };
+  const renderMobileAccountSwitcher = () => (
+    <div className="mobile-session-account-switcher">
+      <Text strong>企微账号</Text>
+      <Select
+        value={activeWecomAccount?.key}
+        options={wecomAccountRows.map((account) => ({
+          value: account.key,
+          label: `${account.label} · ${account.customerTotal} 个会话`
+        }))}
+        onChange={(value) => {
+          const account = wecomAccountRows.find((item) => item.key === value);
+          if (account) selectWecomAccount(account);
+        }}
+        placeholder="选择企微账号"
+      />
+    </div>
+  );
   const renderWecomAccountList = () => (
     <aside className="wecom-account-list">
       <div className="wecom-account-list-head">
@@ -970,7 +990,10 @@ function ConversationsPage({
           return (
             <List.Item
               className={selected.key === item.key ? "conversation-list-item active" : "conversation-list-item"}
-              onClick={() => setSelected(item)}
+              onClick={() => {
+                setSelected(item);
+                setMobileConversationOpen(true);
+              }}
             >
               <WecomAvatar item={item} />
               <div className="conversation-list-main">
@@ -1230,6 +1253,25 @@ function ConversationsPage({
       </section>
     );
   };
+  const renderMobileSession = () => (
+    <div className={mobileConversationOpen ? "mobile-session-shell chat-open" : "mobile-session-shell"}>
+      {!mobileConversationOpen ? <>
+        {renderMobileAccountSwitcher()}
+        <div className="mobile-session-controls">{renderSessionFilterPanel()}</div>
+      </> : (
+        <div className="mobile-chat-backbar">
+          <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => setMobileConversationOpen(false)}>
+            会话列表
+          </Button>
+          <Text type="secondary">{selected?.name}</Text>
+          <Button type="text" onClick={() => openCustomerDetail(selected, "profile")}>客户资料</Button>
+        </div>
+      )}
+      <div className={mobileConversationOpen ? "mobile-session-detail" : "mobile-session-list"}>
+        {mobileConversationOpen ? renderMainChatPanel() : renderConversationList()}
+      </div>
+    </div>
+  );
   const renderDrawerChatHistory = () => (
     <section className="drawer-chat-history-panel">
       <div className="wecom-message-area">
@@ -1296,6 +1338,7 @@ function ConversationsPage({
             )}
           </div>
         </aside>
+        {renderMobileSession()}
       </div>
       <Drawer
         title="客户筛选"

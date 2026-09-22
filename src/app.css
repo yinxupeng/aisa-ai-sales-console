@@ -3,6 +3,227 @@
   background: #f3f6fb;
 }
 
+/* 会话中心移动端：只在手机断点切换为单栏，桌面端保持原三栏布局。 */
+.mobile-session-shell {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .app-header:has(.conversation-view-switch) {
+    min-height: 64px;
+    height: 64px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .app-header:has(.conversation-view-switch) .header-actions {
+    display: none;
+  }
+
+  .app-header:has(.conversation-view-switch) .page-heading {
+    gap: 8px;
+  }
+
+  .app-header:has(.conversation-view-switch) .page-heading h2 {
+    font-size: 20px;
+  }
+
+  .app-header:has(.conversation-view-switch) .wecom-account-switch {
+    width: min(190px, 48vw);
+  }
+
+  .app-content:has(.wecom-workbench) {
+    padding: 0;
+  }
+
+  .wecom-workbench {
+    display: block;
+    height: calc(100dvh - 64px);
+    min-height: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .wecom-workbench > .wecom-account-list,
+  .wecom-workbench > .wecom-session-list {
+    display: none;
+  }
+
+  .mobile-session-shell {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    background: #fff;
+  }
+
+  .mobile-session-account-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #edf1f7;
+    background: #fff;
+  }
+
+  .mobile-session-account-switcher .ant-select {
+    min-width: 0;
+    flex: 1 1 auto;
+    max-width: 280px;
+  }
+
+  .mobile-session-controls {
+    min-height: 0;
+    border-bottom: 1px solid #edf1f7;
+    background: #fff;
+  }
+
+  .mobile-session-controls .session-filter-panel {
+    padding: 8px 12px;
+    border-bottom: 0;
+  }
+
+  .mobile-session-controls .session-filter-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(96px, max-content);
+    gap: 8px;
+  }
+
+  .mobile-session-controls .session-filter-search,
+  .mobile-session-controls .session-filter-tags,
+  .mobile-session-controls .session-filter-actions {
+    grid-column: 1 / -1;
+  }
+
+  .mobile-session-controls .session-filter-actions {
+    justify-content: flex-end;
+  }
+
+  .mobile-session-list,
+  .mobile-session-detail {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .mobile-session-list .session-conversation-column {
+    height: 100%;
+    border-right: 0;
+  }
+
+  .mobile-session-list .conversation-list-item {
+    grid-template-columns: 40px minmax(0, 1fr) 20px;
+    gap: 10px;
+    padding: 12px !important;
+  }
+
+  .mobile-session-list .conversation-list-item .wecom-avatar,
+  .mobile-session-list .conversation-list-item .wecom-avatar-wrap {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px;
+  }
+
+  .mobile-session-list .conversation-customer-name {
+    font-size: 14px;
+  }
+
+  .mobile-session-list .conversation-list-pagination {
+    justify-content: center;
+    padding-inline: 8px;
+  }
+
+  .mobile-session-list .conversation-list-pagination > .ant-typography,
+  .mobile-session-list .conversation-list-pagination .ant-pagination-options {
+    display: none;
+  }
+
+  .mobile-chat-backbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 48px;
+    padding: 4px 8px;
+    border-bottom: 1px solid #edf1f7;
+    background: #fff;
+  }
+
+  .mobile-chat-backbar .ant-typography {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-chat-backbar .ant-btn {
+    flex: 0 0 auto;
+    padding-inline: 6px;
+  }
+
+  .mobile-session-detail .wecom-chat-panel {
+    height: 100%;
+  }
+
+  .mobile-session-detail .chat-header {
+    padding: 8px 12px;
+  }
+
+  .mobile-session-detail .chat-header-actions .ant-btn {
+    display: none;
+  }
+
+  .mobile-session-detail .chat-header-actions {
+    gap: 0;
+  }
+
+  .mobile-session-detail .chat-stage-timeline {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    overflow-x: auto;
+  }
+
+  .mobile-session-detail .chat-stage-segment {
+    width: 96px;
+    flex: 0 0 96px;
+  }
+
+  .mobile-session-detail .wecom-message-area {
+    padding: 14px 12px;
+  }
+
+  .mobile-session-detail .wecom-message {
+    max-width: 92%;
+  }
+
+  .mobile-session-detail .chat-composer {
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-session-detail .chat-composer textarea {
+    height: 56px !important;
+    min-height: 56px !important;
+    font-size: 14px;
+  }
+
+  .session-filter-drawer.ant-drawer,
+  .customer-side-drawer.ant-drawer {
+    width: 100% !important;
+  }
+
+  .session-filter-drawer .ant-drawer-header,
+  .customer-side-drawer .ant-drawer-header {
+    padding-inline: 14px;
+  }
+
+  .session-filter-drawer .ant-drawer-body,
+  .customer-side-drawer .ant-drawer-body {
+    padding-inline: 12px;
+  }
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -8864,5 +9085,30 @@ body {
 
   .bubble {
     max-width: 92%;
+  }
+}
+
+@media (max-width: 767px) {
+  /* 该覆盖必须位于桌面工作台样式之后，确保手机端真正使用单栏容器。 */
+  .wecom-workbench {
+    display: block;
+    height: calc(100dvh - 64px);
+    overflow: hidden;
+  }
+
+  /* 进入聊天后只有返回栏和聊天面板两行，避免内容区下方出现空白行。 */
+  .mobile-session-shell.chat-open {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  /* 手机端输入区保持横向工具栏，发送按钮固定在右下角。 */
+  .mobile-session-detail .composer-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .mobile-session-detail .composer-actions > .ant-btn {
+    margin-left: auto;
   }
 }
