@@ -28,6 +28,7 @@ import CustomersPage from './src/pages/CustomersPage.jsx';
 import CompanyPage from './src/pages/CompanyPage.jsx';
 import WecomPage from './src/pages/WecomPage.jsx';
 import SuggestionsPage from './src/pages/SuggestionsPage.jsx';
+import HumanMachineCollaborationPage from './src/pages/HumanMachineCollaborationPage.jsx';
 import { strategies } from './src/data/appData.js';
 
 globalThis.window = { location: { search: '' }, matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {} }) };
@@ -54,6 +55,7 @@ const pages = [
   ['ConversationsPage', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], onActiveWecomChange: () => {} })],
   ['ConversationsPageListMode', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], conversationViewMode: 'list', onActiveWecomChange: () => {} })],
   ['SuggestionsPage', React.createElement(SuggestionsPage)],
+  ['HumanMachineCollaborationPage', React.createElement(HumanMachineCollaborationPage, { userRole: 'operator', onViewConversation: () => {} })],
   ['SettingsPage', React.createElement(SettingsPage, { platform: true })]
 ];
 
