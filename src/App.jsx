@@ -35,7 +35,8 @@ import {
   SmileOutlined,
   TagsOutlined,
   TeamOutlined,
-  ToolOutlined
+  ToolOutlined,
+  UserSwitchOutlined
 } from "@ant-design/icons";
 
 import { conversations } from "./data/conversations";
@@ -63,6 +64,7 @@ import WecomAccountPage from "./pages/WecomAccountPage";
 import EnterpriseLogin from "./shared/EnterpriseLogin";
 import { selectedEnterpriseId, usePlatformData } from "./shared/platformStore";
 import SuggestionsPage from "./pages/SuggestionsPage";
+import HumanMachineCollaborationPage from "./pages/HumanMachineCollaborationPage";
 
 const { Header, Sider, Content } = Layout;
 const { Paragraph, Title, Text } = Typography;
@@ -70,6 +72,7 @@ const { Paragraph, Title, Text } = Typography;
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
+  { key: "humanCollaboration", icon: <UserSwitchOutlined />, label: "人机协作" },
   {
     key: "sales",
     icon: <TeamOutlined />,
@@ -244,6 +247,7 @@ function AppShell({ user, onLogout }) {
     ),
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
+    humanCollaboration: <HumanMachineCollaborationPage userRole={user.role === "employee" ? "employee" : user.role === "platform_admin" ? "platform_admin" : "operator"} onViewConversation={handleViewConversation} />,
     agentManager: <IntelligentAgentPage />,
     strategy: <StrategyPage />,
     skills: <AISkillPage />,

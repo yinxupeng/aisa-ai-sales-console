@@ -1426,7 +1426,7 @@ export const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -1436,7 +1436,7 @@ export const loginAccounts = {
     badge: "员",
     company: "星河教育科技",
     account: "账号2",
-    menuKeys: ["dashboard", "conversations"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "3": {
@@ -1446,7 +1446,7 @@ export const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };
