@@ -257,7 +257,7 @@ function AppShell({ user, onLogout }) {
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
     intentAnalysis: <IntentAnalysisPage onViewConversation={handleViewConversation} />,
-    dailyReport: <DailyReportPage />,
+    dailyReport: <DailyReportPage onViewConversation={handleViewConversation} />,
     agentManager: <IntelligentAgentPage />,
     strategy: <StrategyPage />,
     skills: <AISkillPage />,

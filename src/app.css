@@ -424,6 +424,71 @@
   min-height: 360px;
 }
 
+.daily-report-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.daily-report-header .ant-typography {
+  margin-bottom: 4px;
+}
+
+.daily-report-window-card,
+.daily-report-stat-card,
+.daily-report-filter-card,
+.daily-report-table-card {
+  border: 1px solid #edf0f5;
+  box-shadow: 0 4px 16px rgba(31, 35, 41, 0.04);
+}
+
+.daily-report-window-card {
+  background: linear-gradient(110deg, #f5f9ff 0%, #fff 72%);
+}
+
+.daily-report-stat-card {
+  min-height: 116px;
+}
+
+.daily-report-stat-card .ant-typography {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.daily-report-stat-primary {
+  border-top: 3px solid #1677ff;
+  background: linear-gradient(145deg, #fff 0%, #f5f9ff 100%);
+}
+
+.daily-report-summary-cell {
+  max-width: 500px;
+  color: #344054;
+  line-height: 1.65;
+  white-space: normal;
+}
+
+.daily-report-table-row {
+  cursor: pointer;
+}
+
+.daily-report-table-row:hover td {
+  background: #f7fbff !important;
+}
+
+.daily-report-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
 @media (max-width: 767px) {
   .intent-analysis-header {
     flex-direction: column;
@@ -436,6 +501,10 @@
 
   .intent-analysis-header > .ant-space .ant-btn {
     flex: 1;
+  }
+
+  .daily-report-header {
+    flex-direction: column;
   }
 }
 
