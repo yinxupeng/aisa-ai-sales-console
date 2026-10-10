@@ -3,6 +3,7 @@ import { Tabs } from "antd";
 
 import IntentAnalysisPage from "./IntentAnalysisPage";
 import DailyReportPage from "./DailyReportPage";
+import UserInsightPage from "./UserInsightPage";
 
 export default function HumanCollaborationPage({ onViewConversation = () => {} }) {
   return (
@@ -24,7 +25,7 @@ export default function HumanCollaborationPage({ onViewConversation = () => {} }
           {
             key: "insight",
             label: "用户洞察与建议",
-            children: null
+            children: <UserInsightPage onViewConversation={onViewConversation} />
           }
         ]}
       />
