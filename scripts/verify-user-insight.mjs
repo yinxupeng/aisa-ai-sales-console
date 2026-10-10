@@ -20,6 +20,6 @@ assert.match(configSource, /输出内容/);
 assert.match(configSource, /生成提示词/);
 assert.match(dataSource, /totalUsers: 291/);
 assert.match(dataSource, /historicalValidChatUsers:/);
-assert.match(strategyEditorSource, /strategy-agent-config-removed/);
+assert.doesNotMatch(strategyEditorSource, /strategy-agent-config-removed/);
 
 console.log("USER INSIGHT PAGE STRUCTURE: PASS");

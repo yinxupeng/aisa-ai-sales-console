@@ -336,14 +336,6 @@
   gap: 12px 22px;
 }
 
-.strategy-agent-config-removed .skill-logic-config-grid {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.strategy-agent-config-removed .skill-config-pane {
-  display: none;
-}
-
 @media (max-width: 760px) {
   .user-insight-config-header {
     flex-direction: column;
