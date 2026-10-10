@@ -231,6 +231,14 @@
   gap: 16px;
 }
 
+.human-collaboration-page {
+  min-width: 0;
+}
+
+.human-collaboration-tabs > .ant-tabs-nav {
+  margin-bottom: 16px;
+}
+
 .intent-analysis-header {
   display: flex;
   align-items: flex-start;

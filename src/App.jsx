@@ -64,8 +64,7 @@ import WecomAccountPage from "./pages/WecomAccountPage";
 import EnterpriseLogin from "./shared/EnterpriseLogin";
 import { selectedEnterpriseId, usePlatformData } from "./shared/platformStore";
 import SuggestionsPage from "./pages/SuggestionsPage";
-import IntentAnalysisPage from "./pages/IntentAnalysisPage";
-import DailyReportPage from "./pages/DailyReportPage";
+import HumanCollaborationPage from "./pages/HumanCollaborationPage";
 
 const { Header, Sider, Content } = Layout;
 const { Paragraph, Title, Text } = Typography;
@@ -76,11 +75,7 @@ const menuItems = [
   {
     key: "humanCollaboration",
     icon: <UserSwitchOutlined />,
-    label: "人机协作",
-    children: [
-      { key: "intentAnalysis", icon: <UserSwitchOutlined />, label: "用户意向度分析" },
-      { key: "dailyReport", icon: <BarChartOutlined />, label: "用户日报分析" }
-    ]
+    label: "人机协作"
   },
   {
     key: "sales",
@@ -176,7 +171,11 @@ function Login({ onLogin }) {
 
 function AppShell({ user, onLogout }) {
   const rawInitialRoute = location.hash?.replace("#", "") || "dashboard";
-  const initialRoute = ["sales", "aiSeats"].includes(rawInitialRoute) ? "wecomAccounts" : rawInitialRoute;
+  const initialRoute = ["sales", "aiSeats"].includes(rawInitialRoute)
+    ? "wecomAccounts"
+    : ["intentAnalysis", "dailyReport"].includes(rawInitialRoute)
+      ? "humanCollaboration"
+      : rawInitialRoute;
   const allowedMenuItems = getAllowedMenuItems(menuItems, user.menuKeys);
   const allowedLeafMenuItems = flattenMenuItems(allowedMenuItems).filter((item) => !item.children);
   const allowedPageTitle = Object.fromEntries(allowedLeafMenuItems.map((item) => [item.key, item.label]));
@@ -256,8 +255,7 @@ function AppShell({ user, onLogout }) {
     ),
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
-    intentAnalysis: <IntentAnalysisPage onViewConversation={handleViewConversation} />,
-    dailyReport: <DailyReportPage onViewConversation={handleViewConversation} />,
+    humanCollaboration: <HumanCollaborationPage onViewConversation={handleViewConversation} />,
     agentManager: <IntelligentAgentPage />,
     strategy: <StrategyPage />,
     skills: <AISkillPage />,
