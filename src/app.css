@@ -271,7 +271,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
 }
 
 .intent-level-card:hover {
@@ -279,23 +279,57 @@
   transform: translateY(-2px);
 }
 
-.intent-level-card .ant-statistic-title {
-  color: #344054;
-  font-size: 13px;
-}
-
-.intent-level-card .ant-typography {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
 .intent-level-card-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
+  min-height: 32px;
   gap: 8px;
+}
+
+.intent-level-card-title {
+  min-width: 0;
+  overflow: hidden;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intent-level-card-heading .ant-tag {
+  flex: 0 0 auto;
+  margin-inline-end: 0;
+}
+
+.intent-level-card-metric {
+  display: flex;
+  align-items: baseline;
+  height: 48px;
+  gap: 4px;
+}
+
+.intent-level-card-metric .ant-typography:first-child {
+  color: #101828;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.intent-level-card-metric .ant-typography:last-child {
+  color: #667085;
+  font-size: 14px;
+}
+
+.intent-level-card-description {
+  display: -webkit-box;
+  height: 42px;
+  overflow: hidden;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.75;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .intent-level-card-priority {
@@ -306,11 +340,6 @@
 .intent-level-card-4.intent-level-card-priority {
   background: linear-gradient(145deg, #fff 0%, #faf5ff 100%);
   box-shadow: 0 8px 22px rgba(114, 46, 209, 0.1);
-}
-
-.intent-level-card-priority .ant-statistic-content {
-  font-size: 28px;
-  font-weight: 700;
 }
 
 .intent-level-card-0 { border-top: 3px solid #98a2b3; }
