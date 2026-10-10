@@ -91,7 +91,7 @@ export default function IntentAnalysisPage({ onViewConversation = () => {} }) {
   const columns = [
     { title: "用户", dataIndex: "name", width: 180, render: (_, user) => <Space><Avatar icon={<UserOutlined />} /><div><Text strong>{user.name}</Text><div><Text type="secondary">{user.relation} · {user.manager}</Text></div></div></Space> },
     { title: "当前课程", dataIndex: "currentLesson", width: 150, render: (value) => <div><Text>第{value}节课</Text><div><Text type="secondary">儿童心理健康医疗课程</Text></div></div> },
-    { title: "意向档位", dataIndex: "level", width: 130, render: (value, user) => <Space direction="vertical" size={2}><Tag color={user.levelInfo.color}>{value}档 · {user.levelInfo.label}</Tag><Text type="secondary">{user.levelInfo.description}</Text></Space> },
+    { title: "意向档位", dataIndex: "level", width: 130, render: (value, user) => <Tag color={user.levelInfo.color}>{value}档 · {user.levelInfo.label}</Tag> },
     { title: "到课表现", key: "attendance", width: 180, render: (_, user) => <Space wrap><MetricTag color="cyan">到课{user.metrics.attendanceDays}天</MetricTag><MetricTag color="blue">观看{user.metrics.totalWatchMinutes}分钟</MetricTag></Space> },
     { title: "意向信号", key: "signals", width: 200, render: (_, user) => <Space wrap>{user.metrics.hasIllnessKeyword ? <MetricTag color="orange">病情词</MetricTag> : null}{user.metrics.askedPrice ? <MetricTag color="red">已询价</MetricTag> : null}{user.metrics.expressedAfterLessons123 ? <MetricTag color="purple">表达感受</MetricTag> : null}</Space> },
     { title: "AI建议的跟进策略和行动", key: "followUp", width: 300, render: (_, user) => <div className="intent-follow-up-cell"><Text>{user.followUp}</Text></div> },
