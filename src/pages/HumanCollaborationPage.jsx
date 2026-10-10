@@ -20,6 +20,11 @@ export default function HumanCollaborationPage({ onViewConversation = () => {} }
             key: "daily",
             label: "用户沟通日报",
             children: <DailyReportPage onViewConversation={onViewConversation} />
+          },
+          {
+            key: "insight",
+            label: "用户洞察与建议",
+            children: null
           }
         ]}
       />

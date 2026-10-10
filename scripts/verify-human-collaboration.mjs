@@ -17,5 +17,6 @@ assert.doesNotMatch(dataSource, /menuKeys: \[[^\]]*"dailyReport"/);
 assert.match(pageSource, /Tabs/);
 assert.match(pageSource, /用户意向度分析/);
 assert.match(pageSource, /用户沟通日报/);
+assert.match(pageSource, /用户洞察与建议/);
 
 console.log("HUMAN COLLABORATION TAB STRUCTURE: PASS");
