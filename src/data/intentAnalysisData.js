@@ -57,7 +57,15 @@ const followUpByLevel = {
 
 const buildUser = (index) => {
   const profile = profiles[index % profiles.length];
-  const metrics = { ...metricTemplates[index % metricTemplates.length] };
+  const targetLevelSequence = [
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 0, 0
+  ];
+  const metrics = { ...metricTemplates[targetLevelSequence[index % targetLevelSequence.length]] };
   const level = calculateIntentLevel(metrics);
   const lastChatAt = `2026-10-${String(10 - (index % 5)).padStart(2, "0")} ${String(9 + (index % 10)).padStart(2, "0")}:${String((index * 11) % 60).padStart(2, "0")}`;
   return {
@@ -74,5 +82,5 @@ const buildUser = (index) => {
   };
 };
 
-export const intentAnalysisUsers = Array.from({ length: 30 }, (_, index) => buildUser(index));
+export const intentAnalysisUsers = Array.from({ length: 42 }, (_, index) => buildUser(index));
 export { illnessKeywords };

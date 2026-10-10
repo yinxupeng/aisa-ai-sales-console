@@ -279,6 +279,29 @@
   line-height: 1.5;
 }
 
+.intent-level-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intent-level-card-priority {
+  min-height: 132px;
+  background: linear-gradient(145deg, #fff 0%, #fff7f5 100%);
+  box-shadow: 0 8px 22px rgba(245, 34, 45, 0.1);
+}
+
+.intent-level-card-4.intent-level-card-priority {
+  background: linear-gradient(145deg, #fff 0%, #faf5ff 100%);
+  box-shadow: 0 8px 22px rgba(114, 46, 209, 0.1);
+}
+
+.intent-level-card-priority .ant-statistic-content {
+  font-size: 28px;
+  font-weight: 700;
+}
+
 .intent-level-card-0 { border-top: 3px solid #98a2b3; }
 .intent-level-card-1 { border-top: 3px solid #1677ff; }
 .intent-level-card-2 { border-top: 3px solid #13c2c2; }
