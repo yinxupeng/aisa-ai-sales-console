@@ -321,6 +321,13 @@
   background: #f7fbff !important;
 }
 
+.intent-follow-up-cell {
+  max-width: 280px;
+  color: #344054;
+  line-height: 1.6;
+  white-space: normal;
+}
+
 .intent-pagination {
   display: flex;
   justify-content: flex-end;

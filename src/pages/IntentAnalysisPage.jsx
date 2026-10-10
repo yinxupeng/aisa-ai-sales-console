@@ -37,7 +37,7 @@ function MetricTag({ children, color }) {
   return <Tag color={color}>{children}</Tag>;
 }
 
-function IntentDetailDrawer({ user, open, onClose, onViewConversation }) {
+function IntentDetailDrawer({ user, open, onClose }) {
   if (!user) return null;
   const { metrics } = user;
   return (
@@ -46,7 +46,6 @@ function IntentDetailDrawer({ user, open, onClose, onViewConversation }) {
       width={560}
       open={open}
       onClose={onClose}
-      extra={<Button type="primary" icon={<CommentOutlined />} onClick={() => onViewConversation(user)}>查看聊天</Button>}
     >
       <div className="intent-detail-profile">
         <Avatar size={56} icon={<UserOutlined />} />
@@ -96,9 +95,10 @@ export default function IntentAnalysisPage({ onViewConversation = () => {} }) {
     { title: "意向档位", dataIndex: "level", width: 130, render: (value, user) => <Space direction="vertical" size={2}><Tag color={user.levelInfo.color}>{value}档 · {user.levelInfo.label}</Tag><Text type="secondary">{user.levelInfo.description}</Text></Space> },
     { title: "到课表现", key: "attendance", width: 180, render: (_, user) => <Space wrap><MetricTag color="cyan">到课{user.metrics.attendanceDays}天</MetricTag><MetricTag color="blue">观看{user.metrics.totalWatchMinutes}分钟</MetricTag></Space> },
     { title: "意向信号", key: "signals", width: 200, render: (_, user) => <Space wrap>{user.metrics.hasIllnessKeyword ? <MetricTag color="orange">病情词</MetricTag> : null}{user.metrics.askedPrice ? <MetricTag color="red">已询价</MetricTag> : null}{user.metrics.expressedAfterLessons123 ? <MetricTag color="purple">表达感受</MetricTag> : null}</Space> },
+    { title: "AI建议的跟进策略和行动", key: "followUp", width: 300, render: (_, user) => <div className="intent-follow-up-cell"><Text>{user.followUp}</Text></div> },
     { title: "聊天", key: "chat", width: 100, render: (_, user) => <Text>{user.metrics.chatCount} 条</Text> },
     { title: "最近沟通", dataIndex: "recentChatAt", width: 145, render: (value) => <Text type="secondary">{value}</Text> },
-    { title: "操作", key: "action", fixed: "right", width: 110, render: (_, user) => <Button type="link" icon={<EyeOutlined />} onClick={() => openUser(user)}>查看分析</Button> }
+    { title: "操作", key: "action", fixed: "right", width: 180, render: (_, user) => <Space direction="vertical" size={0}><Button type="link" icon={<EyeOutlined />} onClick={() => openUser(user)}>查看分析</Button><Button type="link" icon={<CommentOutlined />} onClick={() => onViewConversation(user)}>查看聊天</Button></Space> }
   ];
 
   return (
@@ -108,7 +108,7 @@ export default function IntentAnalysisPage({ onViewConversation = () => {} }) {
       <Row gutter={[12, 12]} className="intent-level-summary">{intentLevelDefinitions.slice().reverse().map((item) => <Col xs={12} sm={8} lg={4} key={item.level}><Card className={`intent-level-card intent-level-card-${item.level} ${item.level >= 4 ? "intent-level-card-priority" : ""}`} bordered={false} onClick={() => { setLevel(String(item.level)); setPage(1); }}><div className="intent-level-card-heading"><Statistic title={`${item.level}档 · ${item.label}`} value={levelCounts[item.level]} suffix="人" />{item.level >= 4 ? <Tag color={item.level === 5 ? "red" : "purple"}>重点跟进</Tag> : null}</div><Text type="secondary">{item.description}</Text></Card></Col>)}</Row>
       <Card className="intent-filter-card" bordered={false}><Space wrap size={[8, 10]}><Input allowClear value={keyword} onChange={(event) => { setKeyword(event.target.value); setPage(1); }} placeholder="搜索用户、问题或课程" style={{ width: 230 }} /><Select value={level} onChange={(value) => { setLevel(value); setPage(1); }} options={[{ value: "all", label: "全部意向档位" }, ...intentLevelDefinitions.map((item) => ({ value: String(item.level), label: `${item.level}档 · ${item.label}` }))]} /><Select value={lesson} onChange={(value) => { setLesson(value); setPage(1); }} options={[{ value: "all", label: "全部课程节次" }, { value: "3", label: "第3节课" }, { value: "4", label: "第4节课" }, { value: "5", label: "第5节课" }]} /><Select value={manager} onChange={(value) => { setManager(value); setPage(1); }} options={[{ value: "all", label: "全部负责人" }, ...managers.map((value) => ({ value, label: value }))]} /><Button onClick={clearFilters}>重置</Button></Space></Card>
       <Card className="intent-table-card" bordered={false} title={<Space><span>用户意向度列表</span><Text type="secondary">共 {filteredUsers.length} 人</Text></Space>}><Table rowKey="id" columns={columns} dataSource={pageUsers} pagination={false} scroll={{ x: 1250 }} locale={{ emptyText: <Empty description="暂无符合条件的用户" /> }} onRow={(user) => ({ onClick: () => openUser(user), className: "intent-table-row" })} /><div className="intent-pagination"><Pagination current={page} pageSize={pageSize} total={filteredUsers.length} showSizeChanger onChange={(nextPage, nextSize) => { setPage(nextPage); setPageSize(nextSize); }} /></div></Card>
-      <IntentDetailDrawer user={selectedUser} open={drawerOpen} onClose={() => setDrawerOpen(false)} onViewConversation={onViewConversation} />
+      <IntentDetailDrawer user={selectedUser} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </div>
   );
 }
