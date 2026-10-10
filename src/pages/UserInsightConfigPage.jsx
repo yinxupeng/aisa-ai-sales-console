@@ -10,7 +10,6 @@ export const defaultConfig = {
   scope: "当前企微账号下全部用户",
   validChatRule: "用户至少有1条回复消息",
   dataSources: ["用户档案", "历史聊天记录", "课程到课记录", "用户标签"],
-  outputContent: ["用户背景", "聊天总结", "用户洞察", "关键风险", "销售建议", "提示词摘要"],
   prompt: "请综合分析用户档案、历史聊天、课程到课和标签信息，输出面向人工跟进的用户洞察。必须区分事实与推断，说明用户当前阶段、核心诉求、沟通风险和建议行动；涉及心理健康风险时不得做诊断或承诺疗效，必要时提示人工专业人员介入。",
   enabled: true
 };
@@ -44,11 +43,7 @@ export default function UserInsightConfigPage({ onBack = () => {}, initialConfig
         <Form.Item label="有效聊天口径"><Select value={config.validChatRule} onChange={(value) => update("validChatRule", value)} options={["用户至少有1条回复消息", "用户当天至少回复1条消息"].map((value) => ({ value, label: value }))} /></Form.Item>
         <Form.Item label="数据来源"><Checkbox.Group value={config.dataSources} onChange={(value) => update("dataSources", value)} options={["用户档案", "历史聊天记录", "课程到课记录", "用户标签"].map((value) => ({ value, label: value }))} /></Form.Item>
       </Card>
-      <Card className="user-insight-config-card" title="3. 输出内容">
-        <Paragraph type="secondary">以下字段将生成到“用户洞察与建议”列表中，供人工快速了解用户情况。</Paragraph>
-        <Checkbox.Group value={config.outputContent} onChange={(value) => update("outputContent", value)} options={["用户背景", "聊天总结", "用户洞察", "关键风险", "销售建议", "提示词摘要"].map((value) => ({ value, label: value }))} />
-      </Card>
-      <Card className="user-insight-config-card" title="4. 生成提示词">
+      <Card className="user-insight-config-card" title="3. 生成提示词">
         <Input.TextArea value={config.prompt} onChange={(event) => update("prompt", event.target.value)} rows={9} showCount maxLength={1200} />
         <Divider />
         <Text type="secondary">安全边界：涉及心理、情绪、家庭冲突或风险表达时，只输出沟通建议和人工介入提示，不做医疗诊断，不承诺疗效。</Text>
