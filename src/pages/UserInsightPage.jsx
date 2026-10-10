@@ -26,6 +26,9 @@ import {
   userInsightSummary,
   userInsightUsers
 } from "../data/userInsightData";
+import UserInsightConfigPage from "./UserInsightConfigPage";
+import { defaultConfig } from "./UserInsightConfigPage";
+import { SettingOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -42,6 +45,8 @@ function InsightSegments({ user }) {
 }
 
 export default function UserInsightPage({ onViewConversation = () => {} }) {
+  const [view, setView] = useState("results");
+  const [generationConfig, setGenerationConfig] = useState(defaultConfig);
   const [keyword, setKeyword] = useState("");
   const [stage, setStage] = useState("all");
   const [page, setPage] = useState(1);
@@ -68,11 +73,15 @@ export default function UserInsightPage({ onViewConversation = () => {} }) {
     { title: "操作", key: "action", fixed: "right", width: 110, render: (_, user) => <Button type="link" icon={<CommentOutlined />} onClick={() => onViewConversation({ key: user.conversationKey })}>查看</Button> }
   ];
 
+  if (view === "config") {
+    return <UserInsightConfigPage initialConfig={generationConfig} onSave={setGenerationConfig} onBack={() => setView("results")} />;
+  }
+
   return (
     <div className="user-insight-page">
       <div className="user-insight-header">
         <div><Title level={3}>用户洞察与建议</Title><Paragraph type="secondary">观心实验室 · 综合用户档案与历史聊天，帮助人工快速了解儿童心理健康课程用户</Paragraph></div>
-        <Tag color="blue" icon={<ClockCircleOutlined />}>{userInsightSchedule.generatedAt}</Tag>
+        <Space><Tag color="blue" icon={<ClockCircleOutlined />}>{userInsightSchedule.generatedAt}</Tag><Button icon={<SettingOutlined />} onClick={() => setView("config")}>洞察生成配置</Button></Space>
       </div>
       <Card className="user-insight-window-card" bordered={false}><Space size={28} wrap><div><Text type="secondary">统计时间范围</Text><div><Text strong>{userInsightSchedule.label}</Text></div></div><div><Text type="secondary">分析人群</Text><div><Text strong>{userInsightSchedule.scope}</Text></div></div><div><Text type="secondary">最近生成</Text><div><Text strong>2026-06-12 18:00</Text></div></div></Space></Card>
       <Row gutter={[12, 12]} className="user-insight-summary-grid">

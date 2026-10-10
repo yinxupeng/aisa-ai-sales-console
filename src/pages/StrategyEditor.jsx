@@ -866,7 +866,7 @@ function StrategyEditor({ skill, onBack }) {
           </Space>
         </div>
         <Tabs
-          className="skill-editor-tabs"
+          className={`skill-editor-tabs ${isStrategyAgent ? "strategy-agent-config-removed" : ""}`}
           activeKey={activeAgentTab}
           onChange={setActiveAgentTab}
           items={[

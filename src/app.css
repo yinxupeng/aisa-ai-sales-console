@@ -304,6 +304,52 @@
   padding-top: 16px;
 }
 
+.user-insight-config-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.user-insight-config-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.user-insight-config-header .ant-typography {
+  margin-bottom: 4px;
+}
+
+.user-insight-config-card {
+  border: 1px solid #e8edf5;
+  box-shadow: 0 5px 18px rgba(20, 50, 90, 0.04);
+}
+
+.user-insight-config-card .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.user-insight-config-card .ant-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+}
+
+.strategy-agent-config-removed .skill-logic-config-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.strategy-agent-config-removed .skill-config-pane {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .user-insight-config-header {
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 760px) {
   .user-insight-header {
     flex-direction: column;
