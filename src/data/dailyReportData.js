@@ -2,7 +2,8 @@ export const dailyReportSchedule = {
   generatedAt: "2026-10-10 18:00",
   windowStart: "2026-10-09 18:00",
   windowEnd: "2026-10-10 18:00",
-  label: "昨天18:00至今天18:00"
+  label: "昨天18:00至今天18:00",
+  scope: "当前企微账号下所有用户"
 };
 
 const chatCounts = [18, 16, 14, 12, 20, 11, 15, 13, 17, 9, 22, 10, 16, 14, 19, 12, 15, 11, 21, 13];
@@ -33,7 +34,7 @@ export const dailyReportUsers = users.map((item, index) => ({
   id: `daily-report-user-${index + 1}`,
   name: item[0],
   relation: item[1],
-  currentLesson: item[2],
+  currentLesson: (index % 5) + 1,
   conversationKey: item[3],
   manager: item[4],
   courseName: "观心实验室·儿童心理健康医疗课程",
