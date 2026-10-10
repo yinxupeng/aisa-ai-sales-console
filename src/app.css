@@ -336,6 +336,19 @@
   gap: 12px 22px;
 }
 
+.user-insight-config-card .ant-picker,
+.user-insight-config-card .ant-input-number {
+  width: 100%;
+}
+
+.user-insight-schedule-preview {
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f5f9ff;
+}
+
 @media (max-width: 760px) {
   .user-insight-config-header {
     flex-direction: column;
