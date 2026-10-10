@@ -64,7 +64,8 @@ import WecomAccountPage from "./pages/WecomAccountPage";
 import EnterpriseLogin from "./shared/EnterpriseLogin";
 import { selectedEnterpriseId, usePlatformData } from "./shared/platformStore";
 import SuggestionsPage from "./pages/SuggestionsPage";
-import HumanMachineCollaborationPage from "./pages/HumanMachineCollaborationPage";
+import IntentAnalysisPage from "./pages/IntentAnalysisPage";
+import DailyReportPage from "./pages/DailyReportPage";
 
 const { Header, Sider, Content } = Layout;
 const { Paragraph, Title, Text } = Typography;
@@ -72,7 +73,15 @@ const { Paragraph, Title, Text } = Typography;
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
-  { key: "humanCollaboration", icon: <UserSwitchOutlined />, label: "人机协作" },
+  {
+    key: "humanCollaboration",
+    icon: <UserSwitchOutlined />,
+    label: "人机协作",
+    children: [
+      { key: "intentAnalysis", icon: <UserSwitchOutlined />, label: "用户意向度分析" },
+      { key: "dailyReport", icon: <BarChartOutlined />, label: "用户日报分析" }
+    ]
+  },
   {
     key: "sales",
     icon: <TeamOutlined />,
@@ -247,7 +256,8 @@ function AppShell({ user, onLogout }) {
     ),
     customers: <CustomersPage onViewConversation={handleViewConversation} visibleWecomKeys={visibleWecomKeys} />,
     company: <CompanyPage platform={platform} />,
-    humanCollaboration: <HumanMachineCollaborationPage userRole={user.role === "employee" ? "employee" : user.role === "platform_admin" ? "platform_admin" : "operator"} onViewConversation={handleViewConversation} />,
+    intentAnalysis: <IntentAnalysisPage onViewConversation={handleViewConversation} />,
+    dailyReport: <DailyReportPage />,
     agentManager: <IntelligentAgentPage />,
     strategy: <StrategyPage />,
     skills: <AISkillPage />,
@@ -287,7 +297,7 @@ function AppShell({ user, onLogout }) {
           <div className="brand-mark"><RobotOutlined /></div>
           {!collapsed ? <Title level={4}>Sabuddy</Title> : null}
         </div>
-        <Menu theme="light" mode="inline" selectedKeys={[route]} defaultOpenKeys={["sales", "agentGroup", "userOpsGroup"]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
+        <Menu theme="light" mode="inline" selectedKeys={[route]} defaultOpenKeys={["sales", "agentGroup", "userOpsGroup", "humanCollaboration"]} items={allowedMenuItems} onClick={({ key }) => handleMenuSelect(key)} />
         <Tooltip title={collapsed ? "展开导航" : "收起导航"} placement={collapsed ? "right" : "top"}>
           <Button
             className="sider-collapse-button"

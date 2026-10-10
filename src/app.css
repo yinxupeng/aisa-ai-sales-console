@@ -224,6 +224,145 @@
   }
 }
 
+.intent-analysis-page,
+.collaboration-placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.intent-analysis-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.intent-analysis-header .ant-typography,
+.collaboration-placeholder-card .ant-typography {
+  margin-bottom: 4px;
+}
+
+.intent-schedule-card,
+.intent-filter-card,
+.intent-table-card,
+.collaboration-placeholder-card {
+  border: 1px solid #edf0f5;
+  box-shadow: 0 4px 16px rgba(31, 35, 41, 0.04);
+}
+
+.intent-schedule-card {
+  background: linear-gradient(110deg, #f5f9ff 0%, #fff 72%);
+}
+
+.intent-level-card {
+  min-height: 118px;
+  cursor: pointer;
+  border: 1px solid #edf0f5;
+  transition: all 0.2s ease;
+}
+
+.intent-level-card:hover {
+  border-color: #91caff;
+  transform: translateY(-2px);
+}
+
+.intent-level-card .ant-statistic-title {
+  color: #344054;
+  font-size: 13px;
+}
+
+.intent-level-card .ant-typography {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.intent-level-card-0 { border-top: 3px solid #98a2b3; }
+.intent-level-card-1 { border-top: 3px solid #1677ff; }
+.intent-level-card-2 { border-top: 3px solid #13c2c2; }
+.intent-level-card-3 { border-top: 3px solid #fa8c16; }
+.intent-level-card-4 { border-top: 3px solid #722ed1; }
+.intent-level-card-5 { border-top: 3px solid #f5222d; }
+
+.intent-table-card .ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.intent-table-row {
+  cursor: pointer;
+}
+
+.intent-table-row:hover td {
+  background: #f7fbff !important;
+}
+
+.intent-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.intent-detail-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+}
+
+.intent-detail-profile .ant-typography {
+  margin: 0;
+}
+
+.intent-level-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.intent-level-highlight .ant-typography {
+  margin: 0;
+}
+
+.intent-detail-card {
+  margin-bottom: 14px;
+}
+
+.intent-detail-grid {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  gap: 12px;
+}
+
+.intent-detail-conclusion {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #f5f9ff;
+  color: #175cd3;
+  line-height: 1.6;
+}
+
+.collaboration-placeholder-card {
+  min-height: 360px;
+}
+
+@media (max-width: 767px) {
+  .intent-analysis-header {
+    flex-direction: column;
+  }
+
+  .intent-analysis-header > .ant-space {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .intent-analysis-header > .ant-space .ant-btn {
+    flex: 1;
+  }
+}
+
 .collaboration-page {
   display: flex;
   flex-direction: column;
