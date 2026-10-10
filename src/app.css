@@ -256,10 +256,22 @@
 }
 
 .intent-level-card {
-  min-height: 118px;
+  display: flex;
+  height: 190px;
   cursor: pointer;
   border: 1px solid #edf0f5;
   transition: all 0.2s ease;
+}
+
+.intent-level-summary > .ant-col {
+  display: flex;
+}
+
+.intent-level-card .ant-card-body {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .intent-level-card:hover {
@@ -287,7 +299,6 @@
 }
 
 .intent-level-card-priority {
-  min-height: 132px;
   background: linear-gradient(145deg, #fff 0%, #fff7f5 100%);
   box-shadow: 0 8px 22px rgba(245, 34, 45, 0.1);
 }
