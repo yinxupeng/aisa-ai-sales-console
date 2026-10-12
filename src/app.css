@@ -349,6 +349,13 @@
   background: #f5f9ff;
 }
 
+.user-insight-skill-boundary {
+  margin-top: 18px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #f8fbff;
+}
+
 @media (max-width: 760px) {
   .user-insight-config-header {
     flex-direction: column;
