@@ -41,6 +41,7 @@ import {
   PlusOutlined,
   SendOutlined,
   SmileOutlined,
+  TeamOutlined,
   SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
@@ -75,7 +76,7 @@ function ConversationsPage({
 }) {
   const { message } = AntApp.useApp();
   const visibleConversations = conversations.filter((item) => visibleWecomKeys.includes(item.accountKey));
-  const accountConversations = visibleConversations.filter((item) => item.accountKey === activeWecom);
+  const accountConversations = activeWecom === "all-users" ? visibleConversations : visibleConversations.filter((item) => item.accountKey === activeWecom);
   const activeConversation = activeConversationKey ? visibleConversations.find((item) => item.key === activeConversationKey) : null;
   const [selected, setSelected] = useState(activeConversation || accountConversations[0] || visibleConversations[0] || null);
   const [customerPhoneValues, setCustomerPhoneValues] = useState({});
@@ -100,6 +101,7 @@ function ConversationsPage({
   const [strategyInsightDrafts, setStrategyInsightDrafts] = useState({});
   const [strategyInsightEditing, setStrategyInsightEditing] = useState(false);
   const [strategyInsightDraft, setStrategyInsightDraft] = useState("");
+  const [phoneRecordsOpen, setPhoneRecordsOpen] = useState(false);
   const defaultSessionFilters = {
     tags: [],
     tagMatch: "满足任一",
@@ -399,7 +401,8 @@ function ConversationsPage({
     setTagPickerState((item) => ({ ...item, open: false }));
   };
   const visibleWecomAccounts = managedWecomAccounts.filter((item) => visibleWecomKeys.includes(item.key));
-  const activeWecomAccount = visibleWecomAccounts.find((item) => item.key === activeWecom) || visibleWecomAccounts[0];
+  const allUsersAccount = { key: "all-users", displayName: "全部用户", isAllUsers: true, customerTotal: visibleConversations.length };
+  const activeWecomAccount = activeWecom === "all-users" ? allUsersAccount : visibleWecomAccounts.find((item) => item.key === activeWecom) || visibleWecomAccounts[0];
   const wecomAccountRows = visibleWecomAccounts.map((account) => {
     const accountConversations = visibleConversations.filter((item) => item.accountKey === account.key);
     return {
@@ -409,7 +412,7 @@ function ConversationsPage({
     };
   });
   const selectWecomAccount = (account) => {
-    const firstConversation = visibleConversations.find((item) => item.accountKey === account.key) || null;
+    const firstConversation = account.isAllUsers ? visibleConversations[0] || null : visibleConversations.find((item) => item.accountKey === account.key) || null;
     onActiveWecomChange?.(account.key);
     setSelected(firstConversation);
     setMobileConversationOpen(false);
@@ -432,12 +435,12 @@ function ConversationsPage({
       <Text strong>企微账号</Text>
       <Select
         value={activeWecomAccount?.key}
-        options={filteredAccountRows.map((account) => ({
+        options={[allUsersAccount, ...filteredAccountRows].map((account) => ({
           value: account.key,
-          label: `${account.displayName || account.employee} · ${account.role || "未分配角色"}`
+          label: account.isAllUsers ? "全部用户" : `${account.displayName || account.employee} · ${account.role || "未分配角色"}`
         }))}
         onChange={(value) => {
-          const account = wecomAccountRows.find((item) => item.key === value);
+          const account = value === "all-users" ? allUsersAccount : wecomAccountRows.find((item) => item.key === value);
           if (account) selectWecomAccount(account);
         }}
         placeholder="选择企微账号"
@@ -455,14 +458,14 @@ function ConversationsPage({
       </div>
       <List
         className="wecom-account-items"
-        dataSource={filteredAccountRows}
+        dataSource={[allUsersAccount, ...filteredAccountRows]}
         locale={{ emptyText: "暂无匹配的企微账号" }}
         renderItem={(account) => (
           <List.Item className={activeWecomAccount?.key === account.key ? "wecom-account-item active" : "wecom-account-item"} onClick={() => selectWecomAccount(account)}>
-            <Avatar className="wecom-account-avatar" src={account.avatarImage} icon={<UserOutlined />} />
+            <Avatar className="wecom-account-avatar" src={account.avatarImage} icon={account.isAllUsers ? <TeamOutlined /> : <UserOutlined />} />
             <div className="wecom-account-main">
               <Text className="wecom-account-name" ellipsis>{account.displayName || account.employee}</Text>
-              <Tag color={account.role === "销售B类" ? "gold" : account.role === "销售C类" ? "purple" : "blue"}>{account.role || "未分配角色"}</Tag>
+              {account.isAllUsers ? <Text type="secondary" className="wecom-account-all-scope">全部企微账号</Text> : <Tag color={account.role === "销售B类" ? "gold" : account.role === "销售C类" ? "purple" : "blue"}>{account.role || "未分配角色"}</Tag>}
             </div>
             <Text type="secondary" className="wecom-account-count">{account.customerTotal}</Text>
           </List.Item>
@@ -1192,6 +1195,8 @@ function ConversationsPage({
   const renderMainChatPanel = () => {
     const insights = getSessionInsights(selected);
     const scheduleStatus = getScheduleStatus(insights);
+    const salesAccount = managedWecomAccounts.find((account) => account.key === selected.accountKey);
+    const salesName = salesAccount?.displayName || salesAccount?.employee || selected.owner || "未分配";
     return (
       <section className="wecom-chat-panel">
         <div className="chat-header">
@@ -1200,6 +1205,7 @@ function ConversationsPage({
               <WecomAvatar item={selected} size={34} />
               <Title level={4}>{selected.name}</Title>
               <span className={scheduleStatus === "已排课" ? "chat-schedule-pill arranged" : "chat-schedule-pill"}>{scheduleStatus}</span>
+              {activeWecom === "all-users" ? <Tag className="chat-sales-name" color="blue" icon={<UserOutlined />}>销售：{salesName}</Tag> : null}
             </div>
             <div className="chat-header-actions">
               <span className="hosting-switch-wrap">
@@ -1484,20 +1490,6 @@ function ConversationsPage({
                     </section>
                     <section className="customer-profile-section">
                       <div className="customer-section-head">
-                        <Text>策略智能体输出结果</Text>
-                        <Text type="secondary">用户洞察与销售建议</Text>
-                      </div>
-                      <div className="sales-strategy-rich-content">
-                        {generatedInsightSections.length ? generatedInsightSections.map((item) => (
-                          <div className="sales-strategy-rich-item" key={`profile-${item.title}`}>
-                            <Text strong>{item.title}：</Text>
-                            <span>{item.text}</span>
-                          </div>
-                        )) : <Paragraph className="sales-strategy-content">暂无生成结果</Paragraph>}
-                      </div>
-                    </section>
-                    <section className="customer-profile-section">
-                      <div className="customer-section-head">
                         <Text>用户标签</Text>
                         <Text type="secondary">统一标签库管理，AI打标标签以样式区分</Text>
                       </div>
@@ -1633,15 +1625,16 @@ function ConversationsPage({
                       <div className="sales-strategy-section-head">
                         <div>
                           <div className="sales-strategy-section-title">电话沟通总结</div>
-                          <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.generatedAt : "暂无"}</Text>
+                          <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.phoneSummaryGeneratedAt : "暂无"}</Text>
                         </div>
+                        <Button size="small" onClick={() => setPhoneRecordsOpen(true)}>沟通记录</Button>
                       </div>
                       <Paragraph className="sales-strategy-content">{generatedInsight ? generatedInsight.phoneSummary : "暂无生成结果"}</Paragraph>
                     </section>
                     <section className="sales-strategy-section">
                       <div className="sales-strategy-section-head">
                         <div>
-                          <div className="sales-strategy-section-title">聊天总结</div>
+                          <div className="sales-strategy-section-title">历史聊天总结</div>
                           <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.generatedAt : "暂无"}</Text>
                         </div>
                       </div>
@@ -1709,6 +1702,28 @@ function ConversationsPage({
           />
         </div>
       </Drawer>
+      <Modal
+        title={`${selected?.name || "用户"} · 电话沟通记录`}
+        open={phoneRecordsOpen}
+        onCancel={() => setPhoneRecordsOpen(false)}
+        footer={null}
+        width={680}
+      >
+        {generatedInsight?.phoneCallRecords?.length ? (
+          <List
+            className="phone-call-record-list"
+            dataSource={generatedInsight.phoneCallRecords}
+            renderItem={(record) => (
+              <List.Item className="phone-call-record-item">
+                <div>
+                  <Text strong>通话时间：{record.calledAt}</Text>
+                  <Paragraph>{record.summary}</Paragraph>
+                </div>
+              </List.Item>
+            )}
+          />
+        ) : <div className="phone-call-record-empty">暂无历史电话沟通记录</div>}
+      </Modal>
     </>
   );
 }

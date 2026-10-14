@@ -26,7 +26,7 @@
   }
 
   .app-header:has(.conversation-view-switch) .page-heading h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .app-header:has(.conversation-view-switch) .wecom-account-switch {
@@ -1194,12 +1194,12 @@ body {
 }
 
 .app-sider .brand .brand-mark {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   background: linear-gradient(180deg, #4f63ff 0%, #3137ee 100%);
   color: #ffffff;
-  font-size: 22px;
+  font-size: 18px;
   box-shadow: 0 9px 18px rgba(53, 62, 241, 0.26);
 }
 
@@ -1209,8 +1209,8 @@ body {
 }
 
 .app-sider .brand h4 {
-  padding-top: 8px;
-  font-size: 22px;
+  padding-top: 5px;
+  font-size: 18px;
   font-weight: 650;
   letter-spacing: 0;
 }
@@ -1375,7 +1375,7 @@ body {
 .page-heading h2 {
   margin: 0;
   color: #111827;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 650;
   line-height: 1.2;
   white-space: nowrap;
@@ -7216,6 +7216,8 @@ body {
   line-height: 20px;
 }
 
+.wecom-account-all-scope { font-size: 12px; white-space: nowrap; }
+
 .session-filter-panel {
   padding: 8px 10px;
   border-bottom: 1px solid #edf1f7;
@@ -8227,6 +8229,12 @@ body {
   flex-shrink: 0;
 }
 
+.chat-sales-name.ant-tag {
+  margin: 0;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
 .chat-schedule-pill {
   display: inline-flex;
   align-items: center;
@@ -8865,6 +8873,12 @@ body {
   margin-top: 3px;
   font-size: 12px;
 }
+
+.phone-call-record-list { max-height: 60vh; overflow-y: auto; }
+.phone-call-record-item { align-items: flex-start !important; }
+.phone-call-record-item .ant-typography { margin-bottom: 0; line-height: 1.75; }
+.phone-call-record-item p.ant-typography { margin-top: 8px; color: #475467; }
+.phone-call-record-empty { padding: 36px 0; color: #98a2b3; text-align: center; }
 
 .sales-strategy-content {
   margin: 0;
@@ -9847,7 +9861,7 @@ body {
   }
 
   .page-heading h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .app-content {

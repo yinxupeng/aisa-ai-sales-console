@@ -228,7 +228,7 @@ function AppShell({ user, onLogout }) {
   };
 
   useEffect(() => {
-    if (!visibleWecomKeys.includes(activeWecom)) {
+    if (activeWecom !== "all-users" && !visibleWecomKeys.includes(activeWecom)) {
       setActiveWecom(visibleWecomKeys[0] || managedWecomAccounts[0].key);
       setActiveConversationKey("");
     }

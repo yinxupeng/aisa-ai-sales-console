@@ -969,8 +969,6 @@ assert.ok(!aiSkillTabsSource.includes("options={toolOptions}"), "Skill 关联工
   "updateCustomerPhone",
   "customer-course-table",
   "sales-strategy-panel",
-  "策略智能体输出结果",
-  "用户洞察与销售建议",
   "strategyInsightDrafts",
   "strategyInsightEditing",
   "startEditStrategyInsight",
