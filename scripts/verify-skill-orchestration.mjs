@@ -498,6 +498,14 @@ assert.ok(!customerStrategyTabSource.includes("已写入客户档案"), "客户�
 assert.ok(!customerStrategyTabSource.includes("AI写入标签"), "客户详情销售策略 Tab 不应展示 AI 写入标签模块");
 assert.ok(!customerStrategyTabSource.includes("个性化提示词摘要"), "客户详情销售策略 Tab 应将个性化提示词摘要合并到用户洞察与销售建议");
 assert.ok(customerStrategyTabSource.includes("strategyInsightEditing"), "客户详情销售策略 Tab 应支持编辑态");
+assert.ok(customerStrategyTabSource.includes("聊天总结"), "客户详情销售策略 Tab 应展示生成的聊天总结");
+assert.ok(customerStrategyTabSource.includes("电话沟通总结"), "客户详情销售策略 Tab 应展示电话沟通总结");
+assert.ok(customerStrategyTabSource.includes("generatedInsight.generatedAt"), "客户详情销售策略 Tab 应展示生成时间");
+assert.ok(customerStrategyTabSource.includes("generatedInsight.summary"), "客户详情销售策略 Tab 应同步聊天总结内容");
+assert.ok(customerStrategyTabSource.includes("generatedInsight.insight"), "客户详情销售策略 Tab 应同步用户洞察内容");
+assert.ok(customerStrategyTabSource.includes("用户背景"), "客户详情销售策略 Tab 应展示用户背景分段");
+assert.ok(customerStrategyTabSource.includes("关键风险"), "客户详情销售策略 Tab 应展示关键风险分段");
+assert.ok(customerStrategyTabSource.includes("销售建议"), "客户详情销售策略 Tab 应展示销售建议分段");
 assert.ok(customerStrategyTabSource.includes("保存"), "客户详情销售策略 Tab 应支持保存编辑内容");
 assert.ok(customerStrategyTabSource.includes("取消"), "客户详情销售策略 Tab 应支持取消编辑");
 assert.ok(customerStrategyTabSource.includes("Input.TextArea"), "客户详情销售策略 Tab 合并内容应使用可编辑文本域");

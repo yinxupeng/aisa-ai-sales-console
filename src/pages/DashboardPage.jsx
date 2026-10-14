@@ -597,7 +597,7 @@ function DashboardPage({ setRoute, onViewConversation, conversationsData = conve
         />
       </Card>
       <Row gutter={[16, 16]} className="dashboard-analysis-row">
-        <Col xs={24} className="dashboard-analysis-col">
+        <Col xs={24} xl={12} className="dashboard-analysis-col">
           <Card className="dashboard-card stage-distribution-card" title={<PanelTitle title="阶段用户分布" desc="直接展示当前所处每个阶段的用户数和人工介入情况。" />}>
             <Table
               size="small"
@@ -612,6 +612,53 @@ function DashboardPage({ setRoute, onViewConversation, conversationsData = conve
                 className: "clickable-table-row"
               })}
             />
+          </Card>
+        </Col>
+        <Col xs={24} xl={12} className="dashboard-analysis-col">
+          <Card className="dashboard-card intention-action-card" title={<PanelTitle title="意向分布" desc="按转化意向拆分用户，并给出AI培育与人工跟进动作。" />}>
+            <div className="intention-action-layout">
+              <div className="intention-summary-bar"><Text type="secondary">{intentionSummary}</Text></div>
+              <div className="intention-distribution-panel">
+                <Text strong className="insight-section-title">人群分布</Text>
+                <div className="intention-distribution-list">
+                  {intentionDistributionRows.map((item) => (
+                    <button type="button" className="intention-distribution-row" key={item.key} onClick={() => openInsightUserList({ title: item.name, count: item.count, rows: item.users })}>
+                      <span className="intention-row-name"><i style={{ background: item.color }} />{item.name}</span>
+                      <span className="intention-progress-track"><span style={{ width: `${Math.max(4, (item.count / maxIntentionCount) * 100)}%`, background: item.color }} /></span>
+                      <span className="intention-row-metrics">
+                        <Text strong>{item.count}人</Text>
+                        <Tag color={item.manualCount ? "red" : "blue"}>{item.manualCount}人介入</Tag>
+                        <Tag color="green">转化订单 {item.convertedCount}</Tag>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} className="dashboard-analysis-col">
+          <Card className="dashboard-card intention-strategy-section-card" title={<PanelTitle title="人机协同动作" desc="不同意向层级对应的AI动作、人工动作和风险边界。" />}>
+            <div className="intention-strategy-grid">
+              {intentionDistributionRows.map((item) => (
+                <div className="intention-strategy-card" key={`${item.key}-strategy`} style={{ background: item.bg }}>
+                  <div className="intention-strategy-head">
+                    <Text strong>{item.name}</Text>
+                    <Tag color={item.color}>{item.level}</Tag>
+                  </div>
+                  <div className="intention-strategy-copy">
+                    <Paragraph type="secondary">命中：{item.reason}</Paragraph>
+                    <Paragraph>AI动作：{item.aiAction}</Paragraph>
+                    <Paragraph>人工动作：{item.humanAction}</Paragraph>
+                    <Paragraph type="secondary">当前风险：{item.risk}</Paragraph>
+                    <Space size={8}>
+                      <Button size="small" onClick={() => openInsightUserList({ title: item.name, count: item.count, rows: item.users })}>生成跟进任务</Button>
+                      <Button size="small">加入群发人群</Button>
+                    </Space>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Card>
         </Col>
       </Row>

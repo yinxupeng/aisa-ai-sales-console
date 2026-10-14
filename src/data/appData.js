@@ -999,11 +999,11 @@ export const salesAccounts = [
 ];
 
 export const managedWecomAccounts = [
-  { key: "wecom-li", label: "李老师企微", owner: "李销售", employee: "李老师", department: "销售部", account: "li_sales" },
-  { key: "wecom-chen", label: "陈老师企微", owner: "陈销售", employee: "陈老师", department: "班主任组", account: "chen_sales" },
-  { key: "wecom-zhou", label: "周老师企微", owner: "周销售", employee: "周老师", department: "市场部", account: "zhou_sales" },
-  { key: "wecom-wu", label: "吴老师企微", owner: "吴销售", employee: "吴老师", department: "销售部", account: "wu_sales" },
-  { key: "wecom-lin", label: "林老师企微", owner: "林销售", employee: "林老师", department: "销售部", account: "lin_sales" }
+  { key: "wecom-li", label: "李老师企微", displayName: "李明", role: "销售A类", avatarImage: "./assets/role-avatars/role-1.png", owner: "李销售", employee: "李老师", department: "销售部", account: "li_sales" },
+  { key: "wecom-chen", label: "陈老师企微", displayName: "陈欣", role: "销售B类", avatarImage: "./assets/role-avatars/role-2.png", owner: "陈销售", employee: "陈老师", department: "班主任组", account: "chen_sales" },
+  { key: "wecom-zhou", label: "周老师企微", displayName: "周悦", role: "销售C类", avatarImage: "./assets/role-avatars/role-3.png", owner: "周销售", employee: "周老师", department: "市场部", account: "zhou_sales" },
+  { key: "wecom-wu", label: "吴老师企微", displayName: "吴尚宇", role: "销售B类", avatarImage: "./assets/role-avatars/role-4.png", owner: "吴销售", employee: "吴老师", department: "销售部", account: "wu_sales" },
+  { key: "wecom-lin", label: "林老师企微", displayName: "林晓", role: "销售A类", avatarImage: "./assets/role-avatars/role-5.png", owner: "林销售", employee: "林老师", department: "销售部", account: "lin_sales" }
 ];
 
 export const tagRoleOptions = ["市场", "销售", "班主任"].map((value) => ({ label: value, value }));

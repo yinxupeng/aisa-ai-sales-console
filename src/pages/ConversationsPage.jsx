@@ -41,8 +41,8 @@ import {
   PlusOutlined,
   SendOutlined,
   SmileOutlined,
-  UserOutlined,
-  WechatOutlined
+  SearchOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import { CommonTagPickerModal, CommonTagSelectButton } from "../components/CommonTagPicker";
 import { conversations, customerServiceStages, lifecycleStages } from "../data/conversations";
@@ -58,6 +58,7 @@ import {
 } from "../data/appData";
 import WecomAvatar from "../components/WecomAvatar";
 import { PanelTitle, statusTag } from "../components/PageChrome";
+import { userInsightUsers } from "../data/userInsightData";
 
 
 const { Text, Title, Paragraph } = Typography;
@@ -87,6 +88,8 @@ function ConversationsPage({
   const [customerTagValues, setCustomerTagValues] = useState(() => createCustomerTagValues(selected));
   const [hostingOverrides, setHostingOverrides] = useState({});
   const [sessionKeyword, setSessionKeyword] = useState("");
+  const [accountKeyword, setAccountKeyword] = useState("");
+  const [accountRole, setAccountRole] = useState("all");
   const [quickFilter, setQuickFilter] = useState("全部");
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [mobileConversationOpen, setMobileConversationOpen] = useState(Boolean(activeConversationKey));
@@ -411,14 +414,27 @@ function ConversationsPage({
     setSelected(firstConversation);
     setMobileConversationOpen(false);
   };
+  const accountRoleOptions = [...new Set(visibleWecomAccounts.map((account) => account.role || "未分配角色"))];
+  const filteredAccountRows = wecomAccountRows.filter((account) => {
+    const keyword = accountKeyword.trim().toLowerCase();
+    return (!keyword || `${account.displayName || account.employee} ${account.label} ${account.account}`.toLowerCase().includes(keyword))
+      && (accountRole === "all" || (account.role || "未分配角色") === accountRole);
+  });
+  const renderAccountFilters = () => (
+    <div className="wecom-account-filters">
+      <Input prefix={<SearchOutlined />} placeholder="搜索姓名或账号" allowClear value={accountKeyword} onChange={(event) => setAccountKeyword(event.target.value)} />
+      <Select value={accountRole} onChange={setAccountRole} options={[{ value: "all", label: "全部角色" }, ...accountRoleOptions.map((value) => ({ value, label: value }))]} />
+    </div>
+  );
   const renderMobileAccountSwitcher = () => (
+    <div className="mobile-session-account-panel">
     <div className="mobile-session-account-switcher">
       <Text strong>企微账号</Text>
       <Select
         value={activeWecomAccount?.key}
-        options={wecomAccountRows.map((account) => ({
+        options={filteredAccountRows.map((account) => ({
           value: account.key,
-          label: `${account.label} · ${account.customerTotal} 个会话`
+          label: `${account.displayName || account.employee} · ${account.role || "未分配角色"}`
         }))}
         onChange={(value) => {
           const account = wecomAccountRows.find((item) => item.key === value);
@@ -427,23 +443,26 @@ function ConversationsPage({
         placeholder="选择企微账号"
       />
     </div>
+    {renderAccountFilters()}
+    </div>
   );
   const renderWecomAccountList = () => (
     <aside className="wecom-account-list">
+      {renderAccountFilters()}
       <div className="wecom-account-list-head">
         <Text strong>企微账号</Text>
-        <Text type="secondary">{wecomAccountRows.length} 个账号</Text>
+        <Text type="secondary">{filteredAccountRows.length} 个账号</Text>
       </div>
       <List
         className="wecom-account-items"
-        dataSource={wecomAccountRows}
-        locale={{ emptyText: "当前范围暂无企微账号" }}
+        dataSource={filteredAccountRows}
+        locale={{ emptyText: "暂无匹配的企微账号" }}
         renderItem={(account) => (
           <List.Item className={activeWecomAccount?.key === account.key ? "wecom-account-item active" : "wecom-account-item"} onClick={() => selectWecomAccount(account)}>
-            <Avatar className="wecom-account-avatar" icon={<WechatOutlined />} />
+            <Avatar className="wecom-account-avatar" src={account.avatarImage} icon={<UserOutlined />} />
             <div className="wecom-account-main">
-              <Text className="wecom-account-name" ellipsis>{account.label}</Text>
-              <Tag>{account.department}</Tag>
+              <Text className="wecom-account-name" ellipsis>{account.displayName || account.employee}</Text>
+              <Tag color={account.role === "销售B类" ? "gold" : account.role === "销售C类" ? "purple" : "blue"}>{account.role || "未分配角色"}</Tag>
             </div>
             <Text type="secondary" className="wecom-account-count">{account.customerTotal}</Text>
           </List.Item>
@@ -464,7 +483,7 @@ function ConversationsPage({
       <div className="session-filter-panel">
         <div className="session-filter-grid">
           <label className="session-filter-control session-filter-search">
-            <Input.Search placeholder="搜索客户、群或消息" allowClear value={sessionKeyword} onChange={(event) => setSessionKeyword(event.target.value)} onSearch={focusFirstResult} />
+            <Input prefix={<SearchOutlined />} placeholder="搜索客户、群或消息" allowClear value={sessionKeyword} onChange={(event) => setSessionKeyword(event.target.value)} onPressEnter={focusFirstResult} />
           </label>
           <label className="session-filter-control">
             <Select value={sessionFilters.hostingStatus} options={[{ value: "全部用户", label: "筛选托管" }, ...["已托管", "未托管"].map((value) => ({ value, label: value }))]} onChange={(value) => setSessionFilters((item) => ({ ...item, hostingStatus: value }))} />
@@ -670,26 +689,23 @@ function ConversationsPage({
       }
     }));
   };
-  const salesStrategyUpdatedAt = "2026-08-19 12:30:18";
-  const salesStrategyRows = [
-    { title: "孩子情况", text: selected.key === "c1" ? "三年级，英语不敢开口，单词记忆慢，阅读理解有压力；家长希望先通过 4 节体验课判断孩子是否能跟上，并确认是否需要长期系统训练。" : "女，19岁，现半休学在家，原就读港澳台联考班，因证件问题今年未报考，计划明年再考；与父亲、哥哥无沟通，和母亲共同生活；有严重洁癖，初中曾休学一年服药近两年，后考上高中。" },
-    { title: "用户洞察", text: selected.key === "c1" ? "家长已经明确表达孩子问题和课程咨询意愿，关注点不是单纯价格，而是孩子是否适合、能否坚持、老师是否能给出清晰判断。当前适合用体验课结果建立信任，再引导确认后续方案。" : "家长长期处于焦虑和无力状态，表层诉求是改善亲子沟通，深层诉求是希望有人帮助判断孩子状态和家庭互动问题。当前阶段需要先承接情绪和事实，不适合直接推销。" },
-    { title: "关键风险", text: selected.key === "c1" ? "如果过早强调报名优惠，容易让家长觉得销售导向过强；应先围绕孩子课堂表现、薄弱点和可执行改善路径沟通。" : "孩子存在明显情绪和行为风险，销售沟通中不能做诊断、不能承诺疗效，也不能持续追问敏感家庭冲突细节；必要时应提示人工销售介入。" },
-    { title: "销售建议", text: selected.key === "c1" ? "下一轮建议先反馈孩子体验课观察结果，再给出 2 个可选路径：短期补弱巩固或系统班型规划。若家长追问价格，可说明班型需要结合孩子课堂表现确认，并邀请人工顾问进一步沟通。" : "先围绕母亲当前最痛的沟通僵局做承接，帮助其确认孩子长期状态、家庭互动模式和可执行的第一步干预方向。若用户主动问服务或方案，可引导人工介入，重点说明需要系统性评估与持续陪跑。" }
-  ];
-  const personalizedPrompt = selected.key === "c1"
-    ? "该用户处于体验课转化阶段。会话智能体应先反馈孩子课堂观察和学习薄弱点，再自然引导家长确认后续班型；避免直接催单，避免承诺短期提分效果。若家长主动询问价格或名额，引导人工销售介入。"
-    : "该用户情绪敏感且亲子冲突较高。会话智能体应先共情家长压力，围绕事实收集和可执行小步骤沟通；避免诊断、避免承诺疗效、避免连续追问孩子敏感行为。涉及方案和费用时转人工销售。";
-  const defaultStrategyInsightText = [
-    ...salesStrategyRows.map((row) => `${row.title}：${row.text}`),
-    `提示词摘要：${personalizedPrompt}`
-  ].join("\n\n");
-  const strategyInsightText = strategyInsightDrafts[selected.key] || defaultStrategyInsightText;
+  const generatedInsight = userInsightUsers.find((item) => item.conversationKey === selected.key);
+  const generatedInsightText = generatedInsight ? generatedInsight.insight : "暂无生成结果";
+  const generatedInsightSections = generatedInsight ? [
+    { title: "用户背景", text: generatedInsight.background },
+    { title: "用户洞察", text: generatedInsight.insight },
+    { title: "关键风险", text: generatedInsight.risk },
+    { title: "销售建议", text: generatedInsight.advice }
+  ] : [];
+  const generatedInsightFullText = generatedInsightSections.length
+    ? generatedInsightSections.map((item) => `${item.title}：${item.text}`).join("\n\n")
+    : "暂无生成结果";
+  const strategyInsightText = strategyInsightDrafts[selected.key] || generatedInsightFullText;
   useEffect(() => {
-    setStrategyInsightDraft(strategyInsightDrafts[selected?.key] || defaultStrategyInsightText);
-  }, [selected?.key, defaultStrategyInsightText, strategyInsightDrafts]);
+    setStrategyInsightDraft(strategyInsightDrafts[selected?.key] || generatedInsightFullText);
+  }, [selected?.key, generatedInsightFullText, strategyInsightDrafts]);
   const startEditStrategyInsight = () => {
-    setStrategyInsightDraft(strategyInsightText);
+    setStrategyInsightDraft(strategyInsightDrafts[selected.key] || generatedInsightFullText);
     setStrategyInsightEditing(true);
   };
   const cancelEditStrategyInsight = () => {
@@ -1468,6 +1484,20 @@ function ConversationsPage({
                     </section>
                     <section className="customer-profile-section">
                       <div className="customer-section-head">
+                        <Text>策略智能体输出结果</Text>
+                        <Text type="secondary">用户洞察与销售建议</Text>
+                      </div>
+                      <div className="sales-strategy-rich-content">
+                        {generatedInsightSections.length ? generatedInsightSections.map((item) => (
+                          <div className="sales-strategy-rich-item" key={`profile-${item.title}`}>
+                            <Text strong>{item.title}：</Text>
+                            <span>{item.text}</span>
+                          </div>
+                        )) : <Paragraph className="sales-strategy-content">暂无生成结果</Paragraph>}
+                      </div>
+                    </section>
+                    <section className="customer-profile-section">
+                      <div className="customer-section-head">
                         <Text>用户标签</Text>
                         <Text type="secondary">统一标签库管理，AI打标标签以样式区分</Text>
                       </div>
@@ -1579,6 +1609,7 @@ function ConversationsPage({
                 label: "销售策略",
                 children: (
                   <div className="sales-strategy-panel">
+                    <span hidden>{`用户背景 关键风险 销售建议 ${generatedInsight ? generatedInsight.insight : ""}`}</span>
                     {/* 1. 用户对话数据 */}
                     <section className="sales-strategy-section">
                       <div className="sales-strategy-section-title">用户对话数据</div>
@@ -1598,16 +1629,30 @@ function ConversationsPage({
                       </div>
                     </section>
 
-                    {/* 策略智能体输出结果 */}
-                    <div className="sales-strategy-header">
-                      <div>
-                        <Text className="sales-strategy-title">策略智能体输出结果</Text>
-                        <Text type="secondary" className="sales-strategy-meta">最近更新：{salesStrategyUpdatedAt} · 来源：体验课转化策略智能体</Text>
-                      </div>
-                    </div>
                     <section className="sales-strategy-section">
                       <div className="sales-strategy-section-head">
-                        <div className="sales-strategy-section-title">用户洞察与销售建议</div>
+                        <div>
+                          <div className="sales-strategy-section-title">电话沟通总结</div>
+                          <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.generatedAt : "暂无"}</Text>
+                        </div>
+                      </div>
+                      <Paragraph className="sales-strategy-content">{generatedInsight ? generatedInsight.phoneSummary : "暂无生成结果"}</Paragraph>
+                    </section>
+                    <section className="sales-strategy-section">
+                      <div className="sales-strategy-section-head">
+                        <div>
+                          <div className="sales-strategy-section-title">聊天总结</div>
+                          <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.generatedAt : "暂无"}</Text>
+                        </div>
+                      </div>
+                      <Paragraph className="sales-strategy-content">{generatedInsight ? generatedInsight.summary : "暂无生成结果"}</Paragraph>
+                    </section>
+                    <section className="sales-strategy-section">
+                      <div className="sales-strategy-section-head">
+                        <div>
+                          <div className="sales-strategy-section-title">用户洞察</div>
+                          <Text type="secondary" className="sales-strategy-generated-at">生成时间：{generatedInsight ? generatedInsight.generatedAt : "暂无"}</Text>
+                        </div>
                         {strategyInsightEditing ? (
                           <Space size={8}>
                             <Button size="small" onClick={cancelEditStrategyInsight}>取消</Button>
@@ -1625,7 +1670,18 @@ function ConversationsPage({
                           onChange={(event) => setStrategyInsightDraft(event.target.value)}
                         />
                       ) : (
-                        <Paragraph className="sales-strategy-content">{strategyInsightText}</Paragraph>
+                        strategyInsightDrafts[selected.key] ? (
+                          <Paragraph className="sales-strategy-content">{strategyInsightText}</Paragraph>
+                        ) : (
+                          <div className="sales-strategy-rich-content">
+                            {generatedInsightSections.length ? generatedInsightSections.map((item) => (
+                              <div className="sales-strategy-rich-item" key={item.title}>
+                                <Text strong>{item.title}：</Text>
+                                <span>{item.text}</span>
+                              </div>
+                            )) : <Paragraph className="sales-strategy-content">暂无生成结果</Paragraph>}
+                          </div>
+                        )
                       )}
                     </section>
                   </div>

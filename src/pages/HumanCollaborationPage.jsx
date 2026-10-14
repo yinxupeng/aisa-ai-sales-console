@@ -4,6 +4,7 @@ import { Tabs } from "antd";
 import IntentAnalysisPage from "./IntentAnalysisPage";
 import DailyReportPage from "./DailyReportPage";
 import UserInsightPage from "./UserInsightPage";
+import EventTaskTriggerPage from "./EventTaskTriggerPage";
 
 export default function HumanCollaborationPage({ onViewConversation = () => {} }) {
   return (
@@ -26,6 +27,11 @@ export default function HumanCollaborationPage({ onViewConversation = () => {} }
             key: "insight",
             label: "用户洞察与建议",
             children: <UserInsightPage onViewConversation={onViewConversation} />
+          },
+          {
+            key: "event-trigger",
+            label: "事件任务触发",
+            children: <EventTaskTriggerPage />
           }
         ]}
       />

@@ -3,7 +3,7 @@ const insightTemplates = [
     conversationKey: "c1",
     name: "张妈妈",
     relation: "母亲 · 李销售负责",
-    stage: "第3节课后 · 评估沟通",
+    stage: "第三节课",
     historyMessageCount: 86,
     summary: "家长持续描述孩子不愿上学、早晨抗拒和亲子沟通困难，已完成三节课程并主动反馈课堂感受。历史沟通中多次补充孩子的作息、情绪触发点和家庭回应方式，当前在观察课程后的细微变化。",
     background: "孩子目前处于初中阶段，长期存在学习动力下降和回避沟通的情况；母亲主要负责陪伴和求助，家庭对孩子状态存在较大分歧。",
@@ -16,7 +16,7 @@ const insightTemplates = [
     conversationKey: "c2",
     name: "刘女士",
     relation: "母亲 · 陈销售负责",
-    stage: "第1节课前 · 需求确认",
+    stage: "开课前",
     historyMessageCount: 42,
     summary: "用户多次咨询孩子情绪爆发和家庭冲突，关注课程是否适合当前情况，但尚未形成稳定到课习惯。历史聊天主要围绕最近一次冲突、家长的应对方式和父母意见差异展开，仍在判断是否进入持续支持。",
     background: "孩子近半年在家容易发脾气，母亲希望改善亲子沟通；父亲对是否寻求外部帮助态度谨慎，家庭决策尚未统一。",
@@ -29,7 +29,7 @@ const insightTemplates = [
     conversationKey: "c3",
     name: "陈妈妈",
     relation: "母亲 · 王销售负责",
-    stage: "第4节课后 · 高意向",
+    stage: "第四节课",
     historyMessageCount: 119,
     summary: "用户持续参与课程，详细反馈孩子的焦虑、睡眠和同伴交往变化，已主动询问持续服务和费用。家长能够连续记录孩子在考试前、睡前和同伴交往中的表现，并对课程后的变化进行对照，已进入方案评估阶段。",
     background: "孩子在考试和同伴交往场景中容易紧张，家长长期记录孩子状态并主动寻找方法；目前对课程内容认可，但担心长期投入效果。",
@@ -42,7 +42,7 @@ const insightTemplates = [
     conversationKey: "c4",
     name: "赵妈妈",
     relation: "母亲 · 李销售负责",
-    stage: "第2节课中 · 观察期",
+    stage: "第二节课",
     historyMessageCount: 57,
     summary: "用户主要围绕孩子沉迷手机、作息混乱和沟通对抗进行咨询，愿意尝试家庭作业，但反馈执行不稳定。历史聊天显示家庭曾多次制定规则又中断，家长当前更需要低冲突、可坚持的执行步骤。",
     background: "孩子进入青春期后亲子冲突增多，母亲希望建立手机使用规则；家庭过去尝试过多种约定，常因执行困难而中断。",
@@ -55,7 +55,7 @@ const insightTemplates = [
     conversationKey: "c5",
     name: "孙爸爸",
     relation: "父亲 · 陈销售负责",
-    stage: "第5节课后 · 决策确认",
+    stage: "第5节课",
     historyMessageCount: 103,
     summary: "父亲前期沟通较少，近期开始主动询问课程内容、孩子的参与度和后续安排，已表达希望改善家庭沟通。历史聊天中父亲开始从‘课程有没有用’转向询问自己可以如何参与，家庭决策意愿正在形成。",
     background: "父亲工作繁忙，过去主要由母亲承担陪伴；孩子与父亲交流较少，家庭希望找到更低冲突的互动方式。",
@@ -68,7 +68,7 @@ const insightTemplates = [
     conversationKey: "c6",
     name: "许妈妈",
     relation: "母亲 · 周销售负责",
-    stage: "第3节课中 · 重点关注",
+    stage: "第三节课",
     historyMessageCount: 71,
     summary: "用户反复描述孩子不愿表达、回家后把自己关在房间，沟通中出现较强担忧和无力感。历史聊天持续涉及作息、社交退缩、家庭沟通失败和母亲的自责，当前需要人工优先判断风险与承接方式。",
     background: "孩子近期减少家庭互动，母亲多次尝试沟通但效果有限；家长对孩子真实想法缺乏把握，希望有人帮助判断下一步。",
@@ -81,7 +81,7 @@ const insightTemplates = [
     conversationKey: "c7",
     name: "周妈妈",
     relation: "母亲 · 李销售负责",
-    stage: "第4节课后 · 复盘跟进",
+    stage: "第四节课",
     historyMessageCount: 64,
     summary: "用户能清晰描述孩子的情绪触发点和改善片段，主动配合课后练习，但希望得到更具体的家庭执行计划。家长已形成记录习惯，历史沟通中多次反馈作业和考试场景的变化，当前重点是把观察转化为稳定行动。",
     background: "孩子在作业和考试场景容易焦虑，母亲已经开始记录触发点；家庭愿意配合，但缺少稳定复盘方法。",
@@ -94,7 +94,7 @@ const insightTemplates = [
     conversationKey: "c8",
     name: "何爸爸",
     relation: "父亲 · 王销售负责",
-    stage: "第1节课后 · 观望",
+    stage: "第一节课",
     historyMessageCount: 35,
     summary: "用户主要询问课程流程和家长配合要求，回复节奏较慢，对孩子问题描述较少，仍在观察课程体验。历史聊天以了解服务边界、家长配合方式和首节课观察重点为主，尚未进入深入问题或方案决策。",
     background: "父亲希望孩子提升情绪管理，但家庭对问题严重程度判断不同；目前主要由父亲代表家庭了解服务。",
@@ -108,17 +108,90 @@ const insightTemplates = [
 export const userInsightSchedule = {
   label: "昨天18:00 至今天18:00",
   generatedAt: "每天18:00自动更新",
-  scope: "当前企微账号下全部用户"
+  scope: "当前企微账号下全部用户",
+  nextGeneratedAt: "2026-10-13 18:00"
 };
 
 export const userInsightSummary = {
   totalUsers: 291,
-  historicalValidChatUsers: 186,
-  historicalValidChatRate: "63.9%"
+  effectiveCommunicationUsers: 186,
+  shouldInsightUsers: 186
 };
+
+const phoneSummaryTemplates = [
+  "电话中家长重点询问孩子近期的上学抗拒和亲子沟通情况，认可先通过课程观察孩子状态，希望了解后续持续支持的安排。",
+  "电话中母亲详细说明了孩子情绪爆发和家庭冲突的情况，当前更关注课程是否适合孩子，建议先完成首节课观察再继续沟通。",
+  "电话中家长反馈孩子在考试和同伴交往时容易紧张，已主动询问持续服务和费用，当前进入方案评估阶段。",
+  "电话中母亲主要咨询孩子沉迷手机和作息混乱问题，愿意尝试低冲突的家庭沟通方式，但仍需要持续跟进执行情况。",
+  "电话中父亲开始主动了解课程内容和孩子参与情况，表达了改善家庭沟通的意愿，家庭决策正在逐步形成。",
+  "电话中母亲多次表达对孩子不愿沟通和长期独处的担忧，情绪较为紧张，已提示后续优先由人工顾问承接。",
+  "电话中家长能够清晰描述孩子的情绪触发点和课后变化，希望获得更具体的家庭执行计划。",
+  "电话中父亲主要了解课程流程和家长配合要求，当前仍处于观察阶段，暂不适合高频推进方案。"
+];
+
+export const userInsightGenerationRecords = [
+  {
+    id: "insight-run-20261012-1800",
+    executedAt: "2026-10-12 18:00",
+    scheduleLabel: "每天 18:00",
+    scope: "当前企微账号下全部用户",
+    validChatRule: "不限",
+    analyzedUsers: 291,
+    shouldInsightUsers: 186,
+    successfulInsightUsers: 186,
+    status: "已完成",
+    duration: "2分18秒",
+    summary: "本次完成全部用户档案与历史聊天的综合分析，生成 186 份用户洞察与建议。重点识别了持续厌学、亲子冲突、情绪退缩以及主动咨询持续支持的家庭。",
+    highlight: "高关注用户主要集中在第3至第5节课后，家长开始反馈孩子变化并询问后续支持；其中 12 位用户出现明显风险表达，已标记人工优先跟进。"
+  },
+  {
+    id: "insight-run-20261011-1800",
+    executedAt: "2026-10-11 18:00",
+    scheduleLabel: "每天 18:00",
+    scope: "当前企微账号下全部用户",
+    validChatRule: "历史聊天数大于1条",
+    analyzedUsers: 291,
+    shouldInsightUsers: 172,
+    successfulInsightUsers: 172,
+    status: "已完成",
+    duration: "2分06秒",
+    summary: "围绕家长历史沟通、孩子到课情况和课后反馈生成阶段性总结，帮助销售快速判断家庭当前诉求、沟通敏感点与下一步承接方向。",
+    highlight: "多数用户处于首次了解或课程观察阶段，建议先承接家长压力并收集事实；已表达方案与费用兴趣的用户集中在连续到课家庭。"
+  },
+  {
+    id: "insight-run-20261010-1800",
+    executedAt: "2026-10-10 18:00",
+    scheduleLabel: "每天 18:00",
+    scope: "当前企微账号下全部用户",
+    validChatRule: "历史聊天数大于5条",
+    analyzedUsers: 291,
+    shouldInsightUsers: 149,
+    successfulInsightUsers: 149,
+    status: "已完成",
+    duration: "1分54秒",
+    summary: "本次聚焦有持续沟通的家庭，梳理孩子学习动力、情绪调节、睡眠与亲子互动等主题的长期变化，并输出分层跟进建议。",
+    highlight: "需要优先关注的是沟通频繁但情绪持续低落的家庭，建议人工先确认事实与风险边界，再决定是否介绍持续陪伴方案。"
+  },
+  {
+    id: "insight-run-20261009-1800",
+    executedAt: "2026-10-09 18:00",
+    scheduleLabel: "每天 18:00",
+    scope: "当前企微账号下全部用户",
+    validChatRule: "历史聊天数大于10条",
+    analyzedUsers: 291,
+    shouldInsightUsers: 118,
+    successfulInsightUsers: 118,
+    status: "已完成",
+    duration: "1分42秒",
+    summary: "完成高频聊天家庭的历史画像更新，结合家长反馈、课程参与和课后互动，整理出可直接用于人工跟进的用户背景、当前阶段和沟通策略。",
+    highlight: "连续记录孩子状态并主动询问课程安排的家长，通常已经进入方案评估阶段；涉及明显失眠、极端表达等内容时，必须优先转人工。"
+  }
+];
 
 export const userInsightUsers = insightTemplates.map((item, index) => ({
   ...item,
   id: `user-insight-${index + 1}`,
-  generatedAt: "2026-06-12 18:00"
+  wecomAccount: ["李老师企微", "陈老师企微", "王老师企微", "李老师企微", "陈老师企微", "周老师企微", "李老师企微", "王老师企微"][index] || "未分配",
+  phoneSummary: phoneSummaryTemplates[index] || "暂无生成结果",
+  generatedAt: "2026-10-12 18:00"
 }));
