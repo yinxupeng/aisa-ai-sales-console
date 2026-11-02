@@ -551,8 +551,8 @@ assert.ok(appDataSource.includes('"wecomChannel"') && appDataSource.includes('"w
   "登录账号",
   "AI托管",
   "个性化描述",
-  "批量开通AI",
-  "批量关闭AI"
+  "批量分配席位",
+  "批量释放席位"
 ].forEach((token) => {
   assert.ok(wecomAccountPageSource.includes(token), `企微账号管理页缺少账号或席位能力：${token}`);
 });

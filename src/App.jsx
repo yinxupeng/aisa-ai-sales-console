@@ -22,11 +22,13 @@ import {
   BarChartOutlined,
   BarsOutlined,
   BookOutlined,
+  BuildOutlined,
   CloudSyncOutlined,
   CommentOutlined,
   DashboardOutlined,
   FileSearchOutlined,
   FileTextOutlined,
+  LineChartOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   RobotOutlined,
@@ -65,12 +67,17 @@ import EnterpriseLogin from "./shared/EnterpriseLogin";
 import { selectedEnterpriseId, usePlatformData } from "./shared/platformStore";
 import SuggestionsPage from "./pages/SuggestionsPage";
 import HumanCollaborationPage from "./pages/HumanCollaborationPage";
+import TokenCostDashboardPage from "./pages/TokenCostDashboardPage";
+import PromptStudioPage from "./pages/PromptStudioPage";
+import SalesReportingPage from "./pages/SalesReportingPage";
 
 const { Header, Sider, Content } = Layout;
 const { Paragraph, Title, Text } = Typography;
 
 const menuItems = [
   { key: "dashboard", icon: <DashboardOutlined />, label: "工作台" },
+  { key: "salesAssistant", icon: <RobotOutlined />, label: "销售助理" },
+  { key: "dataReports", icon: <BarChartOutlined />, label: "数据报表" },
   { key: "conversations", icon: <CommentOutlined />, label: "会话中心" },
   {
     key: "humanCollaboration",
@@ -110,7 +117,9 @@ const menuItems = [
       { key: "massMessage", icon: <SendOutlined />, label: "用户群发" }
     ]
   },
-  { key: "settings", icon: <SettingOutlined />, label: "系统管理" }
+  { key: "settings", icon: <SettingOutlined />, label: "系统管理" },
+  { key: "tokenCost", icon: <LineChartOutlined />, label: "Token消耗看板" },
+  { key: "promptStudio", icon: <BuildOutlined />, label: "阶段Prompt工坊" }
 ];
 
 const flattenMenuItems = (items) => items.flatMap((item) => item.children ? [item, ...flattenMenuItems(item.children)] : [item]);
@@ -285,7 +294,11 @@ function AppShell({ user, onLogout }) {
       />
     ),
     suggestions: <SuggestionsPage />,
-    settings: <SettingsPage platform={platform} />
+    settings: <SettingsPage platform={platform} />,
+    tokenCost: <TokenCostDashboardPage />,
+    promptStudio: <PromptStudioPage />,
+    salesAssistant: <SalesReportingPage key={`reports-${user.key}-${visibleWecomKeys.join(",")}`} mode="assistant" user={user} visibleWecomKeys={visibleWecomKeys} onNavigate={handleMenuSelect} onViewConversation={handleViewConversation} />,
+    dataReports: <SalesReportingPage key={`reports-${user.key}-${visibleWecomKeys.join(",")}`} mode="reports" user={user} visibleWecomKeys={visibleWecomKeys} onNavigate={handleMenuSelect} />
   })[route], [route, platform, activeWecom, activeConversationKey, autoOpenCustomerDrawerToken, visibleWecomKeys.join("|"), conversationViewMode, dashboardWecomFilter, dashboardPeriodFilter]);
 
   return (

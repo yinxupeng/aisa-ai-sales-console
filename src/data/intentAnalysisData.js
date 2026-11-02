@@ -1,3 +1,6 @@
+import { defaultIntentRules, evaluateIntentRules, describeIntentRule } from "./intentRules.js";
+import { conversations } from "./conversations.js";
+
 export const intentAnalysisSchedule = {
   frequency: "每天一次",
   runAt: "09:00",
@@ -6,26 +9,14 @@ export const intentAnalysisSchedule = {
   scope: "当前处于第3、4、5节课的用户"
 };
 
-export const intentLevelDefinitions = [
-  { level: 0, label: "观察中", color: "default", description: "没有到课记录，聊天较少或尚未出现病情相关表达" },
-  { level: 1, label: "开始关注", color: "blue", description: "没有到课记录，但聊天较多且出现病情相关表达" },
-  { level: 2, label: "开始行动", color: "cyan", description: "至少有1天有效看课记录" },
-  { level: 3, label: "持续参与", color: "orange", description: "至少到课2天，第三节课后仍然持续沟通" },
-  { level: 4, label: "重点培育", color: "purple", description: "连续到课3天、累计观看超过40分钟，并表达感受或询价" },
-  { level: 5, label: "高意向", color: "red", description: "连续到课3天、累计观看超过80分钟，询价且课后持续表达感受" }
-];
+export const intentLevelDefinitions = defaultIntentRules.map((rule) => ({ ...rule, description: describeIntentRule(rule) }));
 
 const illnessKeywords = ["厌学", "情绪", "焦虑", "亲子冲突", "抑郁", "失眠", "暴躁", "沉迷手机", "不想上学"];
 
-export const calculateIntentLevel = (metrics) => {
-  const hasIllnessKeyword = metrics.hasIllnessKeyword ?? illnessKeywords.some((keyword) => metrics.recentChat?.includes(keyword));
-  const hasAttendance = metrics.attendanceDays > 0;
-  if (metrics.consecutiveAttendanceDays >= 3 && metrics.totalWatchMinutes > 80 && metrics.askedPrice && metrics.expressedAfterAllLessons) return 5;
-  if (metrics.consecutiveAttendanceDays >= 3 && metrics.totalWatchMinutes > 40 && (metrics.expressedAfterLessons123 || metrics.askedPrice)) return 4;
-  if (metrics.attendanceDays >= 2 && metrics.chattedAfterLesson3) return 3;
-  if (metrics.attendanceDays >= 1) return 2;
-  if (!hasAttendance && metrics.chatCount > 20 && hasIllnessKeyword) return 1;
-  return 0;
+export const calculateIntentLevel = (metrics, rules = defaultIntentRules) => {
+  const normalized = { ...metrics };
+  if (normalized.hasIllnessKeyword == null && typeof metrics.recentChat === "string") normalized.hasIllnessKeyword = illnessKeywords.some((keyword) => metrics.recentChat.includes(keyword));
+  return evaluateIntentRules(normalized, rules).level;
 };
 
 const profiles = [
@@ -42,11 +33,11 @@ const metricTemplates = [
   { chatCount: 32, attendanceDays: 0, consecutiveAttendanceDays: 0, totalWatchMinutes: 0, hasIllnessKeyword: true, askedPrice: false, expressedAfterLessons123: false, expressedAfterAllLessons: false, chattedAfterLesson3: false },
   { chatCount: 28, attendanceDays: 1, consecutiveAttendanceDays: 1, totalWatchMinutes: 12, hasIllnessKeyword: true, askedPrice: false, expressedAfterLessons123: false, expressedAfterAllLessons: false, chattedAfterLesson3: false },
   { chatCount: 42, attendanceDays: 2, consecutiveAttendanceDays: 2, totalWatchMinutes: 28, hasIllnessKeyword: true, askedPrice: false, expressedAfterLessons123: false, expressedAfterAllLessons: false, chattedAfterLesson3: true },
-  { chatCount: 56, attendanceDays: 3, consecutiveAttendanceDays: 3, totalWatchMinutes: 52, hasIllnessKeyword: true, askedPrice: false, expressedAfterLessons123: true, expressedAfterAllLessons: false, chattedAfterLesson3: true },
+  { chatCount: 56, attendanceDays: 3, consecutiveAttendanceDays: 3, totalWatchMinutes: 52, hasIllnessKeyword: true, askedPrice: true, expressedAfterLessons123: true, expressedAfterAllLessons: false, chattedAfterLesson3: true },
   { chatCount: 68, attendanceDays: 3, consecutiveAttendanceDays: 3, totalWatchMinutes: 96, hasIllnessKeyword: true, askedPrice: true, expressedAfterLessons123: true, expressedAfterAllLessons: true, chattedAfterLesson3: true }
 ];
 
-const followUpByLevel = {
+export const followUpByLevel = {
   0: "继续以低压力方式提醒家长了解课程，暂不主动推进咨询转化。",
   1: "围绕孩子当前困扰进行共情和信息收集，邀请家长完成第一节课程。",
   2: "关注家长的首次看课反馈，及时发送课程复盘并推动下一节学习。",
@@ -65,17 +56,19 @@ const buildUser = (index) => {
     1, 1, 1, 1, 1,
     0, 0, 0, 0, 0
   ];
-  const metrics = { ...metricTemplates[targetLevelSequence[index % targetLevelSequence.length]] };
+  const metrics = { ...metricTemplates[targetLevelSequence[index % targetLevelSequence.length]], todayChatCount: Math.min(metricTemplates[targetLevelSequence[index % targetLevelSequence.length]].chatCount, (index * 7) % 23) };
   const level = calculateIntentLevel(metrics);
   const lastChatAt = `2026-10-${String(10 - (index % 5)).padStart(2, "0")} ${String(9 + (index % 10)).padStart(2, "0")}:${String((index * 11) % 60).padStart(2, "0")}`;
   return {
     id: `intent-user-${index + 1}`,
     ...profile,
+    accountKey: conversations.find((conversation) => conversation.key === profile.conversationKey)?.accountKey,
     courseName: "观心实验室·儿童心理健康医疗课程",
     currentLesson: profile.lesson,
+    hosted: index % 3 !== 0,
     metrics,
     level,
-    levelInfo: intentLevelDefinitions[level],
+    levelInfo: intentLevelDefinitions.find((rule) => rule.level === level),
     recentChatAt: lastChatAt,
     analysisAt: "2026-10-10 09:00",
     followUp: followUpByLevel[level]

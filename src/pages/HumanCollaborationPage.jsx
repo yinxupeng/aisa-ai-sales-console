@@ -5,6 +5,7 @@ import IntentAnalysisPage from "./IntentAnalysisPage";
 import DailyReportPage from "./DailyReportPage";
 import UserInsightPage from "./UserInsightPage";
 import EventTaskTriggerPage from "./EventTaskTriggerPage";
+import AutoScheduledTasksPage from "./AutoScheduledTasksPage";
 
 export default function HumanCollaborationPage({ onViewConversation = () => {} }) {
   return (
@@ -32,6 +33,11 @@ export default function HumanCollaborationPage({ onViewConversation = () => {} }
             key: "event-trigger",
             label: "事件任务触发",
             children: <EventTaskTriggerPage />
+          },
+          {
+            key: "auto-scheduled",
+            label: "自动定时任务",
+            children: <AutoScheduledTasksPage onViewConversation={onViewConversation} />
           }
         ]}
       />

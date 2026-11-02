@@ -1,3 +1,6 @@
+import { userIntentSkillPrompt } from "./userIntentSkillPrompt";
+import { autoFollowupSkillPrompt } from "./autoFollowupSkillPrompt";
+
 export const companies = [
   { id: "company-1", name: "星河教育科技", industry: "教育", contact: "张总", phone: "13800008888", status: "启用", wecom: "已连接企微" },
   { id: "company-2", name: "云帆家装服务", industry: "家装", contact: "李总", phone: "13900009999", status: "启用", wecom: "未配置企微" },
@@ -678,6 +681,34 @@ export const complianceSkillPrompt = `# Skill目标
 
 export const aiSkills = [
   {
+    key: "aiskill-auto-followup", name: "AI主动跟进规划", industry: "医疗健康",
+    description: "结合家长聊天识别值得继续沟通的话题，提出单次跟进时间、消息及证据；人工任务优先，未回复不重复跟进，风险转人工。",
+    type: "任务触发", outputType: "任务结果", outputTargets: ["智能体内部", "触发后续任务"],
+    scenario: "观心实验室儿童心理健康课程家长沉默后的适度主动沟通", trigger: "用户沉默达到配置时长时判断",
+    input: "用户档案、聊天记录、最新回复、托管状态、人工及事件任务、发送限制", output: "是否生成、目的、时间、消息、依据、失效时间",
+    boundAgents: [], status: "启用", createdAt: "2026-10-23", updatedAt: "2026-10-23", prompt: autoFollowupSkillPrompt, knowledgeBaseKeys: [], toolKeys: []
+  },
+  {
+    key: "aiskill-intent-analysis",
+    name: "用户意向度分析",
+    industry: "医疗健康",
+    description: "识别观心实验室用户聊天中的询价、问题表达和课后感受等信号，并结合程序按已配置规则计算的意向档位，输出依据、跟进策略与行动建议。",
+    type: "策略判断",
+    outputType: "策略判断",
+    outputTargets: ["客户档案", "生成真人销售建议"],
+    scenario: "儿童心理健康课程用户意向度分层及人工跟进",
+    trigger: "按用户意向度分析配置的执行时间触发",
+    input: "用户档案、累计聊天条数、课程到课天数和观看时长、课后聊天、询价及课后感受",
+    output: "用户、当前阶段、意向档位、判断依据、跟进策略、下一步行动、风险或缺失信息",
+    boundAgents: [],
+    status: "启用",
+    createdAt: "2026-10-19",
+    updatedAt: "2026-10-20",
+    prompt: userIntentSkillPrompt,
+    knowledgeBaseKeys: [],
+    toolKeys: []
+  },
+  {
     key: "aiskill-1",
     name: "用户画像总结",
     description: "从企微聊天记录和历史摘要中提炼孩子情况、家长痛点、家庭互动、购买意向和下一步沟通建议，沉淀到客户档案供后续智能体和真人销售查看。",
@@ -961,8 +992,8 @@ export const aiSalesSeatLicense = {
 };
 
 const syncedSalesAccountSeeds = [
-  { key: "sale1", name: "沈海龙", role: "销售", department: "销售一部", accountRole: "管理者", phone: "13800008881", wecom: "16888576164354", wecomId: "19", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, aiSeatOpenedAt: "2026-07-01", sendMode: "人工确认", skills: ["19元A类课-课前", "19元A类课-第一课"], customerTotal: 6, hostedCustomers: 6, manualCustomers: 0, sentToday: 18, abnormal: 0, syncedAt: "14:20", dedicatedInfo: "" },
-  { key: "sale2", name: "技术部-测试机-13311384812", role: "销售", department: "技术测试组", accountRole: "普通员工", phone: "13311384812", wecom: "16888581166708", wecomId: "00", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, aiSeatOpenedAt: "2026-07-01", sendMode: "自动发送", skills: ["19元A类课-第四课", "19元A类课-课后"], customerTotal: 2, hostedCustomers: 2, manualCustomers: 0, sentToday: 26, abnormal: 0, syncedAt: "14:18", dedicatedInfo: "" }
+  { key: "sale1", name: "沈海龙", role: "销售", department: "销售一部", accountRole: "管理者", phone: "13800008881", wecom: "16888576164354", wecomId: "19", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, sendMode: "人工确认", skills: ["19元A类课-课前", "19元A类课-第一课"], customerTotal: 6, hostedCustomers: 6, manualCustomers: 0, sentToday: 18, abnormal: 0, syncedAt: "14:20", dedicatedInfo: "" },
+  { key: "sale2", name: "技术部-测试机-13311384812", role: "销售", department: "技术测试组", accountRole: "普通员工", phone: "13311384812", wecom: "16888581166708", wecomId: "00", channel: "句子通道已连接", online: true, assignedUser: "", hosted: true, aiSeatEnabled: true, sendMode: "自动发送", skills: ["19元A类课-第四课", "19元A类课-课后"], customerTotal: 2, hostedCustomers: 2, manualCustomers: 0, sentToday: 26, abnormal: 0, syncedAt: "14:18", dedicatedInfo: "" }
 ];
 
 export const salesAccounts = [
@@ -984,7 +1015,6 @@ export const salesAccounts = [
       assignedUser: "",
       hosted: aiSeatEnabled,
       aiSeatEnabled,
-      aiSeatOpenedAt: aiSeatEnabled ? "2026-07-01" : "",
       sendMode: number % 2 === 0 ? "人工确认" : "自动发送",
       skills: [],
       customerTotal: 2 + (number % 8),
@@ -1426,7 +1456,7 @@ export const loginAccounts = {
     badge: "平台",
     company: "全部企业",
     account: "账号1",
-    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "settings", "tools", "tokenCost", "promptStudio", "salesAssistant", "dataReports"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "2": {
@@ -1436,7 +1466,7 @@ export const loginAccounts = {
     badge: "员",
     company: "星河教育科技",
     account: "账号2",
-    menuKeys: ["dashboard", "conversations", "humanCollaboration"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration", "salesAssistant", "dataReports"],
     wecomKeys: managedWecomAccounts.map((item) => item.key)
   },
   "3": {
@@ -1446,7 +1476,7 @@ export const loginAccounts = {
     badge: "企",
     company: "星河教育科技",
     account: "账号3",
-    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools"],
+    menuKeys: ["dashboard", "conversations", "humanCollaboration", "agentManager", "strategy", "skills", "customers", "sales", "wecomChannel", "wecomAccounts", "tagLibrary", "dataDictionary", "strategyInsight", "massMessage", "humanization", "knowledge", "tools", "tokenCost", "promptStudio", "salesAssistant", "dataReports"],
     wecomKeys: ["wecom-li", "wecom-chen", "wecom-zhou", "wecom-wu", "wecom-lin"]
   }
 };

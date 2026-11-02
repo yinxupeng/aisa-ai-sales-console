@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import * as schedule from "../src/data/analysisSchedule.js";
+assert.equal(typeof schedule.getNextAnalysisRun, "function");
+const now = new Date("2026-10-27T10:00:00+08:00");
+assert.equal(schedule.getNextAnalysisRun({ scheduleEnabled: false, dailyTimes: ["18:00"] }, now), "—");
+assert.equal(schedule.getNextAnalysisRun({ scheduleEnabled: true, dailyTimes: ["18:00"] }, now), "2026-10-27 18:00");
+assert.equal(schedule.getNextAnalysisRun({ scheduleEnabled: true, dailyTimes: ["09:00"] }, now), "2026-10-28 09:00");
+assert.equal(schedule.getNextAnalysisRun({ scheduleEnabled: true, dailyTimes: ["18:00", "09:00"] }, now), "2026-10-27 18:00");
+assert.equal(schedule.getNextAnalysisRun({ scheduleEnabled: true, dailyTimes: [] }, now), "—");
+console.log("ANALYSIS_SCHEDULE_OK");

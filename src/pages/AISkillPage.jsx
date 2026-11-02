@@ -40,7 +40,7 @@ const { Paragraph, Text, Title } = Typography;
 
 
 function AISkillPage() {
-  const [rows, setRows] = useState(() => [...aiSkills.map((item) => ({ ...item, industry: "教育培训" })), ...INDUSTRY_SKILL_DATA]);
+  const [rows, setRows] = useState(() => [...aiSkills.map((item) => ({ ...item, industry: item.industry || "教育培训" })), ...INDUSTRY_SKILL_DATA]);
   const [industryFilter, setIndustryFilter] = useState("全部行业");
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);

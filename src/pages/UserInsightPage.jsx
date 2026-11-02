@@ -19,13 +19,12 @@ import {
 } from "antd";
 import {
   ArrowLeftOutlined,
-  ClockCircleOutlined,
   CommentOutlined,
+  EyeOutlined,
   SearchOutlined,
   UserOutlined
 } from "@ant-design/icons";
 import {
-  userInsightSchedule,
   userInsightGenerationRecords,
   userInsightSummary,
   userInsightUsers
@@ -33,6 +32,9 @@ import {
 import UserInsightConfigPage from "./UserInsightConfigPage";
 import { defaultConfig } from "./UserInsightConfigPage";
 import { SettingOutlined } from "@ant-design/icons";
+import { getNextAnalysisRun } from "../data/analysisSchedule";
+import { UserInsightConfigViewPage } from "./CollaborationConfigViewPage";
+import { GenerationScheduleStrip } from "../components/TaskConfigReadOnly";
 
 const { Title, Paragraph, Text } = Typography;
 const insightStageOptions = ["开课前", "第一节课", "第二节课", "第三节课", "第四节课", "第5节课", "课后"];
@@ -48,7 +50,28 @@ function InsightSegments({ user }) {
   );
 }
 
-function UserInsightGenerationRecordsPage({ onBack = () => {} }) {
+export function InsightGenerationRecordDetail({ record }) {
+  return <Space orientation="vertical" size={18} className="user-insight-generation-detail">
+    <Descriptions column={1} size="small" bordered>
+      <Descriptions.Item label="执行时间">{record.executedAt}</Descriptions.Item>
+      <Descriptions.Item label="执行周期">{record.scheduleLabel}</Descriptions.Item>
+      <Descriptions.Item label="分析范围">{record.scope}</Descriptions.Item>
+      <Descriptions.Item label="有效聊天口径">{record.validChatRule}</Descriptions.Item>
+      <Descriptions.Item label="处理用户">{record.analyzedUsers} 人</Descriptions.Item>
+      <Descriptions.Item label="应该洞察用户数">{record.shouldInsightUsers} 人</Descriptions.Item>
+      <Descriptions.Item label="成功生成洞察数">{record.successfulInsightUsers} 人 · {record.duration}</Descriptions.Item>
+      <Descriptions.Item label="洞察失败人数"><Text type={record.failedInsightUsers ? "danger" : undefined}>{record.failedInsightUsers} 人</Text></Descriptions.Item>
+    </Descriptions>
+    <Card size="small" title="失败原因">
+      {record.failedInsightUsers ? <Table size="small" rowKey="reason" pagination={false} dataSource={record.failureReasons} columns={[
+        { title: "失败原因", dataIndex: "reason" },
+        { title: "失败人数", dataIndex: "count", width: 90, render: (count) => <Text type="danger">{count} 人</Text> }
+      ]} /> : <Text type="secondary">暂无失败记录</Text>}
+    </Card>
+  </Space>;
+}
+
+export function UserInsightGenerationRecordsPage({ onBack = () => {} }) {
   const [selectedGenerationRecord, setSelectedGenerationRecord] = useState(null);
   return (
     <div className="user-insight-page user-insight-generation-records-page">
@@ -69,12 +92,13 @@ function UserInsightGenerationRecordsPage({ onBack = () => {} }) {
             { title: "分析范围", dataIndex: "scope", width: 190 },
             { title: "应该洞察用户数", dataIndex: "shouldInsightUsers", width: 140, render: (value) => <Tag color="blue">{value} 人</Tag> },
             { title: "成功生成洞察数", dataIndex: "successfulInsightUsers", width: 140, render: (value) => <Text>{value} 人</Text> },
-            { title: "执行状态", dataIndex: "status", width: 100, render: (value) => <Tag color="success">{value}</Tag> }
+            { title: "洞察失败人数", dataIndex: "failedInsightUsers", width: 130, render: (value) => <Text type={value ? "danger" : undefined}>{value} 人</Text> },
+            { title: "执行状态", dataIndex: "status", width: 100, render: (value) => <Tag color={value === "部分失败" ? "warning" : "success"}>{value}</Tag> }
           ]}
           dataSource={userInsightGenerationRecords}
           pagination={false}
           onRow={(record) => ({ onClick: () => setSelectedGenerationRecord(record), style: { cursor: "pointer" } })}
-          scroll={{ x: 980 }}
+          scroll={{ x: 1100 }}
         />
       </Card>
       <Drawer
@@ -84,19 +108,7 @@ function UserInsightGenerationRecordsPage({ onBack = () => {} }) {
         width={560}
         onClose={() => setSelectedGenerationRecord(null)}
       >
-        {selectedGenerationRecord ? <Space orientation="vertical" size={18} className="user-insight-generation-detail">
-          <Descriptions column={1} size="small" bordered>
-            <Descriptions.Item label="执行时间">{selectedGenerationRecord.executedAt}</Descriptions.Item>
-            <Descriptions.Item label="执行周期">{selectedGenerationRecord.scheduleLabel}</Descriptions.Item>
-            <Descriptions.Item label="分析范围">{selectedGenerationRecord.scope}</Descriptions.Item>
-            <Descriptions.Item label="有效聊天口径">{selectedGenerationRecord.validChatRule}</Descriptions.Item>
-            <Descriptions.Item label="处理用户">{selectedGenerationRecord.analyzedUsers} 人</Descriptions.Item>
-            <Descriptions.Item label="成功生成洞察数">{selectedGenerationRecord.successfulInsightUsers} 人 · {selectedGenerationRecord.duration}</Descriptions.Item>
-          </Descriptions>
-          <Card size="small" title="本次生成摘要"><Paragraph>{selectedGenerationRecord.summary}</Paragraph></Card>
-          <Card size="small" title="重点洞察"><Paragraph>{selectedGenerationRecord.highlight}</Paragraph></Card>
-          <Card size="small" title="本次结果中的用户"><Paragraph type="secondary">以下为本次批次生成的示例用户结果，可继续从用户综合洞察列表查看详细分析并进入对应聊天。</Paragraph><Space wrap>{userInsightUsers.slice(0, 6).map((user) => <Tag key={user.id} color="blue">{user.name}</Tag>)}</Space></Card>
-        </Space> : null}
+        {selectedGenerationRecord ? <InsightGenerationRecordDetail record={selectedGenerationRecord} /> : null}
       </Drawer>
     </div>
   );
@@ -135,6 +147,7 @@ export default function UserInsightPage({ onViewConversation = () => {} }) {
   if (view === "config") {
     return <UserInsightConfigPage initialConfig={generationConfig} onSave={setGenerationConfig} onBack={() => setView("results")} />;
   }
+  if (view === "config-view") return <UserInsightConfigViewPage config={generationConfig} onBack={() => setView("results")} />;
   if (view === "records") {
     return <UserInsightGenerationRecordsPage onBack={() => setView("results")} />;
   }
@@ -143,9 +156,9 @@ export default function UserInsightPage({ onViewConversation = () => {} }) {
     <div className="user-insight-page">
       <div className="user-insight-header">
         <div><Title level={3}>用户洞察与建议</Title><Paragraph type="secondary">观心实验室 · 综合用户档案与历史聊天，帮助人工快速了解儿童心理健康课程用户</Paragraph></div>
-        <Space><Tag color="blue" icon={<ClockCircleOutlined />}>{userInsightSchedule.generatedAt}</Tag><Button icon={<SettingOutlined />} onClick={() => setView("config")}>洞察生成配置</Button><Button onClick={() => setView("records")}>查看记录</Button></Space>
+        <Space wrap><Button icon={<SettingOutlined />} onClick={() => setView("config")}>洞察生成配置（管理员）</Button><Button icon={<EyeOutlined />} onClick={() => setView("config-view")}>查看配置（普通员工）</Button><Button onClick={() => setView("records")}>查看记录</Button></Space>
       </div>
-      <Card className="user-insight-window-card" bordered={false}><Space size={28} wrap><div><Text type="secondary">统计时间范围</Text><div><Text strong>{userInsightSchedule.label}</Text></div></div><div><Text type="secondary">分析人群</Text><div><Text strong>{userInsightSchedule.scope}</Text></div></div><div><Text type="secondary">最近生成</Text><div><Text strong>{userInsightGenerationRecords[0].executedAt}</Text></div></div><div><Text type="secondary">下次生成时间</Text><div><Text strong>{userInsightSchedule.nextGeneratedAt}</Text></div></div></Space></Card>
+      <GenerationScheduleStrip lastGeneratedAt={userInsightGenerationRecords[0]?.executedAt} nextGeneratedAt={getNextAnalysisRun(generationConfig)} />
       <Row gutter={[12, 12]} className="user-insight-summary-grid">
         <Col xs={12} sm={8} lg={6}><Card className="user-insight-stat-card" bordered={false}><Statistic title="总用户数" value={userInsightSummary.totalUsers} suffix="人" /></Card></Col>
         <Col xs={12} sm={8} lg={6}><Card className="user-insight-stat-card user-insight-stat-communication" bordered={false}><Statistic title="有效沟通用户数" value={userInsightSummary.effectiveCommunicationUsers} suffix="人" /></Card></Col>

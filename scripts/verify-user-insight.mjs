@@ -58,7 +58,7 @@ assert.doesNotMatch(configSource, /Input\.TextArea/);
 assert.doesNotMatch(configSource, /任务状态/);
 assert.match(pageSource, /洞察生成记录/);
 assert.match(pageSource, /查看记录/);
-assert.match(pageSource, /下次生成时间/);
+assert.match(pageSource, /GenerationScheduleStrip/);
 assert.match(pageSource, /setView\("records"\)/);
 assert.match(pageSource, /UserInsightGenerationRecordsPage/);
 assert.match(dataSource, /userInsightGenerationRecords/);

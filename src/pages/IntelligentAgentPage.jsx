@@ -18,6 +18,7 @@ import {
   Table,
   Tabs,
   Tag,
+  TimePicker,
   Typography
 } from "antd";
 import {
@@ -28,6 +29,7 @@ import {
 } from "@ant-design/icons";
 import {
   agents,
+  aiSkills,
   agentTools,
   humanizationStrategyOptions,
   knowledgeBases,
@@ -42,6 +44,8 @@ import {
 } from "../components/KnowledgeResourcePickerModal";
 import { PanelTitle } from "../components/PageChrome";
 import { ROLE_CATALOG_DATA, filterRoles, getRolePage, industryOptions, rolePageSize } from "../data/roleCatalog";
+import { getRoleReplyConfig, validateRoleReplyConfig } from "../data/roleReplyConfig";
+import dayjs from "dayjs";
 
 
 const { Text, Title } = Typography;
@@ -159,6 +163,8 @@ ${item.description || item.roleDescription || "根据所属角色配置完成客
   };
 
   const saveAgent = (values) => {
+    const configError = validateRoleReplyConfig(values, aiSkills);
+    if (configError) return message.warning(configError);
     const role = agents.find((item) => item.type === values.positioning || item.name === editingAgent?.roleName);
     const next = {
       ...(editingAgent || {}),
@@ -487,7 +493,8 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
         positioning: agent.positioning || "",
         industry: agent.industry || "教育培训",
         description: agent.description || "",
-        humanizationStrategy: agent.humanizationStrategy
+        humanizationStrategy: agent.humanizationStrategy,
+        ...getRoleReplyConfig(agent)
       });
     }
   }, [agent, form]);
@@ -502,7 +509,7 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
       cancelText="取消"
       width={720}
     >
-      <Form form={form} className="intelligent-agent-edit-form" layout="vertical" onFinish={onSave}>
+      <Form form={form} className="intelligent-agent-edit-form" layout="vertical" onFinish={(values) => onSave({ ...values, ...getRoleReplyConfig(form.getFieldsValue(true)) })}>
         <Form.Item label="智能体名称" name="name" rules={[{ required: true, message: "请输入智能体名称" }]}>
           <Input placeholder="请输入智能体名称" />
         </Form.Item>
@@ -521,9 +528,42 @@ function IntelligentAgentModal({ agent, onClose, onSave }) {
         <Form.Item label="拟人化策略" name="humanizationStrategy" tooltip="选择后会套用对应回复风格，不选则保持默认策略">
           <Select allowClear placeholder="不选则不启用拟人化" options={humanizationStrategyOptions} />
         </Form.Item>
+        <RoleReplyConfigFields />
       </Form>
     </Modal>
   );
+}
+
+export function RoleReplyConfigFields() {
+  return <>
+    <Form.Item label="基于对话轮数" name="analysisConversationRounds" tooltip="AI 获取最近 N 轮对话用于分析；用户发言及其对应回复计为一轮，不足 N 轮时获取全部。" rules={[{ required: true, message: "请输入对话轮数" }, { type: "integer", min: 1, max: 1000, message: "请输入1～1000的整数" }]}>
+      <InputNumber aria-label="基于对话轮数" min={1} max={1000} step={1} style={{ width: "100%" }} placeholder="请输入对话轮数" />
+    </Form.Item>
+    <Form.Item label={<Space wrap size={8}><span>回复内容质检</span><Text type="secondary" style={{ fontWeight: 400 }}>开启后调用回复内容质检skill 检测回复内容是否合理</Text></Space>} name="replyQualityEnabled" valuePropName="checked">
+      <Switch checkedChildren="开启" unCheckedChildren="关闭" />
+    </Form.Item>
+    <Form.Item noStyle shouldUpdate={(previous, current) => previous.replyQualityEnabled !== current.replyQualityEnabled}>
+      {({ getFieldValue }) => getFieldValue("replyQualityEnabled") ? <Form.Item label="回复内容质检 Skill" name="replyQualitySkillKey" rules={[{ required: true, message: "请选择回复内容质检 Skill" }, { validator: (_, key) => !key || aiSkills.some((skill) => skill.key === key && skill.status === "启用") ? Promise.resolve() : Promise.reject(new Error("所选 Skill 不可用，请重新选择")) }]}>
+        <Select showSearch allowClear optionFilterProp="label" placeholder="请选择用于回复内容质检的 Skill" options={aiSkills.map((skill) => ({ value: skill.key, label: `${skill.name}${skill.status !== "启用" ? "（已停用）" : ""}`, disabled: skill.status !== "启用" }))} />
+      </Form.Item> : null}
+    </Form.Item>
+    <Form.Item label="免打扰时段" name="quietHoursEnabled" valuePropName="checked" tooltip="开启后，智能体在设定时段内不发送消息；每天按北京时间生效，包含开始时间、不包含结束时间。">
+      <Switch aria-label="免打扰时段" checkedChildren="开启" unCheckedChildren="关闭" />
+    </Form.Item>
+    <Form.Item noStyle shouldUpdate={(previous, current) => previous.quietHoursEnabled !== current.quietHoursEnabled || previous.quietHoursStart !== current.quietHoursStart || previous.quietHoursEnd !== current.quietHoursEnd}>
+      {({ getFieldValue }) => getFieldValue("quietHoursEnabled") ? <>
+        <Row gutter={16}>
+          <Col xs={24} sm={12}><Form.Item label="开始时间" name="quietHoursStart" getValueProps={(value) => ({ value: value ? dayjs(`2000-01-01T${value}:00`) : null })} getValueFromEvent={(value) => value?.format("HH:mm")} rules={[{ required: true, message: "请选择开始时间" }]}>
+            <TimePicker aria-label="免打扰开始时间" format="HH:mm" style={{ width: "100%" }} />
+          </Form.Item></Col>
+          <Col xs={24} sm={12}><Form.Item label="结束时间" name="quietHoursEnd" dependencies={["quietHoursStart"]} getValueProps={(value) => ({ value: value ? dayjs(`2000-01-01T${value}:00`) : null })} getValueFromEvent={(value) => value?.format("HH:mm")} rules={[{ required: true, message: "请选择结束时间" }, { validator: (_, value) => value && value === getFieldValue("quietHoursStart") ? Promise.reject(new Error("开始和结束时间不能相同")) : Promise.resolve() }]}>
+            <TimePicker aria-label="免打扰结束时间" format="HH:mm" style={{ width: "100%" }} />
+          </Form.Item></Col>
+        </Row>
+        <Text type="secondary">每天 {getFieldValue("quietHoursStart") || "--:--"} 至 {getFieldValue("quietHoursStart") > getFieldValue("quietHoursEnd") ? "次日 " : ""}{getFieldValue("quietHoursEnd") || "--:--"} 不发送消息（北京时间）</Text>
+      </> : null}
+    </Form.Item>
+  </>;
 }
 
 function IntelligentAgentStageModal({ stage, skillOptions, open, onClose, onSave }) {

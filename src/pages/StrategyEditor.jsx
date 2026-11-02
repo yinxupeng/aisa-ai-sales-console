@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   App as AntApp,
   Badge,
@@ -6,6 +6,7 @@ import {
   Card,
   Checkbox,
   Col,
+  ConfigProvider,
   DatePicker,
   Drawer,
   Form,
@@ -57,14 +58,16 @@ import {
   buildKnowledgeResourceRows
 } from "../components/KnowledgeResourcePickerModal";
 import SkillLogicRichEditor from "../components/SkillLogicRichEditor";
+import VersionChangeDetails from "../components/VersionChangeDetails";
 import { PanelTitle, statusTag } from "../components/PageChrome";
+import { cloneVersion, createDraftVersion, publishDraftVersion, deleteDraftVersion, rollbackVersion, summarizeVersionChanges, hydrateVersionLogic } from "../data/agentVersionLifecycle";
 
 
 const { Paragraph, Text, Title } = Typography;
 
 
 
-function StrategyEditor({ skill, onBack }) {
+function StrategyEditor({ skill, onBack, onStatusChange = () => {} }) {
   const { message } = AntApp.useApp();
   const lifecycleOptions = lifecycleStages.map((item) => ({ value: item.title, label: item.title }));
   const knowledgeBaseOptions = knowledgeBases.map((item) => ({ value: item.key, label: item.name }));
@@ -96,6 +99,7 @@ function StrategyEditor({ skill, onBack }) {
   const tagAttributeOptions = ["时间标签", "状态标签"].map((value) => ({ value }));
   const relativeTimeUnitOptions = ["分钟", "小时", "天"].map((value) => ({ value }));
   const [form] = Form.useForm();
+  const [modelForm] = Form.useForm();
   const isStrategyAgent = skill.agentCategory === "策略智能体" || skill.type === "策略编排" || skill.name.includes("策略智能体");
   const strategyAgentLogicText = `# 角色定位
 你是客户运营策略智能体，不直接给客户发送消息，也不替代会话智能体聊天。你的职责是基于客户档案、企微会话、课程状态、标签、订单和听课数据，输出可执行的销售策略、客户标签、策略提示词和后续触达任务。
@@ -257,6 +261,19 @@ function StrategyEditor({ skill, onBack }) {
     delayUnit: "分钟",
     enabled: true
   });
+  const defaultOrchestration = {
+    name: skill.name,
+    effectiveEvent: "企微加好友",
+    effectiveTag: "已预约体验课",
+    effectiveTagAttribute: "状态标签",
+    effectiveTriggerMode: "延后触发",
+    effectiveAmount: 1,
+    effectiveUnit: "分钟",
+    scheduleRules: [createScheduleRule(0), createScheduleRule(1), createScheduleRule(2)],
+    endRefType: "ADD_FRIEND",
+    endValue: 7,
+    endUnit: "天"
+  };
   const createAgentVersionRows = () => [
     {
       key: "v3",
@@ -294,11 +311,34 @@ function StrategyEditor({ skill, onBack }) {
       taskCount: 4,
       updatedAt: "2026-07-24 13:00:05"
     }
-  ];
-  const [versionRows, setVersionRows] = useState(createAgentVersionRows);
-  const [selectedVersionKey, setSelectedVersionKey] = useState("v3");
+  ].map((item) => ({ ...item, orchestration: { ...cloneVersion(defaultOrchestration), scheduleRules: Array.from({ length: item.taskCount }, (_, index) => createScheduleRule(index)) }, strategyTasks: cloneVersion(strategyTaskConfigs), taskCount: isStrategyAgent ? strategyTaskConfigs.length : item.taskCount }));
+  const versionStorageKey = `sales-ai-agent-versions:${skill.key || skill.name}`;
+  const [storedVersions] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(versionStorageKey));
+      return saved?.rows?.length && saved.rows.some((item) => item.status === "当前发布版本") && saved.rows.filter((item) => item.status === "草稿版本").length <= 1 ? saved : null;
+    } catch { return null; }
+  });
+  const [versionRows, setVersionRows] = useState(() => storedVersions?.rows || createAgentVersionRows());
+  const versionSequence = useRef(Math.max(storedVersions?.sequence || 0, ...versionRows.map((item) => Number(item.version.slice(1)) || 0)));
+  const [selectedVersionKey, setSelectedVersionKey] = useState(() => versionRows.find((item) => item.status === "当前发布版本")?.key || versionRows[0]?.key);
+  const [editingVersionKey, setEditingVersionKey] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [publishDialog, setPublishDialog] = useState(null);
+  const [publishForm] = Form.useForm();
+  const [versionNoteKey, setVersionNoteKey] = useState(null);
+  const [draftNote, setDraftNote] = useState("");
+  const [agentEnabled, setAgentEnabled] = useState(storedVersions?.enabled ?? skill.status === "启用");
   const [activeAgentTab, setActiveAgentTab] = useState("model");
   const selectedVersion = versionRows.find((item) => item.key === selectedVersionKey) || versionRows[0];
+  const isDraftVersion = selectedVersion.status === "草稿版本";
+  const isEditingDraft = isDraftVersion && editingVersionKey === selectedVersionKey;
+  const existingDraft = versionRows.find((item) => item.status === "草稿版本");
+  const publishedVersion = versionRows.find((item) => item.status === "当前发布版本");
+  useEffect(() => {
+    try { localStorage.setItem(versionStorageKey, JSON.stringify({ rows: versionRows, sequence: versionSequence.current, enabled: agentEnabled })); }
+    catch { message.warning("本地存储空间不足，本次版本修改仅在当前页面保留"); }
+  }, [versionRows, agentEnabled, versionStorageKey]);
   const currentVersionModelConfig = selectedVersion.modelConfig || modelConfig;
   const taskTypeOptions = [
     { value: "ADD_FRIEND", label: "加好友" },
@@ -378,7 +418,11 @@ function StrategyEditor({ skill, onBack }) {
     setSelectedKnowledgeResourceKeys(selectedVersion.knowledgeResourceKeys || (selectedVersion.knowledgeBaseKeys || defaultKnowledgeBaseKeys).map((key) => `base:${key}`));
     setSelectedToolKeys(selectedVersion.toolKeys || defaultToolKeys);
     setSelectedAiSkillKeys(selectedVersion.aiSkillKeys || fallbackAiSkillKeys);
-    form.setFieldsValue(selectedVersion.modelConfig || modelConfig);
+    modelForm.resetFields();
+    modelForm.setFieldsValue(selectedVersion.modelConfig || modelConfig);
+    form.resetFields();
+    if (selectedVersion.orchestration) form.setFieldsValue(selectedVersion.orchestration);
+    setStrategyTasks(cloneVersion(selectedVersion.strategyTasks || strategyTaskConfigs));
   }, [selectedVersionKey]);
   const knowledgeResourceRows = buildKnowledgeResourceRows();
   const selectedKnowledgeResources = knowledgeResourceRows.filter((item) => selectedKnowledgeResourceKeys.includes(item.key));
@@ -482,6 +526,7 @@ function StrategyEditor({ skill, onBack }) {
     }
   };
   const openRelationPicker = (type) => {
+    if (!isEditingDraft) return;
     if (type === "knowledge") {
       setAgentKnowledgePickerKeys(selectedKnowledgeResourceKeys);
       setAgentKnowledgePickerOpen(true);
@@ -490,11 +535,13 @@ function StrategyEditor({ skill, onBack }) {
     setRelationPicker({ open: true, type, keyword: "", category: "全部类型" });
   };
   const saveAgentKnowledgeResources = () => {
+    if (!isEditingDraft) return;
     const nextKeys = Array.from(new Set(agentKnowledgePickerKeys));
     setSelectedKnowledgeResourceKeys(nextKeys);
     setAgentKnowledgePickerOpen(false);
   };
   const toggleRelationSelection = (type, key) => {
+    if (!isEditingDraft) return;
     const config = relationCatalogs[type];
     config.setSelectedKeys((keys) => (
       keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]
@@ -645,7 +692,13 @@ function StrategyEditor({ skill, onBack }) {
     if (section.steps) lines.push(...section.steps.map((step, index) => `${index + 1}. ${step}`));
     return lines.join("\n");
   }).join("\n\n");
-  const currentVersionLogicText = `${isStrategyAgent ? strategyAgentLogicText : logicText}\n\n# 版本调试说明\n当前选择版本：${selectedVersion.version}。下方模型、工具、Skill 和预览调试均使用该版本快照。`;
+  const currentVersionLogicText = selectedVersion.logic ?? (isStrategyAgent ? strategyAgentLogicText : logicText);
+  const effectiveVersion = (row) => hydrateVersionLogic(row, isStrategyAgent ? strategyAgentLogicText : logicText);
+  useEffect(() => {
+    setVersionRows((rows) => rows.map(effectiveVersion));
+  }, [versionStorageKey]);
+  const [versionLogicDraft, setVersionLogicDraft] = useState(currentVersionLogicText);
+  useEffect(() => { setVersionLogicDraft(currentVersionLogicText); }, [selectedVersionKey]);
   const debugReply = skill.name === "19元A类课-第一课"
     ? "张妈妈，孩子三年级现在词汇和阅读跟不上是比较常见的情况。建议先约一节小学英语诊断试听课，老师会看孩子自然拼读、阅读理解和校内同步掌握情况，再给您一份具体提升建议。"
     : `${skill.name} 已完成调用：已识别学员年级、英语基础、试听状态和下一步跟进动作，可交给课程顾问继续确认。`;
@@ -745,124 +798,233 @@ function StrategyEditor({ skill, onBack }) {
     { title: "课后总结问感受", trigger: "agent生效", delay: "agent 生效 后 21小时", status: "启用" },
     { title: "课后总结问感受", trigger: "agent生效", delay: "agent 生效 后 21小时", status: "启用" }
   ];
-  const createVersion = (sourceVersion = selectedVersion) => {
-    const nextNumber = Math.max(...versionRows.map((item) => Number(item.version.replace("v", "")) || 0)) + 1;
-    const nextVersion = {
-      ...sourceVersion,
-      key: `v${nextNumber}`,
-      version: `v${nextNumber}`,
-      status: "草稿版本",
-      updatedAt: new Date().toISOString().slice(0, 19).replace("T", " ")
-    };
-    setVersionRows((items) => [nextVersion, ...items]);
-    setSelectedVersionKey(nextVersion.key);
-    message.success("已创建草稿版本");
+  const versionTimestamp = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).format(new Date());
+  const snapshotDraft = () => {
+    const orchestration = { ...defaultOrchestration, ...selectedVersion.orchestration, ...form.getFieldsValue(true) };
+    const nextModel = { ...currentVersionModelConfig, ...modelForm.getFieldsValue(true) };
+    const snapshot = cloneVersion({
+      ...selectedVersion,
+      modelConfig: nextModel,
+      model: nextModel.model,
+      logic: versionLogicDraft,
+      orchestration,
+      strategyTasks,
+      toolKeys: selectedToolKeys,
+      aiSkillKeys: selectedAiSkillKeys,
+      knowledgeResourceKeys: selectedKnowledgeResourceKeys,
+      taskCount: isStrategyAgent ? strategyTasks.length : (orchestration.scheduleRules || []).length,
+      updatedAt: versionTimestamp()
+    });
+    const source = selectedVersion.comparisonSnapshot || versionRows.find((item) => item.version === selectedVersion.sourceVersion);
+    snapshot.changeSummary = summarizeVersionChanges(source ? { ...source, logic: source.logic ?? (isStrategyAgent ? strategyAgentLogicText : logicText), orchestration: { ...defaultOrchestration, ...source.orchestration } } : null, snapshot);
+    return snapshot;
   };
-  const publishVersion = (versionKey) => {
-    setVersionRows((items) => items.map((item) => ({
-      ...item,
-      status: item.key === versionKey ? "当前发布版本" : item.status === "当前发布版本" ? "历史版本" : item.status
-    })));
-    setSelectedVersionKey(versionKey);
-    message.success("已切换当前发布版本");
+  const rowsWithDraft = () => isEditingDraft ? versionRows.map((item) => item.key === selectedVersionKey ? snapshotDraft() : item) : versionRows;
+  const selectVersion = (key) => {
+    setEditingVersionKey(versionRows.find((item) => item.key === key)?.status === "草稿版本" ? key : null);
+    if (key === selectedVersionKey) return;
+    if (isEditingDraft) {
+      setVersionRows(rowsWithDraft());
+      message.success(`${selectedVersion.version} 草稿已自动保存`);
+    }
+    setSelectedVersionKey(key);
   };
-  const stopVersion = (versionKey) => {
-    setVersionRows((items) => items.map((item) => (item.key === versionKey ? { ...item, status: "历史版本" } : item)));
-    message.success("版本已停用");
+  const saveDraft = () => {
+    if (!isEditingDraft) return;
+    setVersionRows(rowsWithDraft());
+    setEditingVersionKey(null);
+    message.success("草稿已保存，发布后才对线上生效");
+  };
+  const createVersion = (sourceVersion = publishedVersion) => {
+    if (existingDraft) {
+      selectVersion(existingDraft.key);
+      message.info("已有一个草稿，请先发布或删除后再创建");
+      return;
+    }
+    const nextRows = createDraftVersion(versionRows, { ...sourceVersion, logic: sourceVersion.logic ?? (isStrategyAgent ? strategyAgentLogicText : logicText) }, ++versionSequence.current, versionTimestamp());
+    setVersionRows(nextRows);
+    setSelectedVersionKey(nextRows[0].key);
+    setEditingVersionKey(nextRows[0].key);
+    message.success(`已从 ${sourceVersion.version} 复制为新草稿`);
+  };
+  const publishVersion = (key) => {
+    const rows = rowsWithDraft();
+    const target = rows.find((item) => item.key === key);
+    if (target?.status !== "草稿版本") return;
+    const source = effectiveVersion(target.comparisonSnapshot || rows.find((item) => item.version === (target.comparisonVersion || target.sourceVersion)));
+    const summary = target.changeSummary || summarizeVersionChanges(source, target);
+    publishForm.setFieldsValue({ releaseNote: target.releaseNote || "", effectiveAudience: "new_users" });
+    setPublishDialog({ key, target, rows, summary });
+  };
+  const confirmPublish = async () => {
+    let values;
+    try { values = await publishForm.validateFields(); } catch { return; }
+    setVersionRows(publishDraftVersion(publishDialog.rows, publishDialog.key, versionTimestamp(), {
+      releaseNote: values.releaseNote.trim(), changeSummary: publishDialog.summary, publishedBy: "平台管理员", effectiveAudience: values.effectiveAudience
+    }));
+    setSelectedVersionKey(publishDialog.key);
+    setEditingVersionKey(null);
+    setPublishDialog(null);
+    message.success("草稿已发布");
+  };
+  const noteVersion = versionRows.find((item) => item.key === versionNoteKey);
+  const noteDetails = effectiveVersion(noteVersion?.key === selectedVersionKey && isEditingDraft ? snapshotDraft() : noteVersion);
+  const noteBaseline = effectiveVersion(noteDetails?.comparisonSnapshot || versionRows.find((item) => item.version === (noteDetails?.comparisonVersion || noteDetails?.sourceVersion)));
+  const removeDraft = (record) => Modal.confirm({
+    title: `删除草稿 ${record.version}？`, content: "草稿内容将被删除，当前发布版本和历史记录继续保留。", okText: "删除草稿", cancelText: "取消", okButtonProps: { danger: true },
+    onOk: () => {
+      try {
+        setVersionRows(deleteDraftVersion(versionRows, record.key));
+        if (editingVersionKey === record.key) setEditingVersionKey(null);
+        if (selectedVersionKey === record.key) setSelectedVersionKey(publishedVersion.key);
+        message.success("草稿已删除");
+      } catch (error) { message.warning(error.message); }
+    }
+  });
+  const rollback = (record) => Modal.confirm({
+    title: `回退到 ${record.version} 的配置？`, content: "将使用该历史配置发布一个新版本，历史记录与现有草稿继续保留。", okText: "确认回退发布", cancelText: "取消",
+    onOk: () => {
+      const nextRows = rollbackVersion(rowsWithDraft(), record.key, ++versionSequence.current, versionTimestamp());
+      setVersionRows(nextRows);
+      setSelectedVersionKey(nextRows[0].key);
+      setEditingVersionKey(null);
+      message.success(`已基于 ${record.version} 回退发布为 ${nextRows[0].version}`);
+    }
+  });
+  const archive = (record) => {
+    setVersionRows(rowsWithDraft().map((item) => item.key === record.key ? { ...item, archived: !item.archived } : item));
+    if (!record.archived && selectedVersionKey === record.key) setSelectedVersionKey(publishedVersion.key);
+    message.success(record.archived ? "已恢复历史版本展示" : "已归档历史版本");
   };
   const versionColumns = [
     {
       title: "版本",
       dataIndex: "version",
       width: 110,
-      render: (value, record) => <Button type="link" className="version-name-button" onClick={() => setSelectedVersionKey(record.key)}>{value}</Button>
+      render: (value, record) => <Space size={6}><Button type="link" className="version-name-button" onClick={() => selectVersion(record.key)}>{value}</Button>{record.status === "草稿版本" && record.key === editingVersionKey ? <Tag color="processing">编辑中</Tag> : null}</Space>
     },
     {
       title: "状态",
       dataIndex: "status",
-      width: 150,
+      width: 122,
       render: (value) => (
         <Space direction="vertical" size={4}>
-          <Badge color={value === "当前发布版本" ? "green" : value === "草稿版本" ? "blue" : "default"} text={value === "历史版本" ? "已停用" : value} />
-          {value === "当前发布版本" ? <Tag color="success">当前发布版本</Tag> : null}
+          <Badge color={value === "当前发布版本" ? "green" : value === "草稿版本" ? "blue" : "default"} text={value} />
         </Space>
       )
     },
-    { title: "模型", dataIndex: "model", width: 210 },
-    { title: "工具数", dataIndex: "toolKeys", width: 92, align: "center", render: (items = []) => <Tag color="success">{items.length}</Tag> },
-    { title: "Skill数", dataIndex: "aiSkillKeys", width: 92, align: "center", render: (items = []) => <Tag color="processing">{items.length}</Tag> },
-    { title: "任务数", dataIndex: "taskCount", width: 92, align: "center", render: (value) => <Tag>{value}</Tag> },
-    { title: "更新时间", dataIndex: "updatedAt", width: 170 },
+    { title: "模型", dataIndex: "model", width: 190, ellipsis: true },
+    { title: "工具数", dataIndex: "toolKeys", width: 58, align: "center", render: (items = []) => <Tag color="success">{items.length}</Tag> },
+    { title: "Skill数", dataIndex: "aiSkillKeys", width: 58, align: "center", render: (items = []) => <Tag color="processing">{items.length}</Tag> },
+    { title: "任务数", dataIndex: "taskCount", width: 58, align: "center", render: (value) => <Tag>{value}</Tag> },
+    { title: "更新时间", dataIndex: "updatedAt", width: 156 },
+    {
+      title: "版本说明", ellipsis: true,
+      render: (_, record) => <Button type="link" size="small" className="agent-version-note-button" onClick={(event) => { event.stopPropagation(); setDraftNote(record.releaseNote || ""); setVersionNoteKey(record.key); }}><span>{record.status === "草稿版本" ? (record.releaseNote || "未发布 · 编辑说明") : (record.releaseNote || "查看说明")}</span></Button>
+    },
     {
       title: "操作",
       fixed: "right",
-      width: 150,
+      width: 260,
       render: (_, record) => (
-        <Space size={4} className="table-action-group">
-          <Button type="link" size="small" onClick={() => setSelectedVersionKey(record.key)}>查看</Button>
-          {record.status === "当前发布版本" ? (
-            <Button type="link" size="small" danger onClick={() => stopVersion(record.key)}>停用</Button>
-          ) : (
-            <Button type="link" size="small" onClick={() => publishVersion(record.key)}>设为发布版本</Button>
-          )}
+        <Space size={4} className="table-action-group" onClick={(event) => event.stopPropagation()}>
+          {record.status === "草稿版本" && record.key === editingVersionKey
+            ? <Button type="link" size="small" onClick={saveDraft}>保存草稿</Button>
+            : <Button type="link" size="small" onClick={() => selectVersion(record.key)}>{record.status === "草稿版本" ? "编辑" : "查看"}</Button>}
+          {record.status === "草稿版本" ? <>
+            <Button type="link" size="small" onClick={() => publishVersion(record.key)}>发布</Button>
+            <Button type="link" size="small" danger onClick={() => removeDraft(record)}>删除</Button>
+          </> : record.status === "历史版本" ? <>
+            <Button type="link" size="small" onClick={() => createVersion(record)}>复制为草稿</Button>
+            <Button type="link" size="small" onClick={() => rollback(record)}>回退发布</Button>
+            <Button type="link" size="small" onClick={() => archive(record)}>{record.archived ? "取消归档" : "归档"}</Button>
+          </> : <Button type="link" size="small" onClick={() => createVersion(record)}>复制为草稿</Button>}
         </Space>
       )
     }
   ];
   return (
     <Space direction="vertical" size={16} className="page-stack">
+      <Modal title={`发布 ${publishDialog?.target.version || ""}`} open={Boolean(publishDialog)} onCancel={() => setPublishDialog(null)} onOk={confirmPublish} okText="确认发布" cancelText="取消" width={620}>
+        <Paragraph type="secondary">确认后此草稿成为线上版本，原发布版本保留为历史版本。</Paragraph>
+        <Text strong>系统改动摘要</Text>
+        <Paragraph type="secondary">对比基准：{publishDialog?.target.sourceVersion || "未记录"}</Paragraph>
+        <ul>{publishDialog?.summary.map((item) => <li key={item}>{item}</li>)}</ul>
+        <Form form={publishForm} layout="vertical">
+          <Form.Item name="releaseNote" label="发布说明" rules={[{ required: true, whitespace: true, message: "请填写本次改动目的或预期效果" }, { max: 500, message: "最多填写500字" }]}>
+            <Input.TextArea rows={4} maxLength={500} showCount placeholder="说明本次为什么修改、希望改善什么，例如：优化家长咨询承接方式，减少重复追问。" />
+          </Form.Item>
+          <Form.Item name="effectiveAudience" label="生效对象" rules={[{ required: true, message: "请选择生效对象" }]}>
+            <Radio.Group>
+              <Space direction="vertical" size={12}>
+                <Radio value="all_users">当前在用的用户 + 未来添加的新用户</Radio>
+                <Radio value="new_users">仅未来新添加的用户</Radio>
+              </Space>
+            </Radio.Group>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal title={`${noteVersion?.version || ""} 版本说明`} open={Boolean(noteVersion)} onCancel={() => setVersionNoteKey(null)} width={1040} styles={{ body: { maxHeight: "70vh", overflowY: "auto" } }} footer={noteVersion?.status === "草稿版本" ? <Space><Button onClick={() => setVersionNoteKey(null)}>取消</Button><Button type="primary" onClick={() => {
+        setVersionRows(rowsWithDraft().map((item) => item.key === versionNoteKey ? { ...item, releaseNote: draftNote.trim() } : item));
+        setVersionNoteKey(null); message.success("草稿说明已保存");
+      }}>保存说明</Button></Space> : <Button onClick={() => setVersionNoteKey(null)}>关闭</Button>}>
+        <div className="version-note-metadata">
+          <div><Text type="secondary">版本状态</Text><Tag color={noteVersion?.status === "草稿版本" ? "processing" : "default"}>{noteVersion?.status}</Tag></div>
+          <div><Text type="secondary">对比基准</Text><Text>{noteVersion?.comparisonVersion || noteVersion?.sourceVersion || "未记录"}</Text></div>
+          <div><Text type="secondary">发布人</Text><Text>{noteVersion?.publishedBy || "未记录"}</Text></div>
+          <div><Text type="secondary">发布时间</Text><Text>{noteVersion?.publishedAt || "未记录"}</Text></div>
+          <div className="agent-version-audience"><Text type="secondary">生效对象</Text><Text>{noteVersion?.effectiveAudience === "all_users" ? "当前在用用户 + 未来新用户" : noteVersion?.effectiveAudience === "new_users" ? "仅未来新用户" : "未记录"}</Text></div>
+        </div>
+        <section className="version-note-section">
+          <div className="version-note-section-head"><Text strong>发布说明</Text>{noteVersion?.status === "草稿版本" ? <Text type="secondary">发布时确认</Text> : null}</div>
+          {noteVersion?.status === "草稿版本" ? <Input.TextArea rows={3} value={draftNote} onChange={(event) => setDraftNote(event.target.value)} maxLength={500} showCount placeholder="说明本次修改目的和预期效果" /> : <div className="version-note-description">{noteVersion?.releaseNote || "此版本未记录发布说明"}</div>}
+        </section>
+        <VersionChangeDetails source={noteBaseline} target={noteDetails} baselineLabel={noteVersion?.comparisonVersion || noteVersion?.sourceVersion || "基准版本"} />
+      </Modal>
       <Card className="skill-editor-shell">
         <div className="skill-editor-head">
-          <Space>
-            <Button onClick={onBack}>返回</Button>
+          <Space size={16} wrap>
+            <Button onClick={() => { if (isEditingDraft) saveDraft(); onBack(); }}>返回</Button>
             <Title level={4}>{skill.name}</Title>
           </Space>
-          <Space>
-            <Switch checked={skill.status === "启用"} checkedChildren="启用" unCheckedChildren="停用" />
-            <Button type="primary">保存智能体</Button>
-          </Space>
+            <Space className="agent-status-control" size={8}>
+              <Text type="secondary">智能体状态</Text><Switch checked={agentEnabled} checkedChildren="启用" unCheckedChildren="停用" onChange={(enabled) => { setAgentEnabled(enabled); onStatusChange(enabled ? "启用" : "停用"); message.success(enabled ? "智能体已启用" : "智能体已停用，版本记录已保留"); }} />
+            </Space>
         </div>
         <div className="agent-version-center">
           <div className="agent-version-head">
             <Space size={12}>
               <span className="agent-version-icon"><CloudSyncOutlined /></span>
               <div>
-                <Text className="agent-version-title">版本中心</Text>
-                <Text type="secondary" className="agent-version-desc">当前已发布版本与草稿版本配置快照。选择版本后，下方配置内容会切换为该版本快照。</Text>
+                <Space size={16} wrap>
+                  <Text className="agent-version-title">版本中心</Text>
+                </Space>
+                <Text type="secondary" className="agent-version-desc">每个智能体保留一个可编辑草稿。发布和历史版本只读；切换版本时自动保存当前草稿。</Text>
               </div>
             </Space>
-            <Space>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => createVersion()}>创建版本</Button>
-              <Tooltip title="刷新版本列表"><Button icon={<CloudSyncOutlined />} onClick={() => message.success("版本列表已刷新")} /></Tooltip>
+            <Space size={8} className="agent-archive-control">
+              <Text type="secondary">显示归档版本</Text><Switch aria-label="显示归档版本" size="small" checked={showArchived} onChange={setShowArchived} />
             </Space>
           </div>
           <Table
             className="admin-table agent-version-table"
             rowKey="key"
             size="small"
+            tableLayout="fixed"
             columns={versionColumns}
-            dataSource={versionRows}
+            dataSource={versionRows.filter((item) => showArchived || !item.archived)}
             pagination={false}
             rowClassName={(record) => record.key === selectedVersionKey ? "agent-version-row active" : "agent-version-row"}
-            onRow={(record) => ({ onClick: () => setSelectedVersionKey(record.key) })}
-            scroll={{ x: 1260 }}
+            onRow={(record) => ({ onClick: () => selectVersion(record.key) })}
+            scroll={{ x: 1180, y: 168 }}
           />
         </div>
       </Card>
       <Card className="skill-editor-tabs-card">
-        <div className="agent-selected-version-detail">
-          <div>
-            <Text className="agent-selected-version-title">{selectedVersion.version} 版本详情</Text>
-            <Text type="secondary" className="agent-selected-version-desc">当前下方配置内容来自该版本快照，可切换上方版本查看不同配置。</Text>
-          </div>
-          <Space wrap size={[8, 8]}>
-            <Tag color={selectedVersion.status === "当前发布版本" ? "success" : selectedVersion.status === "草稿版本" ? "processing" : "default"}>{selectedVersion.status}</Tag>
-            <Tag>{selectedVersion.model}</Tag>
-            <Tag>{selectedToolKeys.length} 个工具</Tag>
-            <Tag>{selectedAiSkillKeys.length} 个 Skill</Tag>
-            <Tag>{selectedKnowledgeResourceKeys.length} 个知识资源</Tag>
-            <Tag>{selectedVersion.taskCount} 个任务</Tag>
-            <Text type="secondary">更新时间：{selectedVersion.updatedAt}</Text>
+        <div className="agent-config-context">
+          <Space size={12} wrap>
+            <Text strong>{selectedVersion.version} 配置</Text>
+            <Tag color={isDraftVersion ? "processing" : selectedVersion.status === "当前发布版本" ? "success" : "default"}>{selectedVersion.status}{isEditingDraft ? " · 编辑中" : " · 只读"}</Tag>
           </Space>
         </div>
         <Tabs
@@ -875,7 +1037,7 @@ function StrategyEditor({ skill, onBack }) {
               label: "模型配置",
               children: (
                 <Card size="small" title="模型基础配置" className="agent-config-card">
-                  <Form layout="vertical" initialValues={currentVersionModelConfig} key={selectedVersionKey}>
+                  <Form form={modelForm} layout="vertical" initialValues={currentVersionModelConfig} key={selectedVersionKey}>
                     <Row gutter={16}>
                       <Col span={24}><Form.Item label="Provider" name="provider"><Select options={["DASHSCOPE", "OpenAI", "Azure OpenAI", "自定义模型"].map((value) => ({ value }))} /></Form.Item></Col>
                       <Col span={24}><Form.Item label="模型" name="model"><Input placeholder="请输入模型名称" /></Form.Item></Col>
@@ -894,7 +1056,7 @@ function StrategyEditor({ skill, onBack }) {
                     <div className="builder-pane-head">
                       <Title level={4}>智能体逻辑描述</Title>
                     </div>
-                    <SkillLogicRichEditor key={selectedVersionKey} defaultValue={currentVersionLogicText} />
+                    <SkillLogicRichEditor key={selectedVersionKey} defaultValue={currentVersionLogicText} onChange={setVersionLogicDraft} />
                   </section>
                   <section className="skill-config-pane">
                     <div className="builder-pane-head">
@@ -1121,7 +1283,7 @@ function StrategyEditor({ skill, onBack }) {
                     <Form
                       form={form}
                       layout="vertical"
-                      key={skill.key}
+                      key={selectedVersionKey}
                       initialValues={{
                         name: skill.name,
                         effectiveEvent: "企微加好友",
@@ -1133,7 +1295,8 @@ function StrategyEditor({ skill, onBack }) {
                         scheduleRules: [createScheduleRule(0), createScheduleRule(1), createScheduleRule(2)],
                         endRefType: "ADD_FRIEND",
                         endValue: 7,
-                        endUnit: "天"
+                        endUnit: "天",
+                        ...selectedVersion.orchestration
                       }}
                     >
                       <div className="orchestration-form">
@@ -1380,11 +1543,6 @@ function StrategyEditor({ skill, onBack }) {
               )
             },
             {
-              key: "tools",
-              label: "工具配置",
-              children: renderRelationConfigTab("tools")
-            },
-            {
               key: "agent-skills",
               label: "Skill配置",
               children: renderRelationConfigTab("skills")
@@ -1471,7 +1629,6 @@ function StrategyEditor({ skill, onBack }) {
 	                            </div>
 	                            <Space size={8} className="stage-agent-actions">
 	                              <Button type="link" size="small" danger>移除</Button>
-	                              <Button type="link" size="small">工具配置</Button>
 	                              <Button type="link" size="small">策略任务 &gt;</Button>
 	                            </Space>
 	                          </div>
@@ -1497,7 +1654,7 @@ function StrategyEditor({ skill, onBack }) {
                 </div>
               )
             }
-          ]}
+          ].map((tab) => tab.key === "debug" ? tab : ({ ...tab, children: <ConfigProvider componentDisabled={!isEditingDraft}><fieldset disabled={!isEditingDraft} className="agent-version-config-fields">{tab.children}</fieldset></ConfigProvider> }))}
         />
       </Card>
       {renderRelationPickerModal()}

@@ -122,7 +122,7 @@ function StrategyPage() {
       )
     }
   ];
-  if (editingSkill) return <StrategyEditor skill={editingSkill} onBack={() => setEditingSkill(null)} />;
+  if (editingSkill) return <StrategyEditor skill={editingSkill} onBack={() => setEditingSkill(null)} onStatusChange={(status) => setStrategyRows((items) => items.map((item) => item.key === editingSkill.key ? { ...item, status } : item))} />;
   return (
     <Space direction="vertical" size={16} className="page-stack">
       <Card title={<PanelTitle title="智能体列表" desc="会话智能体按业务流程 SOP 阶段配置；策略智能体用于客户策略、标签和任务编排。" extra={<Button type="primary" icon={<PlusOutlined />} onClick={() => setEditingBasicSkill(createSkillDraft())}>新增智能体</Button>} />}>
@@ -190,7 +190,6 @@ function StrategyBasicModal({ agent, onClose, onSave }) {
           <Col span={24}><Form.Item label="名称" name="name" rules={[{ required: true, message: "请输入智能体名称" }]}><Input placeholder="请输入智能体名称" /></Form.Item></Col>
           <Col span={12}><Form.Item label="智能体分类" name="agentCategory"><Select options={["会话智能体", "策略智能体"].map((value) => ({ value }))} /></Form.Item></Col>
           <Col span={12}><Form.Item label="行业分类" name="industry"><Select options={agentIndustryOptions.filter((value) => value !== "全部行业").map((value) => ({ value }))} /></Form.Item></Col>
-          <Col span={12}><Form.Item label="能力类型" name="type"><Input placeholder="例如：消息生成、策略编排" /></Form.Item></Col>
           <Col span={24}><Form.Item label="状态" name="status"><Select options={["启用", "停用"].map((value) => ({ value }))} /></Form.Item></Col>
           <Col span={24}><Form.Item label="描述" name="description"><Input.TextArea rows={5} showCount maxLength={255} placeholder="说明该智能体负责的场景、调用边界和服务目标。" /></Form.Item></Col>
         </Row>

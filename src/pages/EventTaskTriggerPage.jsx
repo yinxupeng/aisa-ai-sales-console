@@ -36,6 +36,10 @@ import {
   UserSwitchOutlined
 } from "@ant-design/icons";
 
+import WecomRoleSelect from "../components/WecomRoleSelect";
+import { managedWecomAccounts } from "../data/appData";
+import { matchesWecomRole } from "../data/wecomRoleScope";
+
 const { Paragraph, Text, Title } = Typography;
 
 const eventOptions = [
@@ -57,6 +61,7 @@ const initialConfig = {
   event: "assessment_completed",
   assessmentTypes: ["家庭情绪观察评估", "儿童情绪与行为筛查"],
   userScope: "all",
+  wecomRole: "all",
   hostingScope: "hosted_only",
   action: "generate_and_send",
   sendTiming: "immediate",
@@ -77,6 +82,7 @@ const createDefaults = {
   messageThreshold: 1,
   riskLevels: ["需关注"],
   userScope: "all",
+  wecomRole: "all",
   hostingScope: "hosted_only",
   action: "generate_and_send",
   sendTiming: "immediate",
@@ -147,7 +153,7 @@ export default function EventTaskTriggerPage() {
     () => statusFilter === "全部状态" ? tasks : tasks.filter((task) => task.status === statusFilter),
     [tasks, statusFilter]
   );
-  const defaultEnabledConfig = configs.find((item) => item.enabled);
+  const defaultEnabledConfig = configs.find((item) => item.enabled && matchesWecomRole(item.wecomRole, "wecom-li", managedWecomAccounts));
   const sendDescription = draft.action === "generate_only"
     ? "生成结果后创建人工跟进任务，不会自动向用户发送。"
     : draft.action === "human_review"
@@ -215,7 +221,7 @@ export default function EventTaskTriggerPage() {
   const simulateEvent = () => {
     const matchedConfig = defaultEnabledConfig;
     if (!matchedConfig) {
-      message.warning("当前没有已启用的触发任务，请先启用一条配置");
+      message.warning("当前没有适用于模拟用户（销售A类企微）的已启用触发任务");
       return;
     }
     const waitingForHuman = matchedConfig.action !== "generate_and_send" || matchedConfig.requireHumanForRisk;
@@ -365,6 +371,7 @@ export default function EventTaskTriggerPage() {
               <Checkbox.Group options={riskOptions.map((value) => ({ value, label: value }))} />
             </Form.Item> : null}
             <Row gutter={16}>
+              <Col xs={24} md={12}><Form.Item label="企微角色" name="wecomRole"><WecomRoleSelect /></Form.Item></Col>
               <Col xs={24} md={12}><Form.Item label="用户范围" name="userScope"><Select options={userScopeOptions} /></Form.Item></Col>
               <Col xs={24} md={12}><Form.Item label="托管状态" name="hostingScope"><Select options={hostingOptions} /></Form.Item></Col>
             </Row>

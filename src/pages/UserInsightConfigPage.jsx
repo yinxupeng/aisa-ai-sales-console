@@ -3,6 +3,8 @@ import { Button, Card, Checkbox, Col, Form, Row, Select, Space, TimePicker, Typo
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { aiSkills } from "../data/appData";
+import { TaskConfigHeader, TaskEnableSwitch } from "../components/TaskConfigChrome";
+import WecomRoleSelect from "../components/WecomRoleSelect";
 
 const { Paragraph, Text, Title } = Typography;
 const skillOptions = aiSkills.filter((item) => ["用户画像总结", "推品时机判断", "回复合规检查"].includes(item.name));
@@ -11,6 +13,8 @@ const hostingStatusOptions = ["不限", "已托管", "未托管"];
 const chatThresholdOptions = ["不限", ...Array.from({ length: 20 }, (_, index) => `大于${index + 1}条`)];
 
 export const defaultConfig = {
+  scheduleEnabled: false,
+  wecomRole: "all",
   scheduleMode: "daily",
   scheduleTime: "18:00",
   dailyTimes: ["18:00"],
@@ -62,15 +66,8 @@ export default function UserInsightConfigPage({ onBack = () => {}, initialConfig
   };
   return (
     <div className="user-insight-config-page">
-      <div className="user-insight-config-header">
-        <div>
-          <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => onBack()}>返回洞察结果</Button>
-          <Title level={3}>洞察生成配置</Title>
-          <Paragraph type="secondary">配置完成后，系统每天按照当前逻辑生成用户洞察与建议内容。</Paragraph>
-        </div>
-        <Space><Button type="primary" icon={<SaveOutlined />} onClick={save}>保存配置</Button></Space>
-      </div>
-      <Card className="user-insight-config-card">
+      <TaskConfigHeader title="洞察生成配置" backLabel="返回洞察结果" onBack={() => onBack()} actions={<Button type="primary" icon={<SaveOutlined />} onClick={save}>保存配置</Button>} />
+      <Card className="user-insight-config-card" title="执行与分析范围" extra={<TaskEnableSwitch checked={config.scheduleEnabled} onChange={(value) => update("scheduleEnabled", value)} tooltip="保存后生效；关闭仅停止后续定时分析，配置与历史洞察保留。" />}>
         <section aria-label="选择执行节奏">
         <Text strong className="user-insight-config-section-title">选择执行节奏</Text>
         <Row gutter={20}>
@@ -84,6 +81,7 @@ export default function UserInsightConfigPage({ onBack = () => {}, initialConfig
         <section aria-label="分析用户范围">
           <Text strong className="user-insight-config-section-title">分析用户范围</Text>
           <Row gutter={16}>
+            <Col xs={24} md={12}><Form.Item label="企微角色"><WecomRoleSelect value={config.wecomRole} onChange={(value) => update("wecomRole", value)} /></Form.Item></Col>
             <Col xs={24} md={12}><Form.Item label="用户阶段"><Select value={config.userStage} onChange={(value) => update("userStage", value)} options={userStageOptions.map((value) => ({ value, label: value }))} /></Form.Item></Col>
             <Col xs={24} md={12}><Form.Item label="托管状态"><Select value={config.hostingStatus} onChange={(value) => update("hostingStatus", value)} options={hostingStatusOptions.map((value) => ({ value, label: value }))} /></Form.Item></Col>
             <Col xs={24} md={12}><Form.Item label="历史聊天数"><Select value={config.historicalChatThreshold} onChange={(value) => update("historicalChatThreshold", value)} options={chatThresholdOptions.map((value) => ({ value, label: value }))} /></Form.Item></Col>

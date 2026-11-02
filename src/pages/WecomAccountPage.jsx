@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Alert, App as AntApp, Badge, Button, Card, Form, Input, Modal, Select, Space, Switch, Table, Tag, Typography } from "antd";
 import { CloudSyncOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
-import { getAiSeatUsage, getAiSeatView } from "../domain/aiSeats";
+import { getAiSeatUsage } from "../domain/aiSeats";
 import { changeSeats, makeAccounts, selectedEnterpriseId, updateEnterpriseAccounts, usePlatformData } from "../shared/platformStore";
-import { serviceStatus, statusLabels, todayString } from "../shared/platformDomain";
+import { serviceStatus, statusLabels } from "../shared/platformDomain";
 import { PanelTitle } from "../components/PageChrome";
 
 const { Paragraph, Text, Title } = Typography;
@@ -19,7 +19,7 @@ function WecomAccountPage() {
   const serviceAvailable = company && ["active", "expiring"].includes(serviceStatus(company.appliedLicense));
   const setSalesRows = (updater) => updateEnterpriseAccounts(enterpriseId, updater);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [aiSeatFilter, setAiSeatFilter] = useState("全部AI托管");
+  const [aiSeatFilter, setAiSeatFilter] = useState("全部席位状态");
   const [personalDescriptionAccount, setPersonalDescriptionAccount] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const [keyword, setKeyword] = useState("");
@@ -35,11 +35,8 @@ function WecomAccountPage() {
     if (roleFilter !== "全部智能体" && item.role !== roleFilter) return false;
     if (departmentFilter !== "全部部门" && item.department !== departmentFilter) return false;
     if (accountRoleFilter !== "全部账号角色" && item.accountRole !== accountRoleFilter) return false;
-    const aiSeatView = getAiSeatView(item, aiSalesSeatLicense, todayString());
-    if (aiSeatFilter === "已开启托管") return item.aiSeatEnabled;
-    if (aiSeatFilter === "未开启托管") return !item.aiSeatEnabled;
-    if (aiSeatFilter === "即将到期") return aiSeatView.status === "expiring";
-    if (aiSeatFilter === "已过期") return aiSeatView.status === "expired";
+    if (aiSeatFilter === "已分配席位") return item.aiSeatEnabled;
+    if (aiSeatFilter === "未分配席位") return !item.aiSeatEnabled;
     return true;
   });
 
@@ -78,7 +75,7 @@ function WecomAccountPage() {
     const selectedRows = salesRows.filter((item) => selectedRowKeys.includes(item.key));
     const targetRows = selectedRows.filter((item) => item.aiSeatEnabled !== enabled);
     if (!targetRows.length) {
-      message.info(enabled ? "所选账号已开通 AI 能力" : "所选账号均未开通 AI 能力");
+      message.info(enabled ? "所选账号已分配席位" : "所选账号均未分配席位");
       return;
     }
     if (enabled && targetRows.length > aiSeatUsage.remaining) {
@@ -86,11 +83,11 @@ function WecomAccountPage() {
       return;
     }
     modal.confirm({
-      title: enabled ? "批量开通 AI 能力" : "批量关闭 AI 能力",
+      title: enabled ? "批量分配托管席位" : "批量释放托管席位",
       content: enabled
-        ? `将为 ${targetRows.length} 个企微账号开通 AI 能力，占用 ${targetRows.length} 个席位。`
-        : `将关闭 ${targetRows.length} 个企微账号的 AI 能力，并释放对应席位。`,
-      okText: enabled ? "开通" : "关闭",
+        ? `将为 ${targetRows.length} 个企微账号分配席位，占用 ${targetRows.length} 个席位。`
+        : `将释放 ${targetRows.length} 个企微账号的席位，并暂停对应 AI 托管。`,
+      okText: enabled ? "分配" : "释放",
       cancelText: "取消",
       okButtonProps: { danger: !enabled },
       onOk: () => {
@@ -127,7 +124,6 @@ function WecomAccountPage() {
 
   const columns = [
     { title: "员工 / 企微账号", dataIndex: "name", width: 210, render: (_, record) => <div><Text strong>{record.name}</Text><br /><Text type="secondary">{record.wecom} / {record.wecomId}</Text></div> },
-    { title: "所属部门", dataIndex: "department", width: 108 },
     { title: "账号角色", dataIndex: "accountRole", width: 96, render: (v) => <Tag color={v === "管理者" ? "processing" : "default"}>{v}</Tag> },
     {
       title: "智能体",
@@ -178,20 +174,12 @@ function WecomAccountPage() {
       }
     },
     {
-      title: "AI 运行", width: 90,
-      render: (_, record) => <Switch size="small" checked={Boolean(record.hosted && record.aiSeatEnabled && serviceAvailable)} disabled={!record.aiSeatEnabled || !serviceAvailable} checkedChildren="运行" unCheckedChildren="暂停" onChange={(value) => handleInlineAccountChange(record, "hosted", value)} />
-    },
-    {
-      title: "AI到期时间",
-      dataIndex: "aiSeatOpenedAt",
-      width: 112,
-      render: (_, record) => {
-        const aiSeatView = getAiSeatView(record, aiSalesSeatLicense, todayString());
-        return aiSeatView.expiresAt ? <Text>{aiSeatView.expiresAt}</Text> : <Text type="secondary">-</Text>;
-      }
+      title: "AI托管", width: 120,
+      render: (_, record) => <Switch size="small" checked={Boolean(record.hosted && record.aiSeatEnabled && serviceAvailable)} disabled={!record.aiSeatEnabled || !serviceAvailable} checkedChildren="全部开启" unCheckedChildren="全部关闭" onChange={(value) => handleInlineAccountChange(record, "hosted", value)} />
     },
     { title: "客户总数", dataIndex: "customerTotal", width: 82 },
     { title: "托管客户数", dataIndex: "hostedCustomers", width: 92 },
+    { title: "需人工介入数据", dataIndex: "manualCustomers", width: 140, render: (value) => <Text type={value > 0 ? "warning" : "secondary"}>{value ?? 0}</Text> },
     { title: "在线状态", dataIndex: "online", width: 90, render: (v) => <Tag color={v ? "success" : "default"}>{v ? "在线" : "离线"}</Tag> },
     { title: "句子通道", dataIndex: "channel", width: 96, render: (v) => {
       const connected = v.includes("已连接");
@@ -220,14 +208,14 @@ function WecomAccountPage() {
               <Tag color={serviceAvailable ? "processing" : "warning"}>{company ? statusLabels[serviceStatus(company.appliedLicense)] : "未授权"}</Tag>
             </Space>
             <Paragraph type="secondary">
-              管理企业同步到平台的企微账号，并为需要 AI 销售能力的账号分配席位和配置 AI 使用方式。
+              按企业授权账号数分配托管席位，所有账号使用同一到期时间，不区分开通早晚。
             </Paragraph>
           </div>
           <div className="ai-seat-metrics">
-            <div><Text type="secondary">授权席位</Text><strong>{aiSeatUsage.total}</strong></div>
-            <div><Text type="secondary">已分配</Text><strong>{aiSeatUsage.enabled}</strong></div>
-            <div><Text type="secondary">剩余</Text><strong>{aiSeatUsage.remaining}</strong></div>
-            <div><Text type="secondary">到期时间</Text><strong>{aiSalesSeatLicense.expiresAt}</strong></div>
+            <div><Text type="secondary">可托管账号数</Text><strong>{aiSeatUsage.total}</strong></div>
+            <div><Text type="secondary">已分配账号数</Text><strong>{aiSeatUsage.enabled}</strong></div>
+            <div><Text type="secondary">剩余可分配</Text><strong>{aiSeatUsage.remaining}</strong></div>
+            <div className="ai-seat-expiry"><Text type="secondary">企业统一到期时间</Text><strong>{aiSalesSeatLicense.expiresAt || "—"}</strong></div>
           </div>
         </div>
         <Alert type={!serviceAvailable || aiSeatUsage.remaining <= 0 ? "warning" : "info"} showIcon title={!serviceAvailable ? "当前服务尚未生效、已停用或已到期，请联系平台处理授权。可继续查看或释放席位。" : aiSeatUsage.remaining <= 0 ? "托管席位已用完，请联系平台扩容；也可以释放不再使用的席位。" : `已同步 ${salesRows.length} 个企微账号。分配席位后可开启 AI；暂停 AI 或账号离线不会释放席位。`} />
@@ -247,10 +235,10 @@ function WecomAccountPage() {
           <Select value={roleFilter} onChange={setRoleFilter} options={["全部智能体", "销售", "班主任", "市场"].map((value) => ({ value }))} />
           <Select value={departmentFilter} onChange={setDepartmentFilter} options={["全部部门", ...new Set(salesRows.map(row => row.department))].map((value) => ({ value }))} />
           <Select value={accountRoleFilter} onChange={setAccountRoleFilter} options={["全部账号角色", "普通员工", "管理者"].map((value) => ({ value }))} />
-          <Select value={aiSeatFilter} options={["全部AI托管", "已开启托管", "未开启托管", "即将到期", "已过期"].map((value) => ({ value }))} onChange={setAiSeatFilter} />
+          <Select value={aiSeatFilter} options={["全部席位状态", "已分配席位", "未分配席位"].map((value) => ({ value }))} onChange={setAiSeatFilter} />
           <Input.Search placeholder="搜索员工、角色、企微账号或企微ID" allowClear value={keyword} onChange={event=>setKeyword(event.target.value)} />
-          <Button disabled={!selectedRowKeys.length || aiSeatUsage.remaining <= 0 || !serviceAvailable} onClick={() => handleBatchAiSeat(true)}>批量开通AI</Button>
-          <Button disabled={!selectedRowKeys.length} danger onClick={() => handleBatchAiSeat(false)}>批量关闭AI</Button>
+          <Button disabled={!selectedRowKeys.length || aiSeatUsage.remaining <= 0 || !serviceAvailable} onClick={() => handleBatchAiSeat(true)}>批量分配席位</Button>
+          <Button disabled={!selectedRowKeys.length} danger onClick={() => handleBatchAiSeat(false)}>批量释放席位</Button>
         </Space>
         <Table
           className="admin-table compact-admin-table"
@@ -260,7 +248,7 @@ function WecomAccountPage() {
           pagination={false}
           rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
           size="small"
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1340 }}
         />
       </Card>
 
