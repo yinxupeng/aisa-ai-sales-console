@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
+import CustomerCourseStudyTable from "../components/CustomerCourseStudyTable";
+import { buildCustomerCourseStudy, formatStudyDuration } from "../data/customerCourseStudy";
 import {
   App as AntApp,
   Avatar,
@@ -260,7 +262,7 @@ function ConversationsPage({
       <Popover
         trigger="hover"
         placement="topLeft"
-        content={currentStageName.includes("节课") ? renderCourseStagePopoverContent(currentStageName, stage.currentIndex, currentAttendance) : renderStagePopoverContent(serviceStage)}
+        content={currentStageName.includes("节课") ? renderCourseStagePopoverContent(currentStageName, stage.currentIndex, currentAttendance, item, item.key === selected?.key ? activeCourseOrder : null) : renderStagePopoverContent(serviceStage)}
       >
         <div className="service-stage-progress" aria-label={`阶段进度 ${stage.currentNumber}/${stage.total}`}>
           {customerServiceStages.map((stageName, index) => (
@@ -465,7 +467,7 @@ function ConversationsPage({
             <Avatar className="wecom-account-avatar" src={account.avatarImage} icon={account.isAllUsers ? <TeamOutlined /> : <UserOutlined />} />
             <div className="wecom-account-main">
               <Text className="wecom-account-name" ellipsis>{account.displayName || account.employee}</Text>
-              {account.isAllUsers ? <Text type="secondary" className="wecom-account-all-scope">全部企微账号</Text> : <Tag color={account.role === "销售B类" ? "gold" : account.role === "销售C类" ? "purple" : "blue"}>{account.role || "未分配角色"}</Tag>}
+              {account.isAllUsers ? <Text type="secondary" className="wecom-account-all-scope">全部企微账号</Text> : <Tag color={account.role === "班主任" ? "cyan" : account.role === "销售B类" ? "gold" : account.role === "销售C类" ? "purple" : "blue"}>{account.role || "未分配角色"}</Tag>}
             </div>
             <Text type="secondary" className="wecom-account-count">{account.customerTotal}</Text>
           </List.Item>
@@ -546,13 +548,14 @@ function ConversationsPage({
           {
             key: "order-trial-c1",
             type: "体验课",
-            product: "青少年同行者计划 · 4节体验课",
+            product: "青少年同行者计划 · 19a三节体验课",
+            classCode: "19a",
             amount: "¥398",
             status: "已支付",
             orderedAt: "2026-08-18 19:58:11",
             teacher: "韩冰老师",
             advisor: selected.owner,
-            totalLessons: 4,
+            totalLessons: 3,
             completedLessons: 1,
             currentLesson: "第2节 · 家庭沟通观察",
             latestLessonAt: "2026-08-24 20:00",
@@ -647,8 +650,10 @@ function ConversationsPage({
       content: "总结孩子课堂表现、薄弱点和建议课程路径，询问家长是否需要确认班型和课时安排。"
     }
   ];
+  const isTeacherCustomer = managedWecomAccounts.find((account) => account.key === selected.accountKey)?.role === "班主任";
   const customerInfoRows = [
-    { label: "备注", value: selected.remark || "—" },
+    { label: "销售备注（本地）", value: selected.remark || "—" },
+    { label: isTeacherCustomer ? "班级" : "昵称", value: isTeacherCustomer ? selected.className || "—" : getWechatNickname(selected) || "—" },
     {
       label: "电话",
       value: (
@@ -661,27 +666,14 @@ function ConversationsPage({
         />
       )
     },
+    { label: "注册时间", value: selected.registeredAt || "—" },
+    { label: "孩子数量", value: selected.childCount ?? "—" },
     { label: "企微ID", value: selected.wecomId || "—" },
-    {
-      label: "销售 qw_user_id",
-      value: (
-        <Space direction="vertical" size={2}>
-          <Text>{selected.owner === "沈海龙" ? "ShenHaiLong" : selected.owner || "—"}</Text>
-          <Text type="secondary">当前会话托管 {selected.owner || "—"} · 来源 chat/list · 句子 qw_user_id 未返回</Text>
-        </Space>
-      )
-    },
-    {
-      label: "客户 external_user_id",
-      value: (
-        <Space direction="vertical" size={2}>
-          <Text>{selected.type === "group" ? "—" : selected.wecomId || "—"}</Text>
-          <Text type="secondary">句子 externalUserId 未返回</Text>
-        </Space>
-      )
-    },
-    { label: "unionId", value: selected.type === "group" ? "—" : `6sVuK9rkSwSMGSI4SC3ZL8ZoJvdtvX` },
-    { label: "添加时间", value: selected.addedAt || "—" }
+    { label: "销售 qw_user_id", value: selected.salesQwUserId || "—" },
+    { label: "客户 external_user_id", value: selected.type === "group" ? "—" : selected.externalUserId || "—" },
+    { label: "unionId", value: selected.type === "group" ? "—" : selected.unionId || "—" },
+    { label: "进线时间", value: selected.leadEnteredAt || "—" },
+    { label: "加微时间", value: selected.addedAt || "—" }
   ];
   const updateGroupedCustomerTags = (sourceKey, groupKey, value) => {
     setCustomerTagValues((prev) => ({
@@ -731,94 +723,6 @@ function ConversationsPage({
       received: Math.max(28, aiMsgs * 4 + 21)
     };
   }, [selected?.key, selected?.messages]);
-  const trialLessons = useMemo(() => [
-    {
-      index: 1,
-      title: "第1节 · 习惯测评与基础诊断",
-      format: "录播",
-      status: "已结束",
-      attended: true,
-      duration: "34min"
-    },
-    {
-      index: 2,
-      title: "第2节 · 核心考点与动力激发",
-      format: "直播",
-      status: "已结束",
-      attended: true,
-      duration: "42min"
-    },
-    {
-      index: 3,
-      title: "第3节 · 亲子沟通与个性规划",
-      format: "直播",
-      status: "已开始",
-      attended: false,
-      duration: "待上课"
-    },
-    {
-      index: 4,
-      title: "第4节 · 阶段成果与长线方案",
-      format: "直播",
-      status: "未开始",
-      attended: false,
-      duration: "待上课"
-    }
-  ], []);
-  const trialLessonColumns = [
-    {
-      title: "课节名称",
-      dataIndex: "title",
-      key: "title",
-      render: (title) => <span style={{ fontWeight: 500, color: "#1e293b" }}>{title}</span>
-    },
-    {
-      title: "上课形式",
-      dataIndex: "format",
-      key: "format",
-      width: 82,
-      align: "center",
-      render: (format) => <Tag color={format === "直播" ? "purple" : "cyan"}>{format}</Tag>
-    },
-    {
-      title: "课程状态",
-      dataIndex: "status",
-      key: "status",
-      width: 82,
-      align: "center",
-      render: (status) => (
-        <Tag color={status === "已结束" ? "default" : status === "已开始" ? "processing" : "warning"}>
-          {status}
-        </Tag>
-      )
-    },
-    {
-      title: "是否到课",
-      dataIndex: "attended",
-      key: "attended",
-      width: 82,
-      align: "center",
-      render: (attended) => (
-        <span style={{ color: attended ? "#16a34a" : "#94a3b8", fontWeight: attended ? 500 : 400 }}>
-          {attended ? "已到课" : "未到课"}
-        </span>
-      )
-    },
-    {
-      title: "上课总时长",
-      dataIndex: "duration",
-      key: "duration",
-      width: 96,
-      align: "center",
-      render: (duration, record) => (
-        record.attended ? (
-          <span style={{ fontWeight: 600, color: "#0f172a" }}>{duration}</span>
-        ) : (
-          <span style={{ color: "#faad14" }}>待上课</span>
-        )
-      )
-    }
-  ];
   const formatStageDate = (value) => {
     if (!value || ["—", "待确认", "未排课", "待进入", "当前进行中", "已进入后续阶段"].includes(value)) return "";
     const parsed = dayjs(value);
@@ -923,12 +827,14 @@ function ConversationsPage({
       <div><Text type="secondary">上课总时长</Text><Text>—</Text></div>
     </div>
   );
-  const renderCourseStagePopoverContent = (stageName, index, attendance) => {
-    const lessonInfo = trialLessons[index - 1] || {
-      format: "直播",
-      status: attendance.type === "attended" ? "已结束" : attendance.type === "waiting" ? "已开始" : "未开始",
-      attended: attendance.type === "attended",
-      duration: attendance.type === "attended" ? "34min" : "待上课"
+  const renderCourseStagePopoverContent = (stageName, index, attendance, targetItem = selected, targetOrder = activeCourseOrder) => {
+    const role = managedWecomAccounts.find((account) => account.key === targetItem.accountKey)?.role;
+    const study = buildCustomerCourseStudy(targetItem, targetOrder || { key: targetItem.key }, role);
+    const lessonInfo = study.rows?.[index - 1] || {
+      format: "-",
+      status: "-",
+      attended: false,
+      watchedSeconds: null
     };
     return (
       <div className="service-stage-popover">
@@ -941,7 +847,7 @@ function ConversationsPage({
           <Text type="secondary">课程状态</Text>
           <Text>
             <Tag
-              color={lessonInfo.status === "已结束" ? "default" : lessonInfo.status === "已开始" ? "processing" : "warning"}
+              color={lessonInfo.status === "已结束" ? "default" : lessonInfo.status === "进行中" ? "processing" : "warning"}
               style={{ margin: 0 }}
             >
               {lessonInfo.status}
@@ -957,7 +863,7 @@ function ConversationsPage({
         <div>
           <Text type="secondary">上课总时长</Text>
           <Text style={{ fontWeight: lessonInfo.attended ? 500 : 400, color: lessonInfo.attended ? "#1e293b" : "#faad14" }}>
-            {lessonInfo.attended ? lessonInfo.duration : "待上课"}
+            {formatStudyDuration(lessonInfo)}
           </Text>
         </div>
       </div>
@@ -1573,22 +1479,13 @@ function ConversationsPage({
                     </section>
                     {activeCourseOrder ? (
                       <>
-                        <section className="customer-profile-section">
-                          <div className="sales-strategy-section-head">
-                            <div className="sales-strategy-section-title">用户上课信息</div>
-                            <span className="trial-lessons-total-tag">体验课共 4 节课</span>
-                          </div>
-                          <Table
-                            className="trial-lessons-table"
-                            rowKey="index"
-                            columns={trialLessonColumns}
-                            dataSource={trialLessons}
-                            pagination={false}
-                            size="small"
-                            bordered
-                            scroll={{ x: 440 }}
-                          />
-                        </section>
+                        <CustomerCourseStudyTable
+                          key={`${selected.key}-${activeCourseOrder.key}`}
+                          customer={selected}
+                          order={activeCourseOrder}
+                          role={managedWecomAccounts.find((account) => account.key === selected.accountKey)?.role}
+                          active={customerDrawerOpen && customerDrawerTab === "course"}
+                        />
                       </>
                     ) : (
                       <div className="empty-panel">暂无课程订单</div>

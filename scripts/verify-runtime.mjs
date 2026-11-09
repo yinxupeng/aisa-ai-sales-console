@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 
 import DashboardPage from './src/pages/DashboardPage.jsx';
 import ConversationsPage from './src/pages/ConversationsPage.jsx';
+import CustomerCourseStudyTable from './src/components/CustomerCourseStudyTable.jsx';
 import SalesPage from './src/pages/SalesPage.jsx';
 import WecomChannelPage, { JuziAccountForm } from './src/pages/WecomChannelPage.jsx';
 import { defaultJuziAccounts } from './src/data/juziChannelAccounts.js';
@@ -71,6 +72,9 @@ import WecomRoleSelect from './src/components/WecomRoleSelect.jsx';
 globalThis.window = { location: { search: '' }, matchMedia: () => ({ matches: false, addListener: () => {}, removeListener: () => {} }) };
 
 const pages = [
+  ['Sales19aCourseStudy', React.createElement(CustomerCourseStudyTable, { customer: { key: 'c1' }, order: { key: 'demo-a', type: '体验课', status: '已支付' }, role: '销售A类' })],
+  ['Sales19bCourseStudy', React.createElement(CustomerCourseStudyTable, { customer: { key: 'c2' }, order: { key: 'demo-b', type: '体验课', status: '已支付' }, role: '销售B类' })],
+  ['TeacherCourseStudy', React.createElement(CustomerCourseStudyTable, { customer: { key: 'c3' }, order: { key: 'demo-family', type: '正价课', status: '已支付' }, role: '班主任' })],
   ['OrderQueryReport', React.createElement(OrderQueryReport, { report: computeSalesReport(orderQueryDefinition, ['wecom-li']) })],
   ['CohortConversionChatResult', React.createElement(CohortConversionReport, { report: computeSalesReport(cohortConversionDefinition, ['wecom-li']), inChat: true })],
   ['CohortConversionPage', React.createElement(CohortConversionReport, { report: computeSalesReport(cohortConversionDefinition, ['wecom-li']) })],
@@ -106,8 +110,9 @@ const pages = [
   ['AutoScheduledTaskConfigPage', React.createElement(AutoScheduledTaskConfigPage)],
   ['AutoScheduledTaskConfigInFlow', React.createElement(AutoScheduledTasksPage, { initialView: 'config' })],
   ['HumanizationPage', React.createElement(HumanizationPage)],
-  ['ConversationsPage', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], onActiveWecomChange: () => {} })],
-  ['ConversationsPageListMode', React.createElement(ConversationsPage, { activeWecom: 'wecom-1', activeConversationKey: '', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-1'], conversationViewMode: 'list', onActiveWecomChange: () => {} })],
+  ['ConversationsPage', React.createElement(ConversationsPage, { activeWecom: 'wecom-li', activeConversationKey: 'c1', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-li'], onActiveWecomChange: () => {} })],
+  ['ConversationsPageTeacher', React.createElement(ConversationsPage, { activeWecom: 'wecom-chen', activeConversationKey: 'c3', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-chen'], onActiveWecomChange: () => {} })],
+  ['ConversationsPageListMode', React.createElement(ConversationsPage, { activeWecom: 'wecom-li', activeConversationKey: 'c1', autoOpenCustomerDrawerToken: 0, visibleWecomKeys: ['wecom-li'], conversationViewMode: 'list', onActiveWecomChange: () => {} })],
   ['SuggestionsPage', React.createElement(SuggestionsPage)],
   ['IntentAnalysisPage', React.createElement(IntentAnalysisPage, { onViewConversation: () => {} })],
   ['IntentAnalysisConfigPage', React.createElement(IntentAnalysisConfigPage, { initialConfig: defaultIntentConfig, onSave: () => {}, onBack: () => {} })],

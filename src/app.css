@@ -8868,7 +8868,7 @@ body {
 
 .customer-basic-row {
   display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
+  grid-template-columns: 176px minmax(0, 1fr);
   min-height: 42px;
   border-bottom: 1px solid #edf1f7;
 }
@@ -8889,7 +8889,8 @@ body {
 }
 
 .customer-basic-label {
-  justify-content: flex-end;
+  justify-content: flex-start;
+  white-space: nowrap;
   border-right: 1px solid #edf1f7;
   background: #fbfcff;
   color: #667085;
@@ -10347,3 +10348,21 @@ body {
 .order-query-excluded p { margin: 6px 0 0; }
 .order-query-source { font-size: 11px; }
 .version-note-metadata > .agent-version-audience { grid-column: 1 / -1; }
+.customer-study-section { min-width: 0; }
+.customer-study-section-head { min-height: 48px; box-sizing: border-box; }
+.customer-study-section-head > .ant-typography:first-child { flex-shrink: 0; }
+.customer-study-header-summary { min-width: 0; text-align: right; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.customer-study-section-head .ant-segmented { flex-shrink: 0; }
+.customer-study-class-label { margin: 0; padding: 8px 14px; border-bottom: 1px solid #edf1f7; font-size: 12px; }
+.customer-study-course-name { display: inline-flex; align-items: center; vertical-align: middle; gap: 6px; width: 100%; min-width: 0; }
+.customer-study-table.is-tree .customer-study-course-name { width: calc(100% - 28px); }
+.customer-study-course-title { display: block; flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #1e293b; font-weight: 500; }
+.customer-study-course-name .ant-tag { flex-shrink: 0; font-size: 10px; line-height: 18px; padding-inline: 4px; }
+.customer-study-table .ant-table-cell { white-space: nowrap; overflow: hidden; padding-inline: 6px !important; font-size: 12px; }
+.customer-study-table .ant-table { width: 100%; }
+.customer-study-table .ant-table-cell > .ant-tag { margin-inline-end: 0; padding-inline: 4px; font-size: 12px; }
+.customer-study-table .customer-study-course-name > .ant-tag { max-width: 64px; overflow: hidden; text-overflow: ellipsis; }
+.customer-study-table .ant-table-row-indent + .ant-table-row-expand-icon { margin-inline-end: 4px; }
+.customer-study-table .customer-study-current-row > td { background: #eaf3ff !important; }
+.customer-study-table .customer-study-current-row > td:first-child { border-left: 3px solid #1677ff; }
+.customer-study-table .customer-study-current-week > td { background: #f3f7ff; }

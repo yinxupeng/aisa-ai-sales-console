@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, App, Button, Card, Col, Descriptions, Drawer, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Steps, Tag, Typography } from 'antd';
 import { CheckCircleOutlined, CopyOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import type { Consultation } from '../shared/consultationDomain';
 import { Enterprise, License, seatUsage, serviceStatus, statusColors, statusLabels, todayString } from '../shared/platformDomain';
 import { configureLicense, createEnterprise, enterpriseUrl } from '../shared/platformStore';
 
@@ -21,13 +22,14 @@ export function Delivery({company,onClose}:{company:Enterprise|null;onClose:()=>
   </Modal>;
 }
 const nextYear=()=>`${Number(todayString().slice(0,4))+1}${todayString().slice(4)}`;
-export function EnterpriseWizard({open,onClose,onCreated,actor}:{open:boolean;onClose:()=>void;onCreated:(id:string)=>void;actor:string}){
+export function EnterpriseWizard({open,onClose,onCreated,actor,consultation}:{open:boolean;onClose:()=>void;onCreated:(id:string)=>void;actor:string;consultation?:Consultation}){
   const [step,setStep]=useState(0);const [form]=Form.useForm();const {message}=App.useApp();
-  useEffect(()=>{if(open){setStep(0);form.resetFields();}},[open,form]);
+  useEffect(()=>{if(open){setStep(0);form.resetFields();if(consultation)form.setFieldsValue({name:consultation.company,contact:consultation.name,phone:consultation.phone,adminName:consultation.name,total:consultation.expectedSeats||10,note:consultation.needs||''});}},[open,form,consultation]);
   const fields=[['name','industry','contact','phone'],['adminName','adminLogin'],['total','expiresAt']];
   const next=async()=>{try{await form.validateFields(fields[step]);setStep(step+1);}catch{/* Form renders errors. */}};
-  const submit=async(status:License['status'])=>{try{await form.validateFields();const v=form.getFieldsValue(true);const id=createEnterprise({name:v.name.trim(),industry:v.industry,contact:v.contact.trim(),phone:v.phone,note:v.note||'',adminName:v.adminName.trim(),adminLogin:v.adminLogin.trim(),license:{total:v.total,expiresAt:v.expiresAt,status}},actor);onClose();onCreated(id);message.success(status==='draft'?'企业已保存，等待开通':'企业已开通，等待授权同步');}catch(e){if(e instanceof Error)message.error(e.message);}};
-  return <Drawer title="新增企业" width={620} open={open} onClose={onClose} footer={<div className="po-drawer-footer"><Button onClick={onClose}>取消</Button><Space>{step>0&&<Button onClick={()=>setStep(step-1)}>上一步</Button>}{step<2?<Button type="primary" onClick={next}>下一步</Button>:<><Button onClick={()=>submit('draft')}>保存待开通</Button><Button type="primary" onClick={()=>submit('active')}>确认开通</Button></>}</Space></div>}>
+  const submit=async(status:License['status'])=>{try{await form.validateFields();const v=form.getFieldsValue(true);const id=createEnterprise({name:v.name.trim(),industry:v.industry,contact:v.contact.trim(),phone:v.phone,note:v.note||'',adminName:v.adminName.trim(),adminLogin:v.adminLogin.trim(),license:{total:v.total,expiresAt:v.expiresAt,status}},actor,consultation?.id);onClose();onCreated(id);message.success(status==='draft'?'企业已保存，等待开通':'企业已开通，等待授权同步');}catch(e){if(e instanceof Error)message.error(e.message);}};
+  return <Drawer title="新增企业" width={620} open={open} onClose={onClose} footer={<div className="po-drawer-footer"><Button onClick={onClose}>取消</Button><Space>{step>0&&<Button onClick={()=>setStep(step-1)}>上一步</Button>}{step<2?<Button type="primary" onClick={next}>下一步</Button>:<>{!consultation&&<Button onClick={()=>submit('draft')}>保存待开通</Button>}<Button type="primary" onClick={()=>submit('active')}>确认开通</Button></>}</Space></div>}>
+    {consultation&&<Alert type="info" showIcon title={`来自客户咨询：${consultation.name} · ${consultation.phone}`} description="已自动带入咨询资料。开通成功后将关联该咨询，保留跟进记录。" style={{marginBottom:24}}/>}
     <Steps current={step} size="small" items={[{title:'企业信息'},{title:'企业管理员'},{title:'服务配置'}]} className="po-wizard-steps"/>
     <Form form={form} layout="vertical" initialValues={{industry:'教育培训',total:10,expiresAt:nextYear()}} requiredMark="optional">
       <div style={{display:step===0?'block':'none'}}><Title level={4}>录入签约企业</Title><Paragraph type="secondary">用于服务开通、日常联系与交付跟进。</Paragraph><Form.Item name="name" label="企业名称" rules={[{required:true,whitespace:true,message:'请输入企业名称'}]}><Input placeholder="请输入企业完整名称" maxLength={60}/></Form.Item><Form.Item name="industry" label="所属行业" rules={[{required:true}]}><Select options={['教育培训','咨询服务','企业服务','本地生活','健康服务','其他'].map(value=>({value,label:value}))}/></Form.Item><Row gutter={16}><Col span={12}><Form.Item name="contact" label="联系人" rules={[{required:true,whitespace:true,message:'请输入联系人'}]}><Input placeholder="例如：张经理" maxLength={20}/></Form.Item></Col><Col span={12}><Form.Item name="phone" label="联系电话" rules={[{required:true,message:'请输入联系电话'},{pattern:/^[\d+()\-\s]{7,20}$/,message:'请输入有效联系电话'}]}><Input placeholder="手机号或固定电话" maxLength={20}/></Form.Item></Col></Row><Form.Item name="note" label="备注"><Input.TextArea rows={3} maxLength={300} showCount placeholder="补充签约或交付注意事项"/></Form.Item></div>

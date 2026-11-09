@@ -37,7 +37,7 @@ jobs:
       - name: Prepare site artifact
         run: |
           mkdir -p site
-          cp index.html site/
+          cp *.html site/
           cp -R assets site/assets
           cp -R images site/images
           cp -R Resource site/Resource

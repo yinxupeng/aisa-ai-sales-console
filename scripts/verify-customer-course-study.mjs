@@ -1,0 +1,55 @@
+import assert from "node:assert/strict";
+import { buildCustomerCourseStudy, trialClassNames, flattenStudyLeaves, getCurrentStudyPath, getInitialStudyExpandedKeys, findStudyPath, formatStudyDuration, formatStudyUnlockAt } from "../src/data/customerCourseStudy.js";
+const order = { key: "order", type: "体验课", status: "已支付" };
+for (const [key, code, length] of [["c1", "19a", 3], ["c2", "19b", 4]]) {
+  const study = buildCustomerCourseStudy({ key }, order, "销售A类");
+  assert.equal(study.collapsible, false);
+  assert.equal(study.rows.length, length);
+  assert.deepEqual(study.rows.map((row) => row.title), trialClassNames[code]);
+  assert.ok(study.rows.every((row) => !row.children));
+}
+const customClass = buildCustomerCourseStudy({ key: "c1" }, { ...order, classCode: "19b" }, "销售A类");
+assert.equal(customClass.rows.length, 4, "以订单班级为准，不复用当前用户默认19a课名");
+const teacher = buildCustomerCourseStudy({ key: "c3" }, order, "班主任");
+assert.equal(teacher.collapsible, true);
+for (const format of ["录播", "直播"]) {
+  const nodes = teacher.trees[format];
+  const path = getCurrentStudyPath(nodes, teacher.currentKeys[format]);
+  assert.deepEqual(path.map((node) => node.kind), ["block", "week", "section"]);
+  assert.ok(path[1].title.startsWith("第1周"));
+  assert.ok(path.at(-1).attended);
+  const expanded = path.slice(0, -1).map((node) => node.key);
+  const all = (items) => items.flatMap((item) => [item, ...all(item.children || [])]);
+  const week2 = all(nodes).find((node) => node.kind === "week" && node.title.startsWith("第2周"));
+  assert.equal(week2.unlockAt, "2026-11-02", "第二周已在11月6日前解锁");
+  assert.equal(week2.status, "未开始", "解锁进度不能替代学习进度");
+  assert.ok(!expanded.includes(week2.key));
+  assert.equal(expanded.length, 2, "只展开当前学习节的板块和周");
+  const initialExpanded = getInitialStudyExpandedKeys(nodes, teacher.currentKeys[format]);
+  assert.ok(!initialExpanded.includes(week2.key));
+  assert.ok(path[1].children.every((section) => !section.children && !initialExpanded.includes(section.key)), "节是最后一级，不再展开重复小节");
+  assert.deepEqual(initialExpanded, expanded);
+  assert.equal(path.at(-1).unlockAt, "2026-10-28", "节沿用原小节的真实解锁时间");
+  assert.equal(path.at(-1).format, format);
+  assert.equal(formatStudyDuration(path.at(-1)), format === "录播" ? "00:18:22" : "00:26:40", "学习时长保留在节上");
+  assert.ok(all(nodes).every((row) => row.kind !== "sublesson"), "班主任录播及直播均不再有小节层级");
+  assert.equal(findStudyPath(nodes, week2.key)[1].key, week2.key);
+  assert.equal(getCurrentStudyPath(nodes, "missing").at(-1).key, teacher.currentKeys[format], "缺少当前指针时使用最近学习记录而非解锁时间");
+  assert.ok(all(nodes).every((row) => ["已结束", "未开始", "进行中"].includes(row.status)));
+  for (const row of all(nodes)) if (!row.attended || row.status === "未开始") assert.equal(formatStudyDuration(row), "-");
+  const salesSameClass = buildCustomerCourseStudy({ key: "c1" }, { ...order, classStudy: teacher }, "销售B类");
+  assert.equal(salesSameClass.collapsible, false);
+  assert.ok(salesSameClass.rows.every((row) => !row.children), "同一班级对销售仍平铺叶子课程");
+  assert.ok(flattenStudyLeaves(nodes).every((row) => row.format === format));
+}
+assert.equal(formatStudyUnlockAt(null), "-");
+assert.equal(formatStudyUnlockAt("2026-11-02"), "2026-11-02");
+assert.equal(formatStudyUnlockAt("2026-11-02 18:58:00"), "2026-11-02 18:58");
+assert.equal(formatStudyUnlockAt("2026-11-02T10:58:00Z"), "2026-11-02 18:58");
+assert.equal(formatStudyUnlockAt("待确认"), "-");
+assert.equal(formatStudyDuration({ attended: true, status: "进行中", watchedSeconds: 1102 }), "00:18:22");
+assert.equal(formatStudyDuration({ attended: false, status: "已结束", watchedSeconds: 100 }), "-");
+assert.equal(formatStudyDuration({ attended: true, status: "未开始", watchedSeconds: 100 }), "-");
+assert.equal(formatStudyDuration({ attended: true, status: "进行中", watchedSeconds: null }), "-");
+assert.equal(buildCustomerCourseStudy({ key: "unknown" }, order, "销售A类").rows.length, 0, "缺失班级映射不杜撰课表");
+console.log("CUSTOMER_COURSE_STUDY_OK");

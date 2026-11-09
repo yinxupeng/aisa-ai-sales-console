@@ -1296,6 +1296,7 @@ const youthConversationOverrides = {
 
 export const conversations = rawConversations.map((item) => ({
   ...item,
+  ...(item.accountKey === "wecom-chen" ? { className: "领航7班-青少年同行者计划领航营" } : {}),
   ...(youthConversationOverrides[item.key] || {})
 }));
 

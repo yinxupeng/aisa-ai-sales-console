@@ -16,6 +16,7 @@ export function normalizeWecomAccount(account: WecomAccount & {aiSeatOpenedAt?: 
   return current;
 }
 export interface Enterprise {
+  consultationId?: string;
   id: string; name: string; industry: string; contact: string; phone: string; note: string;
   adminName: string; adminLogin: string; demoPassword: string; activated: boolean;
   license: License; appliedLicense: License; accounts: WecomAccount[];

@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from 'react';
+import { assertCanOpenEnterprise } from './consultationDomain';
+import { connectConsultation, getLatestConsultation } from './consultationStore';
 import { salesAccounts, aiSalesSeatLicense } from '../data/appData';
 import { assignSeats, Enterprise, License, normalizeLicense, normalizeWecomAccount, Operator, PlatformData, serviceStatus, syncLicense, todayString, validateLicense, WecomAccount } from './platformDomain';
 
@@ -52,14 +54,24 @@ function log(data:PlatformData,company:Enterprise|undefined,actor:string,action:
 export function changeEnterprise(id:string,actor:string,action:string,detail:string,update:(company:Enterprise)=>Enterprise){
   updateData(data=>{const index=data.enterprises.findIndex(c=>c.id===id);if(index<0)throw new Error('企业不存在');const next=update(data.enterprises[index]);data.enterprises[index]=next;log(data,next,actor,action,detail);return data;});
 }
-export function createEnterprise(input:Omit<Enterprise,'id'|'appliedLicense'|'accounts'|'createdAt'|'syncedAt'|'revision'|'appliedRevision'|'demoPassword'|'activated'>,actor:string){
+export function createEnterprise(input:Omit<Enterprise,'id'|'appliedLicense'|'accounts'|'createdAt'|'syncedAt'|'revision'|'appliedRevision'|'demoPassword'|'activated'|'consultationId'>,actor:string,consultationId?:string){
+  if(consultationId){
+    const consultation=getLatestConsultation(consultationId);
+    if(!consultation)throw new Error('咨询记录不存在');
+    cache=undefined;
+    const existing=getPlatformData().enterprises.find(c=>c.consultationId===consultationId);
+    if(existing){connectConsultation(consultationId,existing.id);return existing.id;}
+    assertCanOpenEnterprise(consultation);
+  }
   const id=uid('ent');
   updateData(data=>{
     if(data.enterprises.some(c=>c.name.trim()===input.name.trim())) throw new Error('该企业名称已存在');
     validateLicense(input.license,[]);
-    const company:Enterprise={...input,license:normalizeLicense(input.license),name:input.name.trim(),id,accounts:[],createdAt:time(),syncedAt:'尚未同步',revision:1,appliedRevision:0,demoPassword:'demo123456',activated:false,appliedLicense:{...normalizeLicense(input.license),total:0,status:'draft'}};
+    const company:Enterprise={...input,...(consultationId?{consultationId}:{}),license:normalizeLicense(input.license),name:input.name.trim(),id,accounts:[],createdAt:time(),syncedAt:'尚未同步',revision:1,appliedRevision:0,demoPassword:'demo123456',activated:false,appliedLicense:{...normalizeLicense(input.license),total:0,status:'draft'}};
     data.enterprises.unshift(company);log(data,company,actor,input.license.status==='draft'?'保存待开通企业':'开通企业',`授权 ${input.license.total} 席，等待企业端同步`);return data;
-  });return id;
+  });
+  if(consultationId)connectConsultation(consultationId,id);
+  return id;
 }
 export function configureLicense(id:string,license:License,actor:string,reason:string){
   changeEnterprise(id,actor,'变更服务授权',reason,c=>{validateLicense(license,c.accounts);return {...c,license:normalizeLicense(license),revision:c.revision+1};});

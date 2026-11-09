@@ -4,7 +4,7 @@ import { buildOrderQueryReport, orderQueryDefinition } from "./orderQueryReport.
 export const reportTypes = { communication: "沟通分析", intent: "意向分析", followup: "跟进分析", conversion: "转化分析" };
 export const reportStages = ["开课前", "第一节课", "第二节课", "第三节课", "第四节课", "第5节课", "课后"];
 export const reportAccounts = [
-  { key: "wecom-li", name: "李明", role: "销售A类" }, { key: "wecom-chen", name: "陈欣", role: "销售B类" },
+  { key: "wecom-li", name: "李明", role: "销售A类" }, { key: "wecom-chen", name: "陈欣", role: "班主任" },
   { key: "wecom-zhou", name: "周悦", role: "销售C类" }, { key: "wecom-wu", name: "吴尚宇", role: "销售B类" }, { key: "wecom-lin", name: "林晓", role: "销售A类" }
 ];
 export const reportDemoUsers = Array.from({ length: 291 }, (_, index) => {

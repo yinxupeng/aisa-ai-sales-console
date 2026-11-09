@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 
 await build({
-  entryPoints: { main: "src/main.jsx", platform: "src/platform/main.tsx" },
+  entryPoints: { main: "src/main.jsx", platform: "src/platform/main.tsx", consultation: "src/consultation/main.tsx" },
   bundle: true,
   format: "iife",
   target: "es2017",
