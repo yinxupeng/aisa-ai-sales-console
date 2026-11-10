@@ -151,6 +151,7 @@ function Login({ onLogin }) {
           <i />
         </div>
       </div>
+      <div className="login-entry">
       <Card className="login-card">
         <Space direction="vertical" size={22} className="full-width">
           <div className="login-brand">
@@ -174,6 +175,8 @@ function Login({ onLogin }) {
           </Form>
         </Space>
       </Card>
+      <a className="login-admin-entry" href="./platform.html">企业管理后台登录 →</a>
+      </div>
     </div>
   );
 }

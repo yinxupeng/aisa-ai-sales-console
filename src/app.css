@@ -1205,6 +1205,30 @@ body {
     linear-gradient(180deg, #fbfdff, #edf3fb);
 }
 
+.login-entry {
+  position: relative;
+  z-index: 2;
+  width: min(430px, 100%);
+}
+
+.login-entry .login-card { width: 100%; }
+
+.login-admin-entry {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #526681;
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.login-admin-entry:hover { color: #1677ff; background: rgba(255, 255, 255, 0.65); }
+.login-admin-entry:focus-visible { outline: 2px solid #1677ff; outline-offset: 3px; }
+
 .login-card {
   position: relative;
   z-index: 2;
